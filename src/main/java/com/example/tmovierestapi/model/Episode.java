@@ -2,10 +2,7 @@ package com.example.tmovierestapi.model;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 @Entity
@@ -18,5 +15,13 @@ public class Episode {
 
     @NotBlank
     private String name;
+
+    @NotBlank
+    @Column(name = "link_embed")
+    private String linkEmbed;
+
+    @ManyToOne
+    @JoinColumn(name = "movie_id", nullable = false)
+    private Movie movie;
 
 }
