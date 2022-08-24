@@ -20,7 +20,7 @@ public class PlaylistController {
     public ResponseEntity<PagedResponse<Playlist>> getAllPlaylists(
             @RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
             @RequestParam(value = "pageSize", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize,
-            @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY, required = false) String sortBy,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_YEAR, required = false) String sortBy,
             @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIRECTION) String sortDir
     ) {
         PagedResponse<Playlist> response = iPlaylistService.getAllPlaylists(pageNo, pageSize, sortDir, sortBy);

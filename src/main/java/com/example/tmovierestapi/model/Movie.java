@@ -1,13 +1,13 @@
 package com.example.tmovierestapi.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
-
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -63,15 +63,18 @@ public class Movie {
     // mappedBy trỏ tới tên biến persons ở trong Address.
     @ManyToMany(mappedBy = "movies")
     // LAZY để tránh việc truy xuất dữ liệu không cần thiết. Lúc nào cần thì mới query
-    @EqualsAndHashCode.Exclude
     private Set<Actor> actors = new HashSet<>();
 
     @ManyToMany(mappedBy = "movies")
-    @EqualsAndHashCode.Exclude
     private Set<Director> directors = new HashSet<>();
 
-    @ManyToMany(mappedBy = "movies")
-    @EqualsAndHashCode.Exclude
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude // không sử dụng trường này trong equals và hashcode
+    @ToString.Exclude // Khoonhg sử dụng trong toString()
+    @JoinTable(name = "movie_category", //Tạo ra một join Table tên là "movie_category"
+            joinColumns = @JoinColumn(name = "movie_id"),  // TRong đó, khóa ngoại chính là address_id trỏ tới class hiện tại (Address)
+            inverseJoinColumns = @JoinColumn(name = "category_id") //Khóa ngoại thứ 2 trỏ tới thuộc tính ở dưới (Person)
+    )
     private Set<Category> categories = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "movie")

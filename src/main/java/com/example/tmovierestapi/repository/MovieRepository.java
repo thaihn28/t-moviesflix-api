@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface MovieRepository extends JpaRepository<Movie, Long> {
     Optional<Movie> findMovieBySlug(String slug);
 
+    Boolean existsMovieByName(String name);
+
 }
