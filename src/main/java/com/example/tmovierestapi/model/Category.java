@@ -1,18 +1,19 @@
 package com.example.tmovierestapi.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.io.Serializable;
+
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
 @Data
 @Entity
+@EqualsAndHashCode(onlyExplicitlyIncluded = true) // important
+@ToString(onlyExplicitlyIncluded = true) // important
 @NoArgsConstructor
 @AllArgsConstructor
 public class Category {
@@ -24,22 +25,15 @@ public class Category {
     @NotBlank
     private String name;
 
+    @Column(name = "created_date")
+    private Instant createdDate;
+
 //    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    // Quan hệ n-n với đối tượng ở dưới (Person) (1 địa điểm có nhiều người ở)
-//    @EqualsAndHashCode.Exclude // không sử dụng trường này trong equals và hashcode
-//    @ToString.Exclude // Khoonhg sử dụng trong toString()
-//    @JoinTable(name = "category_movie", //Tạo ra một join Table tên là "address_person"
-//            joinColumns = @JoinColumn(name = "category_id"),  // TRong đó, khóa ngoại chính là address_id trỏ tới class hiện tại (Address)
-//            inverseJoinColumns = @JoinColumn(name = "movie_id") //Khóa ngoại thứ 2 trỏ tới thuộc tính ở dưới (Person)
-//    )
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    Quan hệ n-n với đối tượng ở dưới (Category) (1 category có nhiều movie)
+    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore
-    @EqualsAndHashCode.Exclude // không sử dụng trường này trong equals và hashcode
-    @ToString.Exclude // Khoonhg sử dụng trong toString()
-    @JoinTable(name = "movie_category", //Tạo ra một join Table tên là "movie_category"
-            joinColumns = @JoinColumn(name = "category_id"),  // TRong đó, khóa ngoại chính là address_id trỏ tới class hiện tại (Address)
-            inverseJoinColumns = @JoinColumn(name = "movie_id") //Khóa ngoại thứ 2 trỏ tới thuộc tính ở dưới (Person)
-    )
+    @EqualsAndHashCode.Include // không sử dụng trường này trong equals và hashcode
+    @ToString.Include // Khoonhg sử dụng trong toString()
     private Set<Movie> movies = new HashSet<>();
 
 }

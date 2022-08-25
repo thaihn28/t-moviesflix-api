@@ -4,11 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.time.Instant;
 
 @Entity
 @Data
@@ -22,4 +20,7 @@ public class Comment {
 
     @NotBlank
     private String name;
+
+    @Column(name = "created_date")
+    private Instant createdDate;
 }

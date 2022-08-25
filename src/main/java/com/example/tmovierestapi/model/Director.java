@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +21,9 @@ public class Director {
 
     @NotBlank
     private String name;
+
+    @Column(name = "created_date")
+    private Instant createdDate;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     // Quan hệ n-n với đối tượng ở dưới (Person) (1 địa điểm có nhiều người ở)

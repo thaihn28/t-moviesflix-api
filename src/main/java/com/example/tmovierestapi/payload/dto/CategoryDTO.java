@@ -1,6 +1,6 @@
 package com.example.tmovierestapi.payload.dto;
 
-import com.example.tmovierestapi.model.Movie;
+import com.example.tmovierestapi.payload.converter.MovieInCategoryDTO;
 import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -15,5 +15,5 @@ public class CategoryDTO {
     @Size(min = 2, max = 200, message = "Category name must be minimum 2 characters and maximum 200 characters")
     private String name;
 
-    private Set<Movie> movies = new HashSet<>();
+    private Set<MovieInCategoryDTO> movies = new HashSet<>();
 }

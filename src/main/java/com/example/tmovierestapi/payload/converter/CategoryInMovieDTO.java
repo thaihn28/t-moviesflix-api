@@ -1,11 +1,11 @@
-package com.example.tmovierestapi.payload.dto;
+package com.example.tmovierestapi.payload.converter;
 
 import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 
 
 @Data
-public class CategoryDtoInMovie {
+public class CategoryInMovieDTO {
     @NotEmpty
     private Long id;
 

@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.time.Instant;
 
 @Entity
 @Data
@@ -23,5 +24,8 @@ public class Episode {
     @ManyToOne
     @JoinColumn(name = "movie_id", nullable = false)
     private Movie movie;
+
+    @Column(name = "created_date")
+    private Instant createdDate;
 
 }
