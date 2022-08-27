@@ -28,7 +28,6 @@ public class Category {
     @Column(name = "created_date")
     private Instant createdDate;
 
-//    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    Quan hệ n-n với đối tượng ở dưới (Category) (1 category có nhiều movie)
     @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonIgnore

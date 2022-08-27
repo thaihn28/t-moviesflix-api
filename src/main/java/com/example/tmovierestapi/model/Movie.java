@@ -57,20 +57,26 @@ public class Movie {
     @Column(name = "created_date")
     private Instant createdDate;
 
-    // mappedBy trỏ tới tên biến persons ở trong Address.
-    @ManyToMany(mappedBy = "movies")
-    // LAZY để tránh việc truy xuất dữ liệu không cần thiết. Lúc nào cần thì mới query
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)   // LAZY để tránh việc truy xuất dữ liệu không cần thiết. Lúc nào cần thì mới query
+    @JoinTable(name = "movie_actor", //Tạo ra một join Table tên là "movie_actor"
+            joinColumns = @JoinColumn(name = "movie_id"),  // TRong đó, khóa ngoại chính là movie_id trỏ tới class hiện tại (Movie)
+            inverseJoinColumns = @JoinColumn(name = "actor_id") //Khóa ngoại thứ 2 trỏ tới thuộc tính ở dưới (Actor)
+    )
     private Set<Actor> actors = new HashSet<>();
 
-    @ManyToMany(mappedBy = "movies")
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "movie_director",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "director_id")
+    )
     private Set<Director> directors = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude // không sử dụng trường này trong equals và hashcode
     @ToString.Exclude // Khoonhg sử dụng trong toString()
-    @JoinTable(name = "movie_category", //Tạo ra một join Table tên là "movie_category"
-            joinColumns = @JoinColumn(name = "movie_id"),  // TRong đó, khóa ngoại chính là address_id trỏ tới class hiện tại (Address)
-            inverseJoinColumns = @JoinColumn(name = "category_id") //Khóa ngoại thứ 2 trỏ tới thuộc tính ở dưới (Person)
+    @JoinTable(name = "movie_category",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> categories = new HashSet<>();
 

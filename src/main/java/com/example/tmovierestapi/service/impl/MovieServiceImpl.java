@@ -3,7 +3,7 @@ package com.example.tmovierestapi.service.impl;
 import com.example.tmovierestapi.exception.APIException;
 import com.example.tmovierestapi.exception.ResourceNotFoundException;
 import com.example.tmovierestapi.model.*;
-import com.example.tmovierestapi.payload.converter.CategoryInMovieDTO;
+import com.example.tmovierestapi.payload.request.CategoryRequest;
 import com.example.tmovierestapi.payload.dto.MovieDTO;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.repository.CategoryRepository;
@@ -64,7 +64,7 @@ public class MovieServiceImpl implements IMovieService {
         Set<Actor> actorSet= new HashSet<>();
         Set<Episode> episodeSet= new HashSet<>();
 
-        for(CategoryInMovieDTO c : movieDTO.getCategories()){
+        for(CategoryRequest c : movieDTO.getCategories()){
             Category category = categoryRepository.findCategoryById(c.getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Category", "id", c.getId()));
             categorySet.add(category);

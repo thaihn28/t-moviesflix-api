@@ -4,7 +4,7 @@ import com.example.tmovierestapi.exception.APIException;
 import com.example.tmovierestapi.exception.ResourceNotFoundException;
 import com.example.tmovierestapi.model.Category;
 import com.example.tmovierestapi.model.Movie;
-import com.example.tmovierestapi.payload.converter.MovieInCategoryDTO;
+import com.example.tmovierestapi.payload.request.MovieRequest;
 import com.example.tmovierestapi.payload.dto.CategoryDTO;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.repository.CategoryRepository;
@@ -55,14 +55,14 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     public CategoryDTO addCategory(CategoryDTO categoryDTO) {
         if(categoryRepository.existsCategoryByName(categoryDTO.getName())){
-            throw new APIException(HttpStatus.BAD_REQUEST, categoryDTO.getName() + "is already exist");
+            throw new APIException(HttpStatus.BAD_REQUEST, categoryDTO.getName() + " is already exist");
         }
         // Convert DTO to Entity
         Category categoryRequest = modelMapper.map(categoryDTO, Category.class);
         Set<Movie> movieSet = new HashSet<>();
 
 
-        for(MovieInCategoryDTO m : categoryDTO.getMovies()){
+        for(MovieRequest m : categoryDTO.getMovies()){
             Movie movie = movieRepository.findMovieById(m.getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Movie", "id", m.getId()));
             movieSet.add(movie);

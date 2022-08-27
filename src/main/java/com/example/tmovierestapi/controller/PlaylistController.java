@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/api/v1/playlists")
 public class PlaylistController {
@@ -31,11 +33,11 @@ public class PlaylistController {
         return new ResponseEntity<>(iPlaylistService.getPlaylistById(id), HttpStatus.OK);
     }
     @PostMapping("/add")
-    public ResponseEntity<PlaylistDTO> addPlaylist(@RequestBody PlaylistDTO playlistDTO) {
+    public ResponseEntity<PlaylistDTO> addPlaylist(@RequestBody @Valid PlaylistDTO playlistDTO) {
         return new ResponseEntity<>(iPlaylistService.addPlaylist(playlistDTO), HttpStatus.CREATED);
     }
     @PutMapping("/update/{id}")
-    public ResponseEntity<PlaylistDTO> updatePlaylist(@PathVariable(value = "id") Long id,@RequestBody PlaylistDTO playlistDTO){
+    public ResponseEntity<PlaylistDTO> updatePlaylist(@PathVariable(value = "id") Long id,@RequestBody @Valid PlaylistDTO playlistDTO){
         return new ResponseEntity<>(iPlaylistService.updatePlaylist(id, playlistDTO), HttpStatus.CREATED);
     }
     @DeleteMapping("/delete/{id}")

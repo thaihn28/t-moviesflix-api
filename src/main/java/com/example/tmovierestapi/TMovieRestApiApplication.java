@@ -13,6 +13,8 @@ public class TMovieRestApiApplication {
     }
 
     public static void main(String[] args) {
+        System.setProperty("server.error.include-stacktrace", "never");
+
         SpringApplication.run(TMovieRestApiApplication.class, args);
     }
 

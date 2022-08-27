@@ -3,7 +3,7 @@ package com.example.tmovierestapi.payload.dto;
 import com.example.tmovierestapi.model.Actor;
 import com.example.tmovierestapi.model.Director;
 import com.example.tmovierestapi.model.Episode;
-import com.example.tmovierestapi.payload.converter.CategoryInMovieDTO;
+import com.example.tmovierestapi.payload.request.CategoryRequest;
 import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -56,7 +56,7 @@ public class MovieDTO {
 
     private Set<Director> directors = new HashSet<>();
 
-    private Set<CategoryInMovieDTO> categories = new HashSet<>();
+    private Set<CategoryRequest> categories = new HashSet<>();
 
     private Set<Episode> episodes = new HashSet<>();
 
