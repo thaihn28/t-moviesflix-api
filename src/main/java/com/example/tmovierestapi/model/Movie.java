@@ -49,31 +49,35 @@ public class Movie {
     @NotBlank
     private String slug;
 
+    @OneToOne
+    @JoinColumn(name = "country_id")
+    private Country country;
+
     @NotBlank
     @Column(name = "poster_url")
+
     private String posterURL;
 
 //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern ="yyyy-MM-dd'T'HH:mm:ss.SSSZZ", timezone = "UTC")
     @Column(name = "created_date")
     private Instant createdDate;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)   // LAZY để tránh việc truy xuất dữ liệu không cần thiết. Lúc nào cần thì mới query
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    // LAZY để tránh việc truy xuất dữ liệu không cần thiết. Lúc nào cần thì mới query
     @JoinTable(name = "movie_actor", //Tạo ra một join Table tên là "movie_actor"
             joinColumns = @JoinColumn(name = "movie_id"),  // TRong đó, khóa ngoại chính là movie_id trỏ tới class hiện tại (Movie)
             inverseJoinColumns = @JoinColumn(name = "actor_id") //Khóa ngoại thứ 2 trỏ tới thuộc tính ở dưới (Actor)
     )
     private Set<Actor> actors = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "movie_director",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "director_id")
     )
     private Set<Director> directors = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @EqualsAndHashCode.Exclude // không sử dụng trường này trong equals và hashcode
-    @ToString.Exclude // Khoonhg sử dụng trong toString()
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "movie_category",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
@@ -82,4 +86,8 @@ public class Movie {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "movie")
     private Set<Episode> episodes = new HashSet<>();
+
+    public void removeCategory(Category category) {
+        this.categories.remove(category);
+    }
 }

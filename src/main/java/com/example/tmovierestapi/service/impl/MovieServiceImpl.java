@@ -3,10 +3,14 @@ package com.example.tmovierestapi.service.impl;
 import com.example.tmovierestapi.exception.APIException;
 import com.example.tmovierestapi.exception.ResourceNotFoundException;
 import com.example.tmovierestapi.model.*;
+import com.example.tmovierestapi.payload.request.ActorRequest;
 import com.example.tmovierestapi.payload.request.CategoryRequest;
 import com.example.tmovierestapi.payload.dto.MovieDTO;
+import com.example.tmovierestapi.payload.request.DirectorRequest;
 import com.example.tmovierestapi.payload.response.PagedResponse;
+import com.example.tmovierestapi.repository.ActorRepository;
 import com.example.tmovierestapi.repository.CategoryRepository;
+import com.example.tmovierestapi.repository.DirectorRepository;
 import com.example.tmovierestapi.repository.MovieRepository;
 import com.example.tmovierestapi.service.IMovieService;
 import com.example.tmovierestapi.utils.AppUtils;
@@ -31,9 +35,12 @@ public class MovieServiceImpl implements IMovieService {
     private ModelMapper modelMapper;
     @Autowired
     private MovieRepository movieRepository;
-
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private ActorRepository actorRepository;
+    @Autowired
+    private DirectorRepository directorRepository;
 
     @Override
     public PagedResponse<Movie> getAllMovies(int pageNo, int pageSize, String sortDir, String sortBy) {
@@ -69,6 +76,19 @@ public class MovieServiceImpl implements IMovieService {
                     .orElseThrow(() -> new ResourceNotFoundException("Category", "id", c.getId()));
             categorySet.add(category);
         }
+
+        for(ActorRequest a : movieDTO.getActors()){
+            Actor actor = actorRepository.findActorById(a.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", a.getId()));
+            actorSet.add(actor);
+        }
+
+        for(DirectorRequest d : movieDTO.getDirectors()){
+            Director director = directorRepository.findDirectorById(d.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", d.getId()));
+            directorSet.add(director);
+        }
+
         movieRequest.setCategories(categorySet);
         movieRequest.setCreatedDate(Instant.now());
         movieRequest.setActors(actorSet);

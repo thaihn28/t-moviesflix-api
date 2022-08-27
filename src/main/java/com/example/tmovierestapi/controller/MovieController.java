@@ -3,6 +3,7 @@ package com.example.tmovierestapi.controller;
 import com.example.tmovierestapi.model.Movie;
 import com.example.tmovierestapi.payload.dto.MovieDTO;
 import com.example.tmovierestapi.payload.response.PagedResponse;
+import com.example.tmovierestapi.repository.MovieRepository;
 import com.example.tmovierestapi.service.IMovieService;
 import com.example.tmovierestapi.utils.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class MovieController {
     @Autowired
     private IMovieService iMovieService;
 
+    @Autowired
+    private MovieRepository movieRepository;
+
     @GetMapping
     public ResponseEntity<PagedResponse<Movie>> getAllMovie(
             @RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
@@ -32,5 +36,12 @@ public class MovieController {
     public ResponseEntity<MovieDTO> addMovie(@RequestBody @Valid MovieDTO movieDTO){
         return new ResponseEntity<>(iMovieService.addMovie(movieDTO), HttpStatus.CREATED);
     }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteMovie(@PathVariable(value = "id") Long id){
+        movieRepository.deleteById(id);
+        return new ResponseEntity<String>("Delted", HttpStatus.OK);
+    }
+
 
 }

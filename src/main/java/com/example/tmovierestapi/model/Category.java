@@ -1,6 +1,6 @@
 package com.example.tmovierestapi.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 
 import javax.persistence.*;
@@ -12,8 +12,6 @@ import java.util.Set;
 
 @Data
 @Entity
-@EqualsAndHashCode(onlyExplicitlyIncluded = true) // important
-@ToString(onlyExplicitlyIncluded = true) // important
 @NoArgsConstructor
 @AllArgsConstructor
 public class Category {
@@ -29,10 +27,14 @@ public class Category {
     private Instant createdDate;
 
 //    Quan hệ n-n với đối tượng ở dưới (Category) (1 category có nhiều movie)
-    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    /* Important when using Lombok */
     @JsonIgnore
-    @EqualsAndHashCode.Include // không sử dụng trường này trong equals và hashcode
-    @ToString.Include // Khoonhg sử dụng trong toString()
+//    @JsonIdentityInfo(
+//            generator = ObjectIdGenerators.PropertyGenerator.class,
+//            property = "id")
+    @EqualsAndHashCode.Exclude // không sử dụng trường này trong equals và hashcode
+    @ToString.Exclude // Khoonhg sử dụng trong toString()
     private Set<Movie> movies = new HashSet<>();
 
 }

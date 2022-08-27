@@ -1,9 +1,12 @@
 package com.example.tmovierestapi.payload.dto;
 
 import com.example.tmovierestapi.model.Actor;
+import com.example.tmovierestapi.model.Country;
 import com.example.tmovierestapi.model.Director;
 import com.example.tmovierestapi.model.Episode;
+import com.example.tmovierestapi.payload.request.ActorRequest;
 import com.example.tmovierestapi.payload.request.CategoryRequest;
+import com.example.tmovierestapi.payload.request.DirectorRequest;
 import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -47,14 +50,18 @@ public class MovieDTO {
     @NotBlank
     private String slug;
 
+
     @NotBlank
     private String posterURL;
 
     private Instant createdDate;
 
-    private Set<Actor> actors = new HashSet<>();
+    // Country
+    private Long countryID;
 
-    private Set<Director> directors = new HashSet<>();
+    private Set<ActorRequest> actors = new HashSet<>();
+
+    private Set<DirectorRequest> directors = new HashSet<>();
 
     private Set<CategoryRequest> categories = new HashSet<>();
 

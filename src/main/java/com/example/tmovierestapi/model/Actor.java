@@ -1,10 +1,11 @@
 package com.example.tmovierestapi.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,11 +23,18 @@ public class Actor {
     @NotBlank
     private String name;
 
-    @NotBlank
     private String avatar;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    // Quan hệ n-n với đối tượng ở dưới (Actor) (1 actor có nhiều movie)
+    @Column(name = "created_date")
+    private Instant createdDate;
+
+    @ManyToMany(mappedBy = "actors", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    /* Important when using Lombok */
     @JsonIgnore
+//    @JsonIdentityInfo(
+//            generator = ObjectIdGenerators.PropertyGenerator.class,
+//            property = "id")
+    @EqualsAndHashCode.Exclude // không sử dụng trường này trong equals và hashcode
+    @ToString.Exclude // Khoonhg sử dụng trong toString()
     private Set<Movie> movies = new HashSet<>();
 }
