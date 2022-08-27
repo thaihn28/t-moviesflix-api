@@ -49,6 +49,8 @@ public class Movie {
     @NotBlank
     private String slug;
 
+    private Integer year;
+
     @OneToOne
     @JoinColumn(name = "country_id")
     private Country country;

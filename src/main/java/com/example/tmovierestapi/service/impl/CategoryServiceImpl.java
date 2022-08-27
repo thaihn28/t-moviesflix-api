@@ -6,6 +6,8 @@ import com.example.tmovierestapi.model.Category;
 import com.example.tmovierestapi.model.Movie;
 import com.example.tmovierestapi.payload.request.MovieRequest;
 import com.example.tmovierestapi.payload.dto.CategoryDTO;
+import com.example.tmovierestapi.payload.response.CategoryResponse;
+import com.example.tmovierestapi.payload.response.MovieResponse;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.repository.CategoryRepository;
 import com.example.tmovierestapi.repository.MovieRepository;
@@ -21,10 +23,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements ICategoryService {
@@ -38,7 +38,7 @@ public class CategoryServiceImpl implements ICategoryService {
     private ModelMapper modelMapper;
 
     @Override
-    public PagedResponse<Category> getAllCategories(int pageNo, int pageSize, String sortDir, String sortBy) {
+    public PagedResponse<CategoryResponse> getAllCategories(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
@@ -46,10 +46,40 @@ public class CategoryServiceImpl implements ICategoryService {
                 : Sort.by(sortBy).descending();
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Page<Category> categories = categoryRepository.findAll(pageable);
 
-        List<Category> categoryResponse = categories.getNumberOfElements() == 0 ? Collections.emptyList() : categories.getContent();
-        return new PagedResponse<>(categoryResponse, categories.getNumber(), categories.getSize(), categories.getTotalElements(), categories.getTotalPages(), categories.isLast());
+        Page<Category> categoryPage = categoryRepository.findAll(pageable);
+
+        List<Category> categories = categoryPage.getNumberOfElements() == 0 ? Collections.emptyList() : categoryPage.getContent();
+//        List<CategoryResponse> categoriesDTOResponse = categoryResponse
+//                .stream()
+//                .map(category -> modelMapper.map(category, CategoryResponse.class))
+//                .collect(Collectors.toList());
+        List<CategoryResponse> categoriesDTOResponse = new ArrayList<>();
+        for(Category c : categories){
+            CategoryResponse categoryResponseObj = new CategoryResponse();
+            categoryResponseObj.setId(c.getId());
+            categoryResponseObj.setName(c.getName());
+            categoryResponseObj.setCreatedDate(c.getCreatedDate());
+            Set<MovieResponse> movieResponseSet = new HashSet<>();
+            for(Movie m : c.getMovies()){
+                MovieResponse movieResponseObj = new MovieResponse();
+                movieResponseObj.setId(m.getId());
+                movieResponseObj.setName(m.getName());
+                movieResponseObj.setContent(m.getContent());
+                movieResponseObj.setType(m.getType());
+                movieResponseObj.setThumbURL(m.getThumbURL());
+                movieResponseObj.setTime(m.getContent());
+                movieResponseObj.setSlug(m.getSlug());
+                movieResponseObj.setYear(m.getYear());
+                movieResponseObj.setQuality(m.getQuality());
+
+                movieResponseSet.add(movieResponseObj);
+            }
+            categoryResponseObj.setMovies(movieResponseSet);
+            categoriesDTOResponse.add(categoryResponseObj);
+        }
+
+        return new PagedResponse<>(categoriesDTOResponse, categoryPage.getNumber(), categoryPage.getSize(), categoryPage.getTotalElements(), categoryPage.getTotalPages(), categoryPage.isLast());
     }
 
     @Override

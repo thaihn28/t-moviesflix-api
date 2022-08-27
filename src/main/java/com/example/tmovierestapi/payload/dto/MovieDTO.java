@@ -8,6 +8,8 @@ import com.example.tmovierestapi.payload.request.ActorRequest;
 import com.example.tmovierestapi.payload.request.CategoryRequest;
 import com.example.tmovierestapi.payload.request.DirectorRequest;
 import lombok.Data;
+import org.hibernate.validator.constraints.Length;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
@@ -50,9 +52,10 @@ public class MovieDTO {
     @NotBlank
     private String slug;
 
-
     @NotBlank
     private String posterURL;
+
+    private Integer year;
 
     private Instant createdDate;
 

@@ -4,6 +4,7 @@ import com.example.tmovierestapi.exception.ResourceNotFoundException;
 import com.example.tmovierestapi.model.Category;
 import com.example.tmovierestapi.model.Movie;
 import com.example.tmovierestapi.payload.dto.CategoryDTO;
+import com.example.tmovierestapi.payload.response.CategoryResponse;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.repository.CategoryRepository;
 import com.example.tmovierestapi.service.ICategoryService;
@@ -25,13 +26,13 @@ public class CategoryController {
     private CategoryRepository categoryRepository;
 
     @GetMapping
-    public ResponseEntity<PagedResponse<Category>> getAllCategories(
+    public ResponseEntity<PagedResponse<CategoryResponse>> getAllCategories(
             @RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
             @RequestParam(value = "pageSize", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize,
             @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_CREATED_DATE, required = false) String sortBy,
             @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIRECTION) String sortDir
     ) {
-        PagedResponse<Category> response = iCategoryService.getAllCategories(pageNo, pageSize, sortDir, sortBy);
+        PagedResponse<CategoryResponse> response = iCategoryService.getAllCategories(pageNo, pageSize, sortDir, sortBy);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
