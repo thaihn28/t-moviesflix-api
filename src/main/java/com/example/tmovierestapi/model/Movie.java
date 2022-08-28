@@ -64,7 +64,8 @@ public class Movie {
     @Column(name = "created_date")
     private Instant createdDate;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     // LAZY để tránh việc truy xuất dữ liệu không cần thiết. Lúc nào cần thì mới query
     @JoinTable(name = "movie_actor", //Tạo ra một join Table tên là "movie_actor"
             joinColumns = @JoinColumn(name = "movie_id"),  // TRong đó, khóa ngoại chính là movie_id trỏ tới class hiện tại (Movie)
@@ -72,24 +73,40 @@ public class Movie {
     )
     private Set<Actor> actors = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "movie_director",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "director_id")
     )
     private Set<Director> directors = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "movie_category",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<Category> categories = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "movie")
+    @OneToMany(
+            mappedBy = "movie",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private Set<Episode> episodes = new HashSet<>();
 
     public void removeCategory(Category category) {
         this.categories.remove(category);
+    }
+    //Constructors, getters and setters removed for brevity
+
+    public void addEpisode(Episode episode) {
+        episodes.add(episode);
+        episode.setMovie(this);
+    }
+
+    public void removeEpisode(Episode episode) {
+        episodes.remove(episode);
+        episode.setMovie(null);
     }
 }

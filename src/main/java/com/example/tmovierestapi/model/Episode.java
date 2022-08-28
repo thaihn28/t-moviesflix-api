@@ -21,11 +21,22 @@ public class Episode {
     @Column(name = "link_embed")
     private String linkEmbed;
 
-    @ManyToOne
-    @JoinColumn(name = "movie_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Movie movie;
 
     @Column(name = "created_date")
     private Instant createdDate;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Episode )) return false;
+        return id != null && id.equals(((Episode) o).getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 
 }

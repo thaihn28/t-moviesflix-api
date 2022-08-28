@@ -7,11 +7,9 @@ import com.example.tmovierestapi.payload.request.ActorRequest;
 import com.example.tmovierestapi.payload.request.CategoryRequest;
 import com.example.tmovierestapi.payload.dto.MovieDTO;
 import com.example.tmovierestapi.payload.request.DirectorRequest;
+import com.example.tmovierestapi.payload.request.EpisodeRequest;
 import com.example.tmovierestapi.payload.response.PagedResponse;
-import com.example.tmovierestapi.repository.ActorRepository;
-import com.example.tmovierestapi.repository.CategoryRepository;
-import com.example.tmovierestapi.repository.DirectorRepository;
-import com.example.tmovierestapi.repository.MovieRepository;
+import com.example.tmovierestapi.repository.*;
 import com.example.tmovierestapi.service.IMovieService;
 import com.example.tmovierestapi.utils.AppUtils;
 import org.modelmapper.ModelMapper;
@@ -42,6 +40,12 @@ public class MovieServiceImpl implements IMovieService {
     @Autowired
     private DirectorRepository directorRepository;
 
+    @Autowired
+    private CountryRepository countryRepository;
+
+    @Autowired
+    private EpisodeRepository episodeRepository;
+
     @Override
     public PagedResponse<Movie> getAllMovies(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
@@ -66,6 +70,9 @@ public class MovieServiceImpl implements IMovieService {
         // Convert DTO to Entity
         Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
 
+        Country country = countryRepository.findCountryById(movieDTO.getCountryID())
+                .orElseThrow(() -> new ResourceNotFoundException("Country", "id", movieDTO.getCountryID()));
+
         Set<Category> categorySet= new HashSet<>();
         Set<Director> directorSet= new HashSet<>();
         Set<Actor> actorSet= new HashSet<>();
@@ -89,11 +96,25 @@ public class MovieServiceImpl implements IMovieService {
             directorSet.add(director);
         }
 
+        for(Episode e : movieDTO.getEpisodes()){
+//            Episode episode = episodeRepository.findEpisodeById(e.getId())
+//                    .orElseThrow(() -> new ResourceNotFoundException("Episode", "ID", e.getId()));
+//            episodeSet.add(episode);
+            Episode episodeRequest = new Episode();
+            episodeRequest.setId(e.getId());
+            episodeRequest.setLinkEmbed(e.getLinkEmbed());
+            episodeRequest.setCreatedDate(Instant.now());
+            episodeRequest.setMovie(movieRequest);
+//            episodeRepository.save(episodeRequest);
+            movieRequest.addEpisode(e);
+        }
+
+        movieRequest.setCountry(country);
         movieRequest.setCategories(categorySet);
         movieRequest.setCreatedDate(Instant.now());
         movieRequest.setActors(actorSet);
         movieRequest.setDirectors(directorSet);
-        movieRequest.setEpisodes(episodeSet);
+//        movieRequest.setEpisodes(episodeSet);
 
         Movie movie = movieRepository.save(movieRequest);
         // Convert Entiry to DTO

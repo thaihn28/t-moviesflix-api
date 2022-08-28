@@ -7,6 +7,7 @@ import com.example.tmovierestapi.model.Episode;
 import com.example.tmovierestapi.payload.request.ActorRequest;
 import com.example.tmovierestapi.payload.request.CategoryRequest;
 import com.example.tmovierestapi.payload.request.DirectorRequest;
+import com.example.tmovierestapi.payload.request.EpisodeRequest;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 

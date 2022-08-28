@@ -14,7 +14,6 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Director {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
