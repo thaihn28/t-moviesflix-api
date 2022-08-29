@@ -102,11 +102,14 @@ public class MovieServiceImpl implements IMovieService {
 //            episodeSet.add(episode);
             Episode episodeRequest = new Episode();
             episodeRequest.setId(e.getId());
+            episodeRequest.setFilename(e.getFilename());
             episodeRequest.setLinkEmbed(e.getLinkEmbed());
+            episodeRequest.setName(e.getName());
             episodeRequest.setCreatedDate(Instant.now());
             episodeRequest.setMovie(movieRequest);
 //            episodeRepository.save(episodeRequest);
-            movieRequest.addEpisode(e);
+//            episodeSet.add(episodeRequest);
+            movieRequest.addEpisode(episodeRequest);
         }
 
         movieRequest.setCountry(country);

@@ -1,5 +1,6 @@
 package com.example.tmovierestapi.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -91,8 +92,9 @@ public class Movie {
 
     @OneToMany(
             mappedBy = "movie",
-            cascade = CascadeType.ALL,
+            cascade = CascadeType.MERGE,
             orphanRemoval = true)
+    @JsonBackReference
     private Set<Episode> episodes = new HashSet<>();
 
     public void removeCategory(Category category) {
