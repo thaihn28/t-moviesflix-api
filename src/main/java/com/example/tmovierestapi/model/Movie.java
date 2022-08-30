@@ -1,6 +1,7 @@
 package com.example.tmovierestapi.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -92,16 +93,26 @@ public class Movie {
 
     @OneToMany(
             mappedBy = "movie",
-            cascade = CascadeType.MERGE,
+            cascade = CascadeType.ALL,
             orphanRemoval = true)
-    @JsonBackReference
     private Set<Episode> episodes = new HashSet<>();
+
+    @OneToMany(
+            mappedBy = "movie",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private Set<Comment> comments = new HashSet<>();
 
     public void removeCategory(Category category) {
         this.categories.remove(category);
     }
     //Constructors, getters and setters removed for brevity
-
+    public void removeActor(Actor actor) {
+        this.actors.remove(actor);
+    }
+    public void removeDirector(Director director) {
+        this.directors.remove(director);
+    }
     public void addEpisode(Episode episode) {
         episodes.add(episode);
         episode.setMovie(this);

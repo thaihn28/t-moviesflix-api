@@ -1,12 +1,12 @@
-package com.example.tmovierestapi.payload.request;
+package com.example.tmovierestapi.payload.dto;
 
-import com.example.tmovierestapi.model.Movie;
 import lombok.Data;
 
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 
 @Data
-public class EpisodeRequest {
+public class EpisodeDTO {
     private Long id;
     @NotEmpty(message = "Episode Name is required")
     private String name;
@@ -17,7 +17,6 @@ public class EpisodeRequest {
     @NotEmpty(message = "LinkEmbed is required")
     private String linkEmbed;
 
-    @NotEmpty(message = "Movie ID is required")
+    @Min(value = 0L, message = "Movie ID is invalid")
     private Long movieID;
-
 }

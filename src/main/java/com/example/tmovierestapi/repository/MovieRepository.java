@@ -12,6 +12,5 @@ import java.util.Optional;
 public interface MovieRepository extends JpaRepository<Movie, Long> {
     Optional<Movie> findMovieBySlug(String slug);
     Optional<Movie> findMovieById(Long id);
-    Boolean existsMovieByName(String name);
     List<Movie> findMoviesByCategories(CategoryDTO categoryDTO, Pageable pageable);
 }

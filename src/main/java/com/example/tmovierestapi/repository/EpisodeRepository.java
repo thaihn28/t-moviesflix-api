@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface EpisodeRepository extends JpaRepository<Episode, Long> {
     Optional<Episode> findEpisodeById(Long id);
+    Boolean existsEpisodeByFilename(String name);
 }

@@ -1,38 +1,39 @@
 package com.example.tmovierestapi.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.time.Instant;
 
 @Entity
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Episode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotEmpty
     private String name;
 
-    @NotBlank
+    @NotEmpty
     private String filename;
 
-    @NotBlank(message = "Link embed is required")
+    @NotEmpty(message = "Link embed is required")
     @Column(name = "link_embed")
     private String linkEmbed;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE})
+    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
     @EqualsAndHashCode.Exclude // không sử dụng trường này trong equals và hashcode
     @ToString.Exclude // Khoonhg sử dụng trong toString()
+    @JsonIgnore
     private Movie movie;
 
     @Column(name = "created_date")
     private Instant createdDate;
-
-
 }

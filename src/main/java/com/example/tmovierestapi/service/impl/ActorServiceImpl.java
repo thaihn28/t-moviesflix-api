@@ -56,9 +56,6 @@ public class ActorServiceImpl implements IActorService {
 
     @Override
     public ActorDTO addActor(ActorDTO actorDTO) {
-        if(actorRepository.existsActorByName(actorDTO.getName())){
-            throw new APIException(HttpStatus.BAD_REQUEST, actorDTO.getName() + " is already exist");
-        }
         // Convert DTO to Entity
         Actor actor = modelMapper.map(actorDTO, Actor.class);
 

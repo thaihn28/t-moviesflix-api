@@ -1,13 +1,11 @@
 package com.example.tmovierestapi.service.impl;
 
-import com.example.tmovierestapi.exception.APIException;
 import com.example.tmovierestapi.exception.ResourceNotFoundException;
 import com.example.tmovierestapi.model.*;
 import com.example.tmovierestapi.payload.request.ActorRequest;
 import com.example.tmovierestapi.payload.request.CategoryRequest;
 import com.example.tmovierestapi.payload.dto.MovieDTO;
 import com.example.tmovierestapi.payload.request.DirectorRequest;
-import com.example.tmovierestapi.payload.request.EpisodeRequest;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.repository.*;
 import com.example.tmovierestapi.service.IMovieService;
@@ -18,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -64,9 +61,6 @@ public class MovieServiceImpl implements IMovieService {
 
     @Override
     public MovieDTO addMovie(MovieDTO movieDTO) {
-        if(movieRepository.existsMovieByName(movieDTO.getName())){
-            throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getName() + " is already exist!");
-        }
         // Convert DTO to Entity
         Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
 
@@ -96,21 +90,21 @@ public class MovieServiceImpl implements IMovieService {
             directorSet.add(director);
         }
 
-        for(Episode e : movieDTO.getEpisodes()){
-//            Episode episode = episodeRepository.findEpisodeById(e.getId())
-//                    .orElseThrow(() -> new ResourceNotFoundException("Episode", "ID", e.getId()));
-//            episodeSet.add(episode);
-            Episode episodeRequest = new Episode();
-            episodeRequest.setId(e.getId());
-            episodeRequest.setFilename(e.getFilename());
-            episodeRequest.setLinkEmbed(e.getLinkEmbed());
-            episodeRequest.setName(e.getName());
-            episodeRequest.setCreatedDate(Instant.now());
-            episodeRequest.setMovie(movieRequest);
-//            episodeRepository.save(episodeRequest);
+//        for(Episode e : movieDTO.getEpisodes()){
+////            Episode episode = episodeRepository.findEpisodeById(e.getId())
+////                    .orElseThrow(() -> new ResourceNotFoundException("Episode", "ID", e.getId()));
+////            episodeSet.add(episode);
+//            Episode episodeRequest = new Episode();
+//            episodeRequest.setId(e.getId());
+//            episodeRequest.setFilename(e.getFilename());
+//            episodeRequest.setLinkEmbed(e.getLinkEmbed());
+//            episodeRequest.setName(e.getName());
+//            episodeRequest.setCreatedDate(Instant.now());
+//            episodeRequest.setMovie(movieRequest);
+////            episodeRepository.save(episodeRequest);
 //            episodeSet.add(episodeRequest);
-            movieRequest.addEpisode(episodeRequest);
-        }
+////            movieRequest.addEpisode(episodeRequest);
+//        }
 
         movieRequest.setCountry(country);
         movieRequest.setCategories(categorySet);

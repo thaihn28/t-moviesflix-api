@@ -55,9 +55,6 @@ public class DirectorServiceImpl implements IDirectorService {
 
     @Override
     public DirectorDTO addDirector(DirectorDTO directorDTO) {
-        if(directorRepository.existsDirectorByName(directorDTO.getName())){
-            throw new APIException(HttpStatus.BAD_REQUEST, directorDTO.getName() + " is already exist");
-        }
         // Convert DTO to Entity
         Director directorRequest = modelMapper.map(directorDTO, Director.class);
         directorRequest.setCreatedDate(Instant.now());
