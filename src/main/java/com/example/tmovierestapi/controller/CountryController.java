@@ -27,4 +27,17 @@ public class CountryController {
         return new ResponseEntity<>(iCountryService.addCountry(countryDTO), HttpStatus.CREATED);
     }
 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<CountryDTO> updateCountry(@PathVariable(value = "id") Long id, @RequestBody @Valid
+                                                    CountryDTO countryDTO
+                                                    ){
+        return new ResponseEntity<>(iCountryService.updateCountry(id, countryDTO), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> deleteCountry(@PathVariable(value = "id") Long id){
+        iCountryService.deleteCountry(id);
+        return new ResponseEntity<>("Deleted country with ID-" + id + " successfully", HttpStatus.OK);
+    }
+
 }

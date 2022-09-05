@@ -60,7 +60,7 @@ public class MovieRepositoryTest {
         categories.add(Long.valueOf(3));
         categories.add(Long.valueOf(4));
 
-        iMovieService.addMovie(movieDTO);
+//        iMovieService.addMovie(movieDTO);
 
         PagedResponse<Movie> movieList = iMovieService.getAllMovies(0, 5, "ASC", "name");
         Assertions.assertThat(movieList.getTotalElements()).isNotZero();

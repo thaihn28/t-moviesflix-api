@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Data
 public class CountryDTO {
@@ -12,5 +13,5 @@ public class CountryDTO {
     @NotEmpty(message = "Country name is required")
     private String name;
 
-    private Instant createdDate;
+    private LocalDateTime createdDate;
 }

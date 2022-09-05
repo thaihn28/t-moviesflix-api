@@ -6,7 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,7 +24,10 @@ public class Category {
     private String name;
 
     @Column(name = "created_date")
-    private Instant createdDate;
+    private LocalDateTime createdDate;
+
+    @Column(name = "modified_date")
+    private LocalDateTime modifiedDate;
 
 //    Quan hệ n-n với đối tượng ở dưới (Category) (1 category có nhiều movie)
     @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})

@@ -8,4 +8,6 @@ import com.example.tmovierestapi.payload.response.PagedResponse;
 public interface ICategoryService {
     PagedResponse<CategoryResponse> getAllCategories(int pageNo, int pageSize, String sortDir, String sortBy);
     CategoryDTO addCategory(CategoryDTO categoryDTO);
+    CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO);
+    void deleteCategory(Long id);
 }

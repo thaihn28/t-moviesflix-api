@@ -3,6 +3,7 @@ package com.example.tmovierestapi.payload.dto;
 import com.example.tmovierestapi.payload.request.MovieRequest;
 import lombok.Data;
 
+import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
@@ -17,5 +18,7 @@ public class DirectorDTO {
 
     private String avatar;
 
-    private Set<MovieRequest> movies = new HashSet<>();
+    private Boolean isHot;
+
+//    private Set<MovieRequest> movies = new HashSet<>();
 }

@@ -2,10 +2,15 @@ package com.example.tmovierestapi.service.impl;
 
 import com.example.tmovierestapi.exception.APIException;
 import com.example.tmovierestapi.exception.ResourceNotFoundException;
+import com.example.tmovierestapi.model.Actor;
 import com.example.tmovierestapi.model.Director;
 import com.example.tmovierestapi.model.Movie;
+import com.example.tmovierestapi.payload.dto.ActorDTO;
 import com.example.tmovierestapi.payload.dto.DirectorDTO;
 import com.example.tmovierestapi.payload.request.MovieRequest;
+import com.example.tmovierestapi.payload.response.ActorResponse;
+import com.example.tmovierestapi.payload.response.DirectorResponse;
+import com.example.tmovierestapi.payload.response.MovieResponse;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.repository.DirectorRepository;
 import com.example.tmovierestapi.repository.MovieRepository;
@@ -21,10 +26,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class DirectorServiceImpl implements IDirectorService {
@@ -32,13 +35,10 @@ public class DirectorServiceImpl implements IDirectorService {
     private ModelMapper modelMapper;
 
     @Autowired
-    private MovieRepository movieRepository;
-
-    @Autowired
     private DirectorRepository directorRepository;
 
     @Override
-    public PagedResponse<Director> getAllDirectors(int pageNo, int pageSize, String sortDir, String sortBy) {
+    public PagedResponse<DirectorResponse> getAllDirectors(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
@@ -47,30 +47,94 @@ public class DirectorServiceImpl implements IDirectorService {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        Page<Director> directors = directorRepository.findAll(pageable);
+        Page<Director> directorsPage = directorRepository.findAll(pageable);
 
-        List<Director> directorResponse = directors.getNumberOfElements() == 0 ? Collections.emptyList() : directors.getContent();
-        return new PagedResponse<>(directorResponse, directors.getNumber(), directors.getSize(), directors.getTotalElements() ,directors.getTotalPages(), directors.isLast());
+        List<Director> directors = directorsPage.getNumberOfElements() == 0 ? Collections.emptyList() : directorsPage.getContent();
+
+        List<DirectorResponse> directorsResponse = new ArrayList<>();
+
+        for(Director d : directors){
+            DirectorResponse directorResponseObj = new DirectorResponse();
+            directorResponseObj.setId(d.getId());
+            directorResponseObj.setName(d.getName());
+            directorResponseObj.setAvatar(d.getAvatar());
+            directorResponseObj.setIsHot(d.getIsHot());
+            directorResponseObj.setCreatedDate(d.getCreatedDate());
+            directorResponseObj.setModifiedDate(d.getModifiedDate());
+
+            Set<MovieResponse> movieResponseSet = new HashSet<>();
+            for(Movie m : d.getMovies()){
+                MovieResponse movieResponseObj = new MovieResponse();
+                movieResponseObj.setId(m.getId());
+                movieResponseObj.setName(m.getName());
+                movieResponseObj.setThumbURL(m.getThumbURL());
+                movieResponseObj.setYear(m.getYear());
+                movieResponseObj.setOriginName(m.getOriginName());
+
+                movieResponseSet.add(movieResponseObj);
+            }
+            directorResponseObj.setMovies(movieResponseSet);
+            directorsResponse.add(directorResponseObj);
+        }
+
+
+        return new PagedResponse<>(directorsResponse, directorsPage.getNumber(), directorsPage.getSize(), directorsPage.getTotalElements()
+                ,directorsPage.getTotalPages(), directorsPage.isLast());
     }
 
     @Override
     public DirectorDTO addDirector(DirectorDTO directorDTO) {
         // Convert DTO to Entity
         Director directorRequest = modelMapper.map(directorDTO, Director.class);
-        directorRequest.setCreatedDate(Instant.now());
+        directorRequest.setCreatedDate(LocalDateTime.now());
 
-        Set<Movie> movieSet = new HashSet<>();
-
-        for(MovieRequest m : directorDTO.getMovies()){
-            Movie movie = movieRepository.findMovieById(m.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", m.getId()));
-            movieSet.add(movie);
-        }
-        directorRequest.setMovies(movieSet);
+//        Set<Movie> movieSet = new HashSet<>();
+//
+//        for(MovieRequest m : directorDTO.getMovies()){
+//            Movie movie = movieRepository.findMovieById(m.getId())
+//                    .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", m.getId()));
+//            movieSet.add(movie);
+//        }
+//        directorRequest.setMovies(movieSet);
 
         Director director = directorRepository.save(directorRequest);
 
         DirectorDTO directorResponse = modelMapper.map(director, DirectorDTO.class);
         return directorResponse;
+    }
+
+    @Override
+    public DirectorDTO updateDirector(Long id, DirectorDTO directorDTO) {
+        Director director = directorRepository.findDirectorById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", id));
+
+        Director directorRequest = modelMapper.map(directorDTO, Director.class);
+
+        director.setName(directorRequest.getName());
+        director.setAvatar(directorRequest.getAvatar());
+        director.setIsHot(directorRequest.getIsHot());
+        director.setModifiedDate(LocalDateTime.now());
+
+        Director directorResponse = directorRepository.save(director);
+        DirectorDTO directorDTOResponse = modelMapper.map(directorResponse, DirectorDTO.class);
+
+        return directorDTOResponse;
+    }
+
+    @Override
+    public void deleteDirector(Long id) {
+        Director director = directorRepository.findDirectorById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", id));
+        for (Movie m : director.getMovies()){
+            m.removeDirector(director);
+        }
+        directorRepository.delete(director);
+    }
+
+    @Override
+    public Director getDirectorByID(Long id) {
+        Director director = directorRepository.findDirectorById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", id));
+        return director;
     }
 }

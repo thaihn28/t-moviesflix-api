@@ -24,6 +24,4 @@ public class CommentDTO {
     @Min(value = 0L, message = "Movie ID is invalid")
     private Long movieID;
 
-
-
 }

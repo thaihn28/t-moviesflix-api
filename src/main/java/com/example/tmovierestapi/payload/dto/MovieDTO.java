@@ -1,9 +1,6 @@
 package com.example.tmovierestapi.payload.dto;
 
-import com.example.tmovierestapi.model.Actor;
-import com.example.tmovierestapi.model.Country;
-import com.example.tmovierestapi.model.Director;
-import com.example.tmovierestapi.model.Episode;
+import com.example.tmovierestapi.model.*;
 import com.example.tmovierestapi.payload.request.ActorRequest;
 import com.example.tmovierestapi.payload.request.CategoryRequest;
 import com.example.tmovierestapi.payload.request.DirectorRequest;
@@ -11,10 +8,12 @@ import com.example.tmovierestapi.payload.request.EpisodeRequest;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
+import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,6 +24,10 @@ public class MovieDTO {
     @NotEmpty
     @Size(min = 2, max = 200, message = "Movie name must be minimum 2 characters and maximum 200 characters")
     private String name;
+
+    @NotEmpty
+    @Size(min = 2, max = 200, message = "Movie origin name must be minimum 2 characters and maximum 200 characters")
+    private String originName;
 
     @NotEmpty(message = "Content should not be null or empty")
     private String content;
@@ -58,10 +61,20 @@ public class MovieDTO {
 
     private Integer year;
 
-    private Instant createdDate;
+    private String showTimes;
+
+    private Boolean isHot;
+
+    private Boolean isFree;
+
+    private Integer price;
+
+    private LocalDateTime createdDate;
+
+    private LocalDateTime modifiedDate;
 
     // Country
-    private Long countryID;
+    private String countryName;
 
     private Set<ActorRequest> actors = new HashSet<>();
 
@@ -70,5 +83,7 @@ public class MovieDTO {
     private Set<CategoryRequest> categories = new HashSet<>();
 
     private Set<Episode> episodes = new HashSet<>();
+
+    private Set<Comment> comments = new HashSet<>();
 
 }

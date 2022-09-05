@@ -1,14 +1,13 @@
 package com.example.tmovierestapi.service.impl;
 
-import com.example.tmovierestapi.exception.APIException;
 import com.example.tmovierestapi.exception.ResourceNotFoundException;
 import com.example.tmovierestapi.model.Actor;
 import com.example.tmovierestapi.model.Movie;
 import com.example.tmovierestapi.payload.dto.ActorDTO;
-import com.example.tmovierestapi.payload.request.MovieRequest;
+import com.example.tmovierestapi.payload.response.ActorResponse;
+import com.example.tmovierestapi.payload.response.MovieResponse;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.repository.ActorRepository;
-import com.example.tmovierestapi.repository.MovieRepository;
 import com.example.tmovierestapi.service.IActorService;
 import com.example.tmovierestapi.utils.AppUtils;
 import org.modelmapper.ModelMapper;
@@ -17,14 +16,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class ActorServiceImpl implements IActorService {
@@ -34,11 +30,9 @@ public class ActorServiceImpl implements IActorService {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Autowired
-    private MovieRepository movieRepository;
 
     @Override
-    public PagedResponse<Actor> getAllActors(int pageNo, int pageSize, String sortDir, String sortBy) {
+    public PagedResponse<ActorResponse> getAllActors(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
@@ -46,12 +40,38 @@ public class ActorServiceImpl implements IActorService {
                 : Sort.by(sortBy).descending();
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Page<Actor> actors = actorRepository.findAll(pageable);
+        Page<Actor> actorPage = actorRepository.findAll(pageable);
 
-        List<Actor> actorResponse =  actors.getNumberOfElements() == 0 ? Collections.emptyList() : actors.getContent();
+        List<Actor> actors =  actorPage.getNumberOfElements() == 0 ? Collections.emptyList() : actorPage.getContent();
 
-        return new PagedResponse<>(actorResponse, actors.getNumber(), actors.getSize(),
-                actors.getTotalElements(), actors.getTotalPages(), actors.isLast());
+        List<ActorResponse> actorsResponse = new ArrayList<>();
+
+        for(Actor a : actors){
+            ActorResponse actorResponseObj = new ActorResponse();
+            actorResponseObj.setId(a.getId());
+            actorResponseObj.setName(a.getName());
+            actorResponseObj.setAvatar(a.getAvatar());
+            actorResponseObj.setIsHot(a.getIsHot());
+            actorResponseObj.setCreatedDate(a.getCreatedDate());
+            actorResponseObj.setModifiedDate(a.getModifiedDate());
+
+            Set<MovieResponse> movieResponseSet = new HashSet<>();
+            for(Movie m : a.getMovies()){
+                MovieResponse movieResponseObj = new MovieResponse();
+                movieResponseObj.setId(m.getId());
+                movieResponseObj.setName(m.getName());
+                movieResponseObj.setThumbURL(m.getThumbURL());
+                movieResponseObj.setYear(m.getYear());
+                movieResponseObj.setOriginName(m.getOriginName());
+
+                movieResponseSet.add(movieResponseObj);
+            }
+            actorResponseObj.setMovies(movieResponseSet);
+            actorsResponse.add(actorResponseObj);
+        }
+
+        return new PagedResponse<>(actorsResponse, actorPage.getNumber(), actorPage.getSize(),
+                actorPage.getTotalElements(), actorPage.getTotalPages(), actorPage.isLast());
     }
 
     @Override
@@ -59,19 +79,55 @@ public class ActorServiceImpl implements IActorService {
         // Convert DTO to Entity
         Actor actor = modelMapper.map(actorDTO, Actor.class);
 
-        actor.setCreatedDate(Instant.now());
-        Set<Movie> movieSet = new HashSet<>();
+//        Set<Movie> movieSet = new HashSet<>();
 
-        for(MovieRequest m : actorDTO.getMovies()){
-            Movie movie = movieRepository.findMovieById(m.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", m.getId()));
-            movieSet.add(movie);
-        }
-        actor.setMovies(movieSet);
+//        for(MovieRequest m : actorDTO.getMovies()){
+//            Movie movie = movieRepository.findMovieById(m.getId())
+//                    .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", m.getId()));
+//            movieSet.add(movie);
+//        }
+        //        actor.setMovies(movieSet);
+
+        actor.setCreatedDate(LocalDateTime.now());
         Actor actorRequest = actorRepository.save(actor);
         // Convert Entity to DTO
         ActorDTO actorResponse = modelMapper.map(actorRequest, ActorDTO.class);
 
         return actorResponse;
+    }
+
+    @Override
+    public ActorDTO updateActor(Long id, ActorDTO actorDTO) {
+        Actor actor = actorRepository.findActorById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", id));
+
+        Actor actorRequest = modelMapper.map(actorDTO, Actor.class);
+
+        actor.setName(actorRequest.getName());
+        actor.setAvatar(actorRequest.getAvatar());
+        actor.setIsHot(actorRequest.getIsHot());
+        actor.setModifiedDate(LocalDateTime.now());
+
+        Actor actorResponse = actorRepository.save(actor);
+        ActorDTO actorDTOResponse = modelMapper.map(actorResponse, ActorDTO.class);
+
+        return actorDTOResponse;
+    }
+
+    @Override
+    public void deleteActor(Long id) {
+        Actor actor = actorRepository.findActorById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", id));
+        for(Movie m : actor.getMovies()){
+            m.removeActor(actor);
+        }
+        actorRepository.delete(actor);
+    }
+
+    @Override
+    public Actor getActorByID(Long id) {
+        Actor actor = actorRepository.findActorById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", id));
+        return actor;
     }
 }

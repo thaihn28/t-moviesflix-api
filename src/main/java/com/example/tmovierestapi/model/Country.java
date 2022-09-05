@@ -5,9 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -23,5 +22,8 @@ public class Country {
     private String name;
 
     @Column(name = "created_date")
-    private Instant createdDate;
+    private LocalDateTime createdDate;
+
+    @Column(name = "modified_date")
+    private LocalDateTime modifiedDate;
 }

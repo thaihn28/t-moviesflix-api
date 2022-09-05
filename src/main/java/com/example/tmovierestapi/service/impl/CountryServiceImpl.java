@@ -1,6 +1,7 @@
 package com.example.tmovierestapi.service.impl;
 
 import com.example.tmovierestapi.exception.APIException;
+import com.example.tmovierestapi.exception.ResourceNotFoundException;
 import com.example.tmovierestapi.model.Country;
 import com.example.tmovierestapi.payload.dto.CountryDTO;
 import com.example.tmovierestapi.repository.CountryRepository;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -37,11 +39,33 @@ public class CountryServiceImpl implements ICountryService {
         }
         Country countryRequest = modelMapper.map(countryDTO, Country.class);
         countryRequest.setName(countryDTO.getName());
-        countryRequest.setCreatedDate(Instant.now());
+        countryRequest.setCreatedDate(LocalDateTime.now());
 
         Country country = countryRepository.save(countryRequest);
         CountryDTO countryResponse = modelMapper.map(country, CountryDTO.class);
 
         return countryResponse;
+    }
+
+    @Override
+    public CountryDTO updateCountry(Long id, CountryDTO countryDTO) {
+        Country country = countryRepository.findCountryById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Country", "ID", id));
+
+        Country countryRequest = modelMapper.map(countryDTO, Country.class);
+        country.setName(countryRequest.getName());
+        country.setModifiedDate(LocalDateTime.now());
+
+        Country countryResponse = countryRepository.save(country);
+        CountryDTO countryDTOResponse = modelMapper.map(countryResponse, CountryDTO.class);
+
+        return countryDTOResponse;
+    }
+
+    @Override
+    public void deleteCountry(Long id) {
+        Country country = countryRepository.findCountryById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Country", "ID", id));
+        countryRepository.delete(country);
     }
 }

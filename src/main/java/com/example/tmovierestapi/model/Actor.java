@@ -5,9 +5,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -26,9 +25,15 @@ public class Actor {
     private String avatar;
 
     @Column(name = "created_date")
-    private Instant createdDate;
+    private LocalDateTime createdDate;
 
-    @ManyToMany(mappedBy = "actors", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @Column(name = "modified_date")
+    private LocalDateTime modifiedDate;
+
+    @Column(name = "is_hot")
+    private Boolean isHot;
+
+    @ManyToMany(mappedBy = "actors", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     /* Important when using Lombok */
     @JsonIgnore
 //    @JsonIdentityInfo(

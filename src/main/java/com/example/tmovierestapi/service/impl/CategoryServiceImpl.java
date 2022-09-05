@@ -22,17 +22,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements ICategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
-
-    @Autowired
-    private MovieRepository movieRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -50,28 +46,22 @@ public class CategoryServiceImpl implements ICategoryService {
         Page<Category> categoryPage = categoryRepository.findAll(pageable);
 
         List<Category> categories = categoryPage.getNumberOfElements() == 0 ? Collections.emptyList() : categoryPage.getContent();
-//        List<CategoryResponse> categoriesDTOResponse = categoryResponse
-//                .stream()
-//                .map(category -> modelMapper.map(category, CategoryResponse.class))
-//                .collect(Collectors.toList());
+
         List<CategoryResponse> categoriesDTOResponse = new ArrayList<>();
         for(Category c : categories){
             CategoryResponse categoryResponseObj = new CategoryResponse();
             categoryResponseObj.setId(c.getId());
             categoryResponseObj.setName(c.getName());
             categoryResponseObj.setCreatedDate(c.getCreatedDate());
+            categoryResponseObj.setModifiedDate(c.getModifiedDate());
             Set<MovieResponse> movieResponseSet = new HashSet<>();
             for(Movie m : c.getMovies()){
                 MovieResponse movieResponseObj = new MovieResponse();
                 movieResponseObj.setId(m.getId());
                 movieResponseObj.setName(m.getName());
-                movieResponseObj.setContent(m.getContent());
-                movieResponseObj.setType(m.getType());
-                movieResponseObj.setThumbURL(m.getThumbURL());
-                movieResponseObj.setTime(m.getContent());
-                movieResponseObj.setSlug(m.getSlug());
                 movieResponseObj.setYear(m.getYear());
-                movieResponseObj.setQuality(m.getQuality());
+                movieResponseObj.setOriginName(m.getOriginName());
+                movieResponseObj.setThumbURL(m.getThumbURL());
 
                 movieResponseSet.add(movieResponseObj);
             }
@@ -89,21 +79,48 @@ public class CategoryServiceImpl implements ICategoryService {
         }
         // Convert DTO to Entity
         Category categoryRequest = modelMapper.map(categoryDTO, Category.class);
-        Set<Movie> movieSet = new HashSet<>();
+//        Set<Movie> movieSet = new HashSet<>();
 
 
-        for(MovieRequest m : categoryDTO.getMovies()){
-            Movie movie = movieRepository.findMovieById(m.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Movie", "id", m.getId()));
-            movieSet.add(movie);
-        }
-        categoryRequest.setMovies(movieSet);
-        categoryRequest.setCreatedDate(Instant.now());
+//        for(MovieRequest m : categoryDTO.getMovies()){
+//            Movie movie = movieRepository.findMovieById(m.getId())
+//                    .orElseThrow(() -> new ResourceNotFoundException("Movie", "id", m.getId()));
+//            movieSet.add(movie);
+//        }
+//        categoryRequest.setMovies(movieSet);
+
+        categoryRequest.setCreatedDate(LocalDateTime.now());
         Category category = categoryRepository.save(categoryRequest);
 
         // Convert Entity to DTO
         CategoryDTO categoryResponse = modelMapper.map(category, CategoryDTO.class);
 
         return categoryResponse;
+    }
+
+    @Override
+    public CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO) {
+        Category category = categoryRepository.findCategoryById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "ID", id));
+
+        Category categoryRequest = modelMapper.map(categoryDTO, Category.class);
+
+        category.setName(categoryRequest.getName());
+        category.setModifiedDate(LocalDateTime.now());
+
+        Category categoryResponse = categoryRepository.save(categoryRequest);
+        CategoryDTO categoryDTOResponse = modelMapper.map(categoryResponse, CategoryDTO.class);
+
+        return categoryDTOResponse;
+    }
+
+    @Override
+    public void deleteCategory(Long id) {
+        Category category = categoryRepository.findCategoryById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "ID", id));
+        for(Movie movie : category.getMovies()){
+            movie.removeCategory(category);
+        }
+        categoryRepository.delete(category);
     }
 }

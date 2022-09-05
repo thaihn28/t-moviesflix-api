@@ -1,13 +1,11 @@
 package com.example.tmovierestapi.model;
 
 import lombok.*;
-import org.modelmapper.ModelMapper;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -24,12 +22,15 @@ public class Comment {
     private String content;
 
     @Column(name = "created_date")
-    private Instant createdDate;
+    private LocalDateTime createdDate;
+
+    @Column(name = "modified_date")
+    private LocalDateTime modifiedDate;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @EqualsAndHashCode.Exclude // không sử dụng trường này trong equals và hashcode
     @ToString.Exclude // Khoonhg sử dụng trong toString()
     private Movie movie;

@@ -15,5 +15,5 @@ public class CategoryDTO {
     @Size(min = 2, max = 200, message = "Category name must be minimum 2 characters and maximum 200 characters")
     private String name;
 
-    private Set<MovieRequest> movies = new HashSet<>();
+//    private Set<MovieRequest> movies = new HashSet<>();
 }

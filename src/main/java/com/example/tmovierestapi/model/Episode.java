@@ -7,6 +7,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -28,12 +29,15 @@ public class Episode {
     @Column(name = "link_embed")
     private String linkEmbed;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
+    @ManyToOne(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @EqualsAndHashCode.Exclude // không sử dụng trường này trong equals và hashcode
     @ToString.Exclude // Khoonhg sử dụng trong toString()
     @JsonIgnore
     private Movie movie;
 
     @Column(name = "created_date")
-    private Instant createdDate;
+    private LocalDateTime createdDate;
+
+    @Column(name = "modified_date")
+    private LocalDateTime modifiedDate;
 }
