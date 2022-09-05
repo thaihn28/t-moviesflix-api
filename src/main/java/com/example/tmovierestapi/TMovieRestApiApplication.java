@@ -1,6 +1,7 @@
 package com.example.tmovierestapi;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -31,7 +32,7 @@ public class TMovieRestApiApplication {
         return new ModelMapper();
     }
 
-//    Here's an example of setting the configuration parameters programatically:
+    //    Here's an example of setting the configuration parameters programatically:
     @Bean
     public Cloudinary cloudinaryConfig() {
         Cloudinary cloudinary = null;
@@ -40,6 +41,8 @@ public class TMovieRestApiApplication {
         config.put("api_key", apiKey);
         config.put("api_secret", apiSecret);
         cloudinary = new Cloudinary(config);
+        cloudinary.url().transformation(
+                new Transformation().height(250).width(250).crop("fill"));
         return cloudinary;
     }
 
@@ -48,6 +51,7 @@ public class TMovieRestApiApplication {
         TimeZone.setDefault(TimeZone.getTimeZone("GMT+7:00"));
         SpringApplication.run(TMovieRestApiApplication.class, args);
     }
+
     // Run when spring boot app is started
     @Bean
     CommandLineRunner run() {

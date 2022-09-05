@@ -69,7 +69,7 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
-    public MovieDTO addMovie(MovieDTO movieDTO, MultipartFile file) {
+    public MovieDTO addMovie(MovieDTO movieDTO, MultipartFile thumbFile) {
         Boolean isExist = movieRepository.existsMovieBySlug(movieDTO.getSlug());
         if(isExist){
             throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " slug is already exist!");
@@ -78,7 +78,7 @@ public class MovieServiceImpl implements IMovieService {
         Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
 
         Country country = countryRepository.findCountryByName(movieDTO.getCountryName())
-                .orElseThrow(() -> new ResourceNotFoundException("Country", "id", movieDTO.getCountryName()));
+                .orElseThrow(() -> new ResourceNotFoundException("Country", "name", movieDTO.getCountryName()));
 
         Set<Category> categorySet= new HashSet<>();
         Set<Director> directorSet= new HashSet<>();
@@ -108,8 +108,11 @@ public class MovieServiceImpl implements IMovieService {
             movieRequest.setPrice(movieDTO.getPrice());
         }
 
-//        String url = cloudinaryService.uploadFile(file);
-//        movieRequest.setThumbURL(file);
+        String thumbURL = cloudinaryService.uploadThumb(thumbFile);
+        movieRequest.setThumbURL(thumbURL);
+
+//        String posterURL = cloudinaryService.uploadPoster(posterFile);
+//        movieRequest.setPosterURL(posterURL);
 
         movieRequest.setCountry(country);
         movieRequest.setCategories(categorySet);

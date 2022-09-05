@@ -1,5 +1,6 @@
 package com.example.tmovierestapi.controller;
 
+import com.example.tmovierestapi.anotation.ValidImage;
 import com.example.tmovierestapi.model.Movie;
 import com.example.tmovierestapi.payload.dto.MovieDTO;
 import com.example.tmovierestapi.payload.response.PagedResponse;
@@ -7,11 +8,14 @@ import com.example.tmovierestapi.service.IMovieService;
 import com.example.tmovierestapi.utils.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 @RequestMapping("/api/v1/movies")
@@ -35,8 +39,9 @@ public class MovieController {
         return new ResponseEntity<>(iMovieService.getMovieBySlug(slug), HttpStatus.OK);
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<MovieDTO> addMovie(@RequestBody @Valid MovieDTO movieDTO, @RequestParam("file") MultipartFile file) {
+//    @PostMapping("/add")
+    @RequestMapping(path = "/add", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<MovieDTO> addMovie(@RequestPart(name = "movie") @Valid MovieDTO movieDTO, @RequestPart(name = "file") @ValidImage MultipartFile file) {
         return new ResponseEntity<>(iMovieService.addMovie(movieDTO, file), HttpStatus.CREATED);
     }
 

@@ -1,6 +1,7 @@
 package com.example.tmovierestapi.service.cloudinary;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,14 +19,32 @@ public class CloudinaryService {
     private Cloudinary cloudinaryConfig;
 
 
-    public String uploadFile(MultipartFile file) {
+    public String uploadThumb(MultipartFile file) {
         try {
             File uploadedFile = convertMultiPartToFile(file);
             Map uploadResult = cloudinaryConfig.uploader().upload(uploadedFile, ObjectUtils.emptyMap());
-            String url = uploadResult.get("url").toString();
-            return url;
+            deleteFile(uploadedFile.getName());
+            String publicID = uploadResult.get("public_id").toString();
+            String format = "." + uploadResult.get("format").toString();
+            String thumbURL = cloudinaryConfig.url().transformation(
+                    new Transformation().width(360).height(480).crop("fill")).generate(publicID + format);
+            return thumbURL;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("File can not empty!");
+        }
+    }
+    public String uploadPoster(MultipartFile file) {
+        try {
+            File uploadedFile = convertMultiPartToFile(file);
+            Map uploadResult = cloudinaryConfig.uploader().upload(uploadedFile, ObjectUtils.emptyMap());
+            deleteFile(uploadedFile.getName());
+            String publicID = uploadResult.get("public_id").toString();
+            String format = "." + uploadResult.get("format").toString();
+            String posterURL = cloudinaryConfig.url().transformation(
+                    new Transformation().width(720).height(480).crop("fill")).generate(publicID + format);
+            return posterURL;
+        } catch (Exception e) {
+            throw new RuntimeException("File can not empty!");
         }
     }
 
@@ -35,5 +54,9 @@ public class CloudinaryService {
         fos.write(file.getBytes());
         fos.close();
         return convFile;
+    }
+    private void deleteFile(String fileName){
+        File file = new File(fileName);
+        file.delete();
     }
 }

@@ -19,7 +19,7 @@ public class TestController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file){
-        return new ResponseEntity<>( cloudinaryService.uploadFile(file), HttpStatus.OK);
+        return new ResponseEntity<>( cloudinaryService.uploadThumb(file), HttpStatus.OK);
     }
 
 }
