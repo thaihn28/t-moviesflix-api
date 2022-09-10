@@ -2,7 +2,14 @@ package com.example.tmovierestapi;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
+import com.example.tmovierestapi.model.ERole;
+import com.example.tmovierestapi.model.Role;
+import com.example.tmovierestapi.payload.request.SignupRequest;
+import com.example.tmovierestapi.repository.RoleRepository;
+import com.example.tmovierestapi.repository.UserRepository;
+import com.example.tmovierestapi.service.IAuthService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -11,12 +18,19 @@ import org.springframework.context.annotation.Bean;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
+import java.util.*;
 
 @SpringBootApplication
 public class TMovieRestApiApplication {
+    @Autowired
+    private IAuthService iAuthService;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
     @Value("${com.cloudinary.cloud_name}")
     private String cloudName;
 
@@ -56,7 +70,24 @@ public class TMovieRestApiApplication {
     @Bean
     CommandLineRunner run() {
         return args -> {
+            Role roleAdmin = new Role();
+            roleAdmin.setName(ERole.ROLE_ADMIN);
+            if(!roleRepository.existsRoleByName(roleAdmin.getName())){
+                roleRepository.save(roleAdmin);
+            }
+
 //            System.out.println(LocalDateTime.now());
+            SignupRequest signupRequest = new SignupRequest();
+            signupRequest.setEmail("thaihn@gmail.com");
+            signupRequest.setUsername("thaihn");
+            signupRequest.setPassword("hnt282001");
+            Set<String> roles = new HashSet<>();
+            roles.add("admin");
+            signupRequest.setRoles(roles);
+            if(!userRepository.existsUserByEmail(signupRequest.getEmail()) ||
+                    !userRepository.existsUserByUsername(signupRequest.getUsername())){
+                iAuthService.signup(signupRequest);
+            }
         };
     }
 

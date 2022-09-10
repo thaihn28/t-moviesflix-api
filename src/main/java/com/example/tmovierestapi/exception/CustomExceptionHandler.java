@@ -15,7 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-@ControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
@@ -34,7 +33,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             String errorMessage = fieldError.getDefaultMessage();
             errors.add(errorMessage);
         }
-
         responseBody.put("errors", errors);
         return new ResponseEntity<>(responseBody, headers, status);
     }

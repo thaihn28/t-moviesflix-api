@@ -9,6 +9,7 @@ import com.example.tmovierestapi.payload.response.MovieResponse;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.repository.ActorRepository;
 import com.example.tmovierestapi.service.IActorService;
+import com.example.tmovierestapi.service.cloudinary.CloudinaryService;
 import com.example.tmovierestapi.utils.AppUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -29,6 +31,9 @@ public class ActorServiceImpl implements IActorService {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
 
     @Override
@@ -75,7 +80,7 @@ public class ActorServiceImpl implements IActorService {
     }
 
     @Override
-    public ActorDTO addActor(ActorDTO actorDTO) {
+    public ActorDTO addActor(ActorDTO actorDTO, MultipartFile avatar) {
         // Convert DTO to Entity
         Actor actor = modelMapper.map(actorDTO, Actor.class);
 
@@ -87,7 +92,8 @@ public class ActorServiceImpl implements IActorService {
 //            movieSet.add(movie);
 //        }
         //        actor.setMovies(movieSet);
-
+        String avatarURL = cloudinaryService.uploadThumb(avatar);
+        actor.setAvatar(avatarURL);
         actor.setCreatedDate(LocalDateTime.now());
         Actor actorRequest = actorRepository.save(actor);
         // Convert Entity to DTO

@@ -69,7 +69,7 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
-    public MovieDTO addMovie(MovieDTO movieDTO, MultipartFile thumbFile) {
+    public MovieDTO addMovie(MovieDTO movieDTO, MultipartFile thumbFile, MultipartFile posterFile) {
         Boolean isExist = movieRepository.existsMovieBySlug(movieDTO.getSlug());
         if(isExist){
             throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " slug is already exist!");
@@ -111,8 +111,8 @@ public class MovieServiceImpl implements IMovieService {
         String thumbURL = cloudinaryService.uploadThumb(thumbFile);
         movieRequest.setThumbURL(thumbURL);
 
-//        String posterURL = cloudinaryService.uploadPoster(posterFile);
-//        movieRequest.setPosterURL(posterURL);
+        String posterURL = cloudinaryService.uploadPoster(posterFile);
+        movieRequest.setPosterURL(posterURL);
 
         movieRequest.setCountry(country);
         movieRequest.setCategories(categorySet);

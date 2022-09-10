@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface IMovieService {
     PagedResponse<Movie> getAllMovies(int pageNo, int pageSize, String sortDir, String sortBy);
-    MovieDTO addMovie(MovieDTO movieDTO, MultipartFile file);
+    MovieDTO addMovie(MovieDTO movieDTO, MultipartFile thumbFile, MultipartFile posterFile);
     PagedResponse<Movie> getMoviesByCategory(Long categoryID, int pageNo, int pageSize, String sortDir, String sortBy);
     MovieDTO updateMovie(Long id, MovieDTO movieDTO);
     void deleteMovie(Long id);

@@ -1,5 +1,6 @@
 package com.example.tmovierestapi.controller;
 
+import com.example.tmovierestapi.anotation.ValidImage;
 import com.example.tmovierestapi.model.Actor;
 import com.example.tmovierestapi.payload.dto.ActorDTO;
 import com.example.tmovierestapi.payload.response.ActorResponse;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
@@ -34,8 +36,9 @@ public class ActorController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ActorDTO> addActor(@RequestBody @Valid ActorDTO actorDTO) {
-        return new ResponseEntity<>(iActorService.addActor(actorDTO), HttpStatus.CREATED);
+    public ResponseEntity<ActorDTO> addActor(@ModelAttribute(name = "actor") @Valid ActorDTO actorDTO,
+                                             @RequestPart(name = "avatarFile") @ValidImage MultipartFile avatar) {
+        return new ResponseEntity<>(iActorService.addActor(actorDTO, avatar), HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")

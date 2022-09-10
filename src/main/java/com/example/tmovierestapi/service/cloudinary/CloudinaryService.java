@@ -30,7 +30,8 @@ public class CloudinaryService {
                     new Transformation().width(360).height(480).crop("fill")).generate(publicID + format);
             return thumbURL;
         } catch (Exception e) {
-            throw new RuntimeException("File can not empty!");
+            deleteFile(file.getOriginalFilename());
+            throw new RuntimeException(e.getMessage());
         }
     }
     public String uploadPoster(MultipartFile file) {
@@ -44,7 +45,8 @@ public class CloudinaryService {
                     new Transformation().width(720).height(480).crop("fill")).generate(publicID + format);
             return posterURL;
         } catch (Exception e) {
-            throw new RuntimeException("File can not empty!");
+            deleteFile(file.getOriginalFilename());
+            throw new RuntimeException(e.getMessage());
         }
     }
 

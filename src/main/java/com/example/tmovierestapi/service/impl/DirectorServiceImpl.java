@@ -15,6 +15,7 @@ import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.repository.DirectorRepository;
 import com.example.tmovierestapi.repository.MovieRepository;
 import com.example.tmovierestapi.service.IDirectorService;
+import com.example.tmovierestapi.service.cloudinary.CloudinaryService;
 import com.example.tmovierestapi.utils.AppUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -36,6 +38,9 @@ public class DirectorServiceImpl implements IDirectorService {
 
     @Autowired
     private DirectorRepository directorRepository;
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     @Override
     public PagedResponse<DirectorResponse> getAllDirectors(int pageNo, int pageSize, String sortDir, String sortBy) {
@@ -83,7 +88,7 @@ public class DirectorServiceImpl implements IDirectorService {
     }
 
     @Override
-    public DirectorDTO addDirector(DirectorDTO directorDTO) {
+    public DirectorDTO addDirector(DirectorDTO directorDTO, MultipartFile avatar) {
         // Convert DTO to Entity
         Director directorRequest = modelMapper.map(directorDTO, Director.class);
         directorRequest.setCreatedDate(LocalDateTime.now());
@@ -97,6 +102,8 @@ public class DirectorServiceImpl implements IDirectorService {
 //        }
 //        directorRequest.setMovies(movieSet);
 
+        String avatarURL = cloudinaryService.uploadThumb(avatar);
+        directorRequest.setAvatar(avatarURL);
         Director director = directorRepository.save(directorRequest);
 
         DirectorDTO directorResponse = modelMapper.map(director, DirectorDTO.class);

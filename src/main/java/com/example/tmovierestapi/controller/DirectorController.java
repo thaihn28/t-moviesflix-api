@@ -1,5 +1,6 @@
 package com.example.tmovierestapi.controller;
 
+import com.example.tmovierestapi.anotation.ValidImage;
 import com.example.tmovierestapi.model.Director;
 import com.example.tmovierestapi.payload.dto.DirectorDTO;
 import com.example.tmovierestapi.payload.response.DirectorResponse;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
@@ -36,8 +38,9 @@ public class DirectorController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<DirectorDTO> addDirector(@RequestBody @Valid DirectorDTO directorDTO) {
-        return new ResponseEntity<>(iDirectorService.addDirector(directorDTO), HttpStatus.CREATED);
+    public ResponseEntity<DirectorDTO> addDirector(@ModelAttribute(name = "director") @Valid DirectorDTO directorDTO,
+                                                   @RequestPart(name = "avatarFile") @ValidImage MultipartFile avatar) {
+        return new ResponseEntity<>(iDirectorService.addDirector(directorDTO, avatar), HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")

@@ -41,8 +41,12 @@ public class MovieController {
 
 //    @PostMapping("/add")
     @RequestMapping(path = "/add", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public ResponseEntity<MovieDTO> addMovie(@RequestPart(name = "movie") @Valid MovieDTO movieDTO, @RequestPart(name = "file") @ValidImage MultipartFile file) {
-        return new ResponseEntity<>(iMovieService.addMovie(movieDTO, file), HttpStatus.CREATED);
+    public ResponseEntity<MovieDTO> addMovie(@ModelAttribute(name = "movie") @Valid MovieDTO movieDTO,
+                                             @RequestPart(name = "thumbFile") @ValidImage MultipartFile thumbFile,
+                                             @RequestPart(name = "posterFile") @ValidImage MultipartFile posterFile
+
+    ) {
+        return new ResponseEntity<>(iMovieService.addMovie(movieDTO, thumbFile, posterFile), HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")

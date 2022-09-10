@@ -31,7 +31,6 @@ public class MovieDTO {
     @NotBlank
     private String type;
 
-    @NotBlank
     private String thumbURL;
 
     @NotBlank
@@ -52,7 +51,6 @@ public class MovieDTO {
     @NotBlank
     private String slug;
 
-    @NotBlank
     private String posterURL;
 
     private Integer year;
