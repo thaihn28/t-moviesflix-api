@@ -5,11 +5,12 @@ import com.cloudinary.Transformation;
 import com.example.tmovierestapi.email.EmailSender;
 import com.example.tmovierestapi.model.ERole;
 import com.example.tmovierestapi.model.Role;
+import com.example.tmovierestapi.model.User;
 import com.example.tmovierestapi.payload.request.SignupRequest;
 import com.example.tmovierestapi.repository.RoleRepository;
 import com.example.tmovierestapi.repository.UserRepository;
-import com.example.tmovierestapi.service.IAuthService;
 import com.example.tmovierestapi.service.IRegistrationService;
+import com.example.tmovierestapi.utils.admin.Password;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,8 +19,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @SpringBootApplication
@@ -75,40 +74,29 @@ public class TMovieRestApiApplication {
     @Bean
     CommandLineRunner run() {
         return args -> {
-            try {
-
-            }catch (Exception e){
-                throw new IllegalStateException("Catch");
+            Boolean isExistRole = roleRepository.existsRoleByName(ERole.ROLE_ADMIN);
+            if(!isExistRole){
+                roleRepository.save(new Role(ERole.ROLE_ADMIN));
             }
-            emailSender.send("1901040197@s.hanu.edu.vn", "1901040197@s.hanu.edu.vn");
+            Boolean isExistRoleUser = roleRepository.existsRoleByName(ERole.ROLE_USER);
+            if(!isExistRoleUser){
+                roleRepository.save(new Role(ERole.ROLE_USER));
+            }
+            SignupRequest signupRequest = new SignupRequest();
+            signupRequest.setEmail("thaihn@gmail.com");
+            signupRequest.setUsername("admin");
+            signupRequest.setLastName("1");
+            signupRequest.setFirstName("ADMIN");
+            signupRequest.setPassword(Password.HIDDEN);
+            Set<String> roles = new HashSet<>();
+            roles.add(ERole.ROLE_ADMIN.name());
+            signupRequest.setRoles(roles);
 
-//            Role roleAdmin = new Role();
-//            roleAdmin.setName(ERole.ROLE_ADMIN);
-//            Boolean isExistRole = roleRepository.existsRoleByName(roleAdmin.getName());
-//            if(!isExistRole){
-//                roleRepository.save(roleAdmin);
-//            }
-//            Role roleUser = new Role();
-//            roleUser.setName(ERole.ROLE_USER);
-//            Boolean isExistRoleUser = roleRepository.existsRoleByName(roleUser.getName());
-//            if(!isExistRoleUser){
-//                roleRepository.save(roleUser);
-//            }
-//
-////            System.out.println(LocalDateTime.now());
-//            SignupRequest signupRequest = new SignupRequest();
-//            signupRequest.setEmail("thaihn@gmail.com");
-//            signupRequest.setUsername("thaihn");
-//            signupRequest.setLastName("Hoang");
-//            signupRequest.setFirstName("Thai");
-//            signupRequest.setPassword("hnt282001");
-//            Set<String> roles = new HashSet<>();
-//            roles.add("ROLE_ADMIN");
-//            signupRequest.setRoles(roles);
-//            if(!userRepository.existsUserByEmail(signupRequest.getEmail()) ||
-//                    !userRepository.existsUserByUsername(signupRequest.getUsername())){
-//                iRegistrationService.signup(signupRequest);
-//            }
+            Boolean existsUserByEmail = userRepository.existsUserByEmail(signupRequest.getEmail());
+            Boolean existsUserByUsername = userRepository.existsUserByUsername(signupRequest.getUsername());
+            if(!existsUserByEmail && !existsUserByUsername){
+                iRegistrationService.signup(signupRequest);
+            }
         };
     }
 

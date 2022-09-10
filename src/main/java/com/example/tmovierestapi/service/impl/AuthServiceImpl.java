@@ -1,6 +1,7 @@
 package com.example.tmovierestapi.service.impl;
 
 
+import com.example.tmovierestapi.model.User;
 import com.example.tmovierestapi.payload.request.LoginRequest;
 import com.example.tmovierestapi.payload.response.JwtResponse;
 import com.example.tmovierestapi.security.jwt.JwtUtils;
@@ -35,16 +36,15 @@ public class AuthServiceImpl implements IAuthService {
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toList());
+//        List<String> roles = userDetails.getAuthorities().stream()
+//                .map(item -> item.getAuthority())
+//                .collect(Collectors.toList());
 
         return new JwtResponse(
                 jwt,
                 userDetails.getId(),
                 userDetails.getUsername(),
-                userDetails.getEmail(),
-                roles
+                userDetails.getEmail()
         );
     }
 }

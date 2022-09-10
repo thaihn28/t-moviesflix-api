@@ -1,5 +1,5 @@
 package com.example.tmovierestapi.email;
 
 public interface EmailSender {
-    void send(String to, String email);
+    void send(String recipient, String name, String link);
 }

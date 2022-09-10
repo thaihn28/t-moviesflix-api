@@ -6,5 +6,4 @@ public interface IRegistrationService {
     String signup(SignupRequest signupRequest);
 
     String confirmToken(String token);
-    String buildEmail(String name, String link);
 }
