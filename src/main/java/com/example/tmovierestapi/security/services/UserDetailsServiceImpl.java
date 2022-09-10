@@ -14,7 +14,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Autowired
     UserRepository userRepository;
 
-
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -22,4 +21,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User Not Found with username" + username));
         return UserDetailsImpl.build(user);
     }
+
+    public int enableUser(String email) {
+        return userRepository.enableUser(email);
+    }
+
 }

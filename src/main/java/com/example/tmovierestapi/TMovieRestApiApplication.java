@@ -2,12 +2,14 @@ package com.example.tmovierestapi;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
+import com.example.tmovierestapi.email.EmailSender;
 import com.example.tmovierestapi.model.ERole;
 import com.example.tmovierestapi.model.Role;
 import com.example.tmovierestapi.payload.request.SignupRequest;
 import com.example.tmovierestapi.repository.RoleRepository;
 import com.example.tmovierestapi.repository.UserRepository;
 import com.example.tmovierestapi.service.IAuthService;
+import com.example.tmovierestapi.service.IRegistrationService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +25,7 @@ import java.util.*;
 @SpringBootApplication
 public class TMovieRestApiApplication {
     @Autowired
-    private IAuthService iAuthService;
+    private IRegistrationService iRegistrationService;
 
     @Autowired
     private UserRepository userRepository;
@@ -39,6 +41,9 @@ public class TMovieRestApiApplication {
 
     @Value("${com.cloudinary.api_secret}")
     private String apiSecret;
+
+    @Autowired
+    private EmailSender emailSender;
 
 
     @Bean
@@ -70,24 +75,40 @@ public class TMovieRestApiApplication {
     @Bean
     CommandLineRunner run() {
         return args -> {
-            Role roleAdmin = new Role();
-            roleAdmin.setName(ERole.ROLE_ADMIN);
-            if(!roleRepository.existsRoleByName(roleAdmin.getName())){
-                roleRepository.save(roleAdmin);
-            }
+            try {
 
-//            System.out.println(LocalDateTime.now());
-            SignupRequest signupRequest = new SignupRequest();
-            signupRequest.setEmail("thaihn@gmail.com");
-            signupRequest.setUsername("thaihn");
-            signupRequest.setPassword("hnt282001");
-            Set<String> roles = new HashSet<>();
-            roles.add("admin");
-            signupRequest.setRoles(roles);
-            if(!userRepository.existsUserByEmail(signupRequest.getEmail()) ||
-                    !userRepository.existsUserByUsername(signupRequest.getUsername())){
-                iAuthService.signup(signupRequest);
+            }catch (Exception e){
+                throw new IllegalStateException("Catch");
             }
+            emailSender.send("1901040197@s.hanu.edu.vn", "1901040197@s.hanu.edu.vn");
+
+//            Role roleAdmin = new Role();
+//            roleAdmin.setName(ERole.ROLE_ADMIN);
+//            Boolean isExistRole = roleRepository.existsRoleByName(roleAdmin.getName());
+//            if(!isExistRole){
+//                roleRepository.save(roleAdmin);
+//            }
+//            Role roleUser = new Role();
+//            roleUser.setName(ERole.ROLE_USER);
+//            Boolean isExistRoleUser = roleRepository.existsRoleByName(roleUser.getName());
+//            if(!isExistRoleUser){
+//                roleRepository.save(roleUser);
+//            }
+//
+////            System.out.println(LocalDateTime.now());
+//            SignupRequest signupRequest = new SignupRequest();
+//            signupRequest.setEmail("thaihn@gmail.com");
+//            signupRequest.setUsername("thaihn");
+//            signupRequest.setLastName("Hoang");
+//            signupRequest.setFirstName("Thai");
+//            signupRequest.setPassword("hnt282001");
+//            Set<String> roles = new HashSet<>();
+//            roles.add("ROLE_ADMIN");
+//            signupRequest.setRoles(roles);
+//            if(!userRepository.existsUserByEmail(signupRequest.getEmail()) ||
+//                    !userRepository.existsUserByUsername(signupRequest.getUsername())){
+//                iRegistrationService.signup(signupRequest);
+//            }
         };
     }
 

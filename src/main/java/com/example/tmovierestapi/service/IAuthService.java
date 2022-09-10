@@ -5,7 +5,6 @@ import com.example.tmovierestapi.payload.request.SignupRequest;
 import com.example.tmovierestapi.payload.response.JwtResponse;
 
 public interface IAuthService {
-    String signup(SignupRequest signupRequest);
     JwtResponse login(LoginRequest loginRequest);
 
 }
