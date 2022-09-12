@@ -24,6 +24,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
         // securedEnabled = true,
         // jsr250Enabled = true,
         prePostEnabled = true)
+/* TODO:
+– @EnableWebSecurity allows Spring to find and automatically apply the class to the global Web Security.
+– @EnableGlobalMethodSecurity provides AOP security on methods.
+ It enables @PreAuthorize, @PostAuthorize,
+ it also supports JSR-250. You can find more parameters in configuration in Method Security Expressions.
+* */
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
@@ -37,6 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+
         authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
     @Bean
@@ -48,15 +55,32 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    /*TODO:
+    We override the configure(HttpSecurity http) method from WebSecurityConfigurerAdapter interface.
+    It tells Spring Security how we configure CORS and CSRF, when we want to require all users to be authenticated or not,
+    which filter (AuthTokenFilter) and when we want it to work (filter before UsernamePasswordAuthenticationFilter),
+    which Exception Handler is chosen (AuthEntryPointJwt).
+    *  */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+//                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)//bỏ session
+                .and()
                 .authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
-                .antMatchers(HttpMethod.GET,"/api/v1/**").permitAll()
-                .anyRequest().authenticated();
+                .antMatchers(HttpMethod.GET,"/api/v1/**/**/**").permitAll()
+                .anyRequest()
+                .authenticated()
+                .and()
+                .logout()
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
+
+        ;
+//                .anyRequest()
+//                .authenticated();
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 

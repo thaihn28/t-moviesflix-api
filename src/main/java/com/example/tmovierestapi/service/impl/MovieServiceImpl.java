@@ -1,5 +1,6 @@
 package com.example.tmovierestapi.service.impl;
 
+import com.example.tmovierestapi.email.EmailSender;
 import com.example.tmovierestapi.exception.APIException;
 import com.example.tmovierestapi.exception.ResourceNotFoundException;
 import com.example.tmovierestapi.model.*;
@@ -8,12 +9,14 @@ import com.example.tmovierestapi.payload.request.CategoryRequest;
 import com.example.tmovierestapi.payload.dto.MovieDTO;
 import com.example.tmovierestapi.payload.request.DirectorRequest;
 import com.example.tmovierestapi.payload.response.PagedResponse;
+import com.example.tmovierestapi.payload.response.UserResponse;
 import com.example.tmovierestapi.repository.*;
 import com.example.tmovierestapi.service.IMovieService;
 import com.example.tmovierestapi.service.cloudinary.CloudinaryService;
 import com.example.tmovierestapi.utils.AppUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class MovieServiceImpl implements IMovieService {
@@ -50,6 +50,8 @@ public class MovieServiceImpl implements IMovieService {
 
     @Autowired
     private CloudinaryService cloudinaryService;
+
+
 
 
     @Override
@@ -103,7 +105,7 @@ public class MovieServiceImpl implements IMovieService {
         }
 
         if (movieDTO.getIsFree()) {
-            movieRequest.setPrice(0);
+            movieRequest.setPrice(0d);
         } else {
             movieRequest.setPrice(movieDTO.getPrice());
         }
@@ -148,16 +150,22 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
-    public MovieDTO updateMovie(Long id, MovieDTO movieDTO) {
+    public MovieDTO updateMovie(Long id, MovieDTO movieDTO, MultipartFile thumbFile, MultipartFile posterFile) {
         Movie movie = movieRepository.findMovieById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", id));
         //  DTO -> Entity
         Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
 
+        if(!thumbFile.isEmpty()){
+            movie.setThumbURL(cloudinaryService.uploadThumb(thumbFile));
+        }
+        if(!posterFile.isEmpty()){
+            movie.setThumbURL(cloudinaryService.uploadPoster(posterFile));
+        }
+
         movie.setName(movieRequest.getName());
         movie.setContent(movieRequest.getContent());
         movie.setType(movieRequest.getType());
-        movie.setThumbURL(movieRequest.getThumbURL());
         movie.setTrailerURL(movieRequest.getTrailerURL());
         movie.setTime(movieRequest.getTime());
         movie.setEpisodeCurrent(movieRequest.getEpisodeCurrent());
@@ -165,7 +173,6 @@ public class MovieServiceImpl implements IMovieService {
         movie.setQuality(movieRequest.getQuality());
         movie.setSlug(movieRequest.getSlug());
         movie.setYear(movieRequest.getYear());
-        movie.setPosterURL(movieRequest.getPosterURL());
         movie.setShowTimes(movieRequest.getShowTimes());
         movie.setIsFree(movieRequest.getIsFree());
         movie.setIsHot(movieRequest.getIsHot());
@@ -269,6 +276,24 @@ public class MovieServiceImpl implements IMovieService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
         Page<Movie> movieResponse = movieRepository.findMoviesByType(type, pageable);
+        List<Movie> contents = movieResponse.getTotalElements() == 0 ? Collections.emptyList() : movieResponse.getContent();
+
+        return new PagedResponse<>(contents, movieResponse.getNumber(), movieResponse.getSize(),
+                movieResponse.getTotalElements(), movieResponse.getTotalPages(), movieResponse.isLast());
+    }
+
+    @Override
+    public PagedResponse<Movie> getAllHotMovies(int pageNo, int pageSize, String sortDir, String sortBy) {
+        AppUtils.validatePageNumberAndSize(pageNo, pageSize);
+
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+
+        Boolean isHot = true;
+
+        Page<Movie> movieResponse = movieRepository.findMoviesByIsHot(isHot, pageable);
         List<Movie> contents = movieResponse.getTotalElements() == 0 ? Collections.emptyList() : movieResponse.getContent();
 
         return new PagedResponse<>(contents, movieResponse.getNumber(), movieResponse.getSize(),

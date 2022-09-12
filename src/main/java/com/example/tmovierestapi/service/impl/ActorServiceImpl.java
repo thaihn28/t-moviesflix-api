@@ -47,11 +47,11 @@ public class ActorServiceImpl implements IActorService {
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
         Page<Actor> actorPage = actorRepository.findAll(pageable);
 
-        List<Actor> actors =  actorPage.getNumberOfElements() == 0 ? Collections.emptyList() : actorPage.getContent();
+        List<Actor> actors = actorPage.getNumberOfElements() == 0 ? Collections.emptyList() : actorPage.getContent();
 
         List<ActorResponse> actorsResponse = new ArrayList<>();
 
-        for(Actor a : actors){
+        for (Actor a : actors) {
             ActorResponse actorResponseObj = new ActorResponse();
             actorResponseObj.setId(a.getId());
             actorResponseObj.setName(a.getName());
@@ -61,7 +61,7 @@ public class ActorServiceImpl implements IActorService {
             actorResponseObj.setModifiedDate(a.getModifiedDate());
 
             Set<MovieResponse> movieResponseSet = new HashSet<>();
-            for(Movie m : a.getMovies()){
+            for (Movie m : a.getMovies()) {
                 MovieResponse movieResponseObj = new MovieResponse();
                 movieResponseObj.setId(m.getId());
                 movieResponseObj.setName(m.getName());
@@ -103,14 +103,18 @@ public class ActorServiceImpl implements IActorService {
     }
 
     @Override
-    public ActorDTO updateActor(Long id, ActorDTO actorDTO) {
+    public ActorDTO updateActor(Long id, ActorDTO actorDTO, MultipartFile avatar) {
         Actor actor = actorRepository.findActorById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", id));
 
         Actor actorRequest = modelMapper.map(actorDTO, Actor.class);
 
+        if (avatar.isEmpty()) {
+            String url = cloudinaryService.uploadThumb(avatar);
+            actor.setAvatar(url);
+        }
+
         actor.setName(actorRequest.getName());
-        actor.setAvatar(actorRequest.getAvatar());
         actor.setIsHot(actorRequest.getIsHot());
         actor.setModifiedDate(LocalDateTime.now());
 
@@ -124,7 +128,7 @@ public class ActorServiceImpl implements IActorService {
     public void deleteActor(Long id) {
         Actor actor = actorRepository.findActorById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", id));
-        for(Movie m : actor.getMovies()){
+        for (Movie m : actor.getMovies()) {
             m.removeActor(actor);
         }
         actorRepository.delete(actor);

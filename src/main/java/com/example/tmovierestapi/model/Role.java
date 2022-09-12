@@ -1,5 +1,6 @@
 package com.example.tmovierestapi.model;
 
+import com.example.tmovierestapi.enums.ERole;
 import lombok.Data;
 
 import javax.persistence.*;

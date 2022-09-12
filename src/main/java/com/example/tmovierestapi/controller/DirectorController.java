@@ -10,6 +10,7 @@ import com.example.tmovierestapi.utils.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,17 +39,27 @@ public class DirectorController {
     }
 
     @PostMapping("/add")
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<DirectorDTO> addDirector(@ModelAttribute(name = "director") @Valid DirectorDTO directorDTO,
-                                                   @RequestPart(name = "avatarFile") @ValidImage MultipartFile avatar) {
+                                                   @RequestPart(name = "avatarFile") @Valid @ValidImage MultipartFile avatar) {
         return new ResponseEntity<>(iDirectorService.addDirector(directorDTO, avatar), HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<DirectorDTO> updateDirector(@PathVariable(value = "id") Long id, @RequestBody @Valid DirectorDTO directorDTO) {
-        return new ResponseEntity<>(iDirectorService.updateDirector(id, directorDTO), HttpStatus.CREATED);
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<DirectorDTO> updateDirector(@PathVariable(value = "id") Long id,
+                                                      @ModelAttribute @Valid DirectorDTO directorDTO,
+                                                      @RequestPart(name = "avatarFile", required = false) @ValidImage MultipartFile updateAvatar
+    ) {
+        return new ResponseEntity<>(iDirectorService.updateDirector(id, directorDTO, updateAvatar), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> deleteDirector(@PathVariable(value = "id") Long id) {
         iDirectorService.deleteDirector(id);
         return new ResponseEntity<>("Deleted director with ID-" + id + "successfully", HttpStatus.OK);

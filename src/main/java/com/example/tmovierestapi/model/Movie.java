@@ -76,7 +76,7 @@ public class Movie {
     private Boolean isFree;
 
     @Column(name = "price")
-    private Integer price;
+    private Double price;
 
     //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern ="yyyy-MM-dd'T'HH:mm:ss.SSSZZ", timezone = "UTC")
     @Column(name = "created_date")

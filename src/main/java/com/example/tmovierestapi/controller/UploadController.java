@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/test")
-public class TestController {
+public class UploadController {
 
     @Autowired
     private CloudinaryService cloudinaryService;

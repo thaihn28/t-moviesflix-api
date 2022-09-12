@@ -8,6 +8,7 @@ import com.example.tmovierestapi.utils.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -29,16 +30,19 @@ public class EpisodeController {
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<EpisodeDTO> addEpisode(@RequestBody @Valid EpisodeDTO episodeDTO){
         return new ResponseEntity<>(iEpisodeService.addEpisode(episodeDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<EpisodeDTO> updateEpisode(@PathVariable(value = "id") Long id, @RequestBody @Valid EpisodeDTO episodeDTO){
         return new ResponseEntity<>(iEpisodeService.updateEpisode(id, episodeDTO), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> deleteEpisode(@PathVariable(value = "id") Long id){
         iEpisodeService.deleteByID(id);
         return new ResponseEntity<>("Deleted Episode with ID-" + id + " successfully!", HttpStatus.OK);

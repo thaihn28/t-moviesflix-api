@@ -61,7 +61,7 @@ public class MovieDTO {
 
     private Boolean isFree;
 
-    private Integer price;
+    private Double price;
 
     private LocalDateTime createdDate;
 

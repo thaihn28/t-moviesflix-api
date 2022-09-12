@@ -5,6 +5,7 @@ import lombok.Data;
 import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 @Data
 public class PlaylistDTO {
@@ -22,8 +23,10 @@ public class PlaylistDTO {
 
     private int year;
 
-    @NotBlank
     @Column(name = "thumb_url")
     private String thumbURL;
+
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
 
 }

@@ -10,11 +10,13 @@ import com.example.tmovierestapi.utils.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/actors")
 public class ActorController {
@@ -36,17 +38,27 @@ public class ActorController {
     }
 
     @PostMapping("/add")
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ActorDTO> addActor(@ModelAttribute(name = "actor") @Valid ActorDTO actorDTO,
                                              @RequestPart(name = "avatarFile") @ValidImage MultipartFile avatar) {
         return new ResponseEntity<>(iActorService.addActor(actorDTO, avatar), HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ActorDTO> updateActor(@PathVariable(value = "id") Long id, @RequestBody @Valid ActorDTO actorDTO) {
-        return new ResponseEntity<>(iActorService.updateActor(id, actorDTO), HttpStatus.CREATED);
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<ActorDTO> updateActor(@PathVariable(value = "id") Long id,
+                                                @ModelAttribute(name = "actor") @Valid ActorDTO actorDTO,
+                                                @RequestPart(name = "avatarFile", required = false) @ValidImage MultipartFile avatar
+    ) {
+        return new ResponseEntity<>(iActorService.updateActor(id, actorDTO, avatar), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> deleteActor(@PathVariable(value = "id") Long id) {
         iActorService.deleteActor(id);
         return new ResponseEntity<>("Deleted actor with ID-" + id + " successfully", HttpStatus.OK);

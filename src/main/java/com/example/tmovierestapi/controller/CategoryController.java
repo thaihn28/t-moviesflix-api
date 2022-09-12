@@ -8,11 +8,12 @@ import com.example.tmovierestapi.utils.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/v1/categories")
 public class CategoryController {
     @Autowired
@@ -28,17 +29,19 @@ public class CategoryController {
         PagedResponse<CategoryResponse> response = iCategoryService.getAllCategories(pageNo, pageSize, sortDir, sortBy);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<CategoryDTO> addCategory(@RequestBody @Valid CategoryDTO categoryDTO) {
         return new ResponseEntity<>(iCategoryService.addCategory(categoryDTO), HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<CategoryDTO> updateCategory(@PathVariable(value = "id") Long id, @RequestBody @Valid CategoryDTO categoryDTO) {
         return new ResponseEntity<>(iCategoryService.updateCategory(id, categoryDTO), HttpStatus.CREATED);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<String> deleteCategory(@PathVariable(value = "id") Long id) {
         iCategoryService.deleteCategory(id);

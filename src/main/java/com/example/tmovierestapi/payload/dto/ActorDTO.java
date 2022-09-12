@@ -6,6 +6,7 @@ import lombok.Data;
 import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,6 +21,9 @@ public class ActorDTO {
     private String avatar;
 
     private Boolean isHot;
+
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
 
 //    private Set<MovieRequest> movies = new HashSet<>();
 }

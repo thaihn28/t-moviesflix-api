@@ -39,6 +39,11 @@ public class UserDetailsImpl implements UserDetails {
         this.enabled = enabled;
     }
 
+    /*TODO:
+    Look at the code above, you can notice that we convert Set<Role> into List<GrantedAuthority>.
+    It is important to work with Spring Security and Authentication object later.
+    *  */
+
     public static UserDetailsImpl build(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))

@@ -2,10 +2,8 @@ package com.example.tmovierestapi;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
-import com.example.tmovierestapi.email.EmailSender;
-import com.example.tmovierestapi.model.ERole;
+import com.example.tmovierestapi.enums.ERole;
 import com.example.tmovierestapi.model.Role;
-import com.example.tmovierestapi.model.User;
 import com.example.tmovierestapi.payload.request.SignupRequest;
 import com.example.tmovierestapi.repository.RoleRepository;
 import com.example.tmovierestapi.repository.UserRepository;
@@ -19,6 +17,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.net.http.HttpRequest;
 import java.util.*;
 
 @SpringBootApplication
@@ -40,10 +39,6 @@ public class TMovieRestApiApplication {
 
     @Value("${com.cloudinary.api_secret}")
     private String apiSecret;
-
-    @Autowired
-    private EmailSender emailSender;
-
 
     @Bean
     public ModelMapper modelMapper() {
@@ -74,22 +69,30 @@ public class TMovieRestApiApplication {
     @Bean
     CommandLineRunner run() {
         return args -> {
-            Boolean isExistRole = roleRepository.existsRoleByName(ERole.ROLE_ADMIN);
+
+
+//            try {
+//                emailSender.send("hoangthai.solem2801@gmail.com", "Thai", "GGGG");
+//            }catch (Exception e){
+//                throw new Exception(e.getMessage());
+//            }
+            Boolean isExistRole = roleRepository.existsRoleByName(ERole.ADMIN);
             if(!isExistRole){
-                roleRepository.save(new Role(ERole.ROLE_ADMIN));
+                roleRepository.save(new Role(ERole.ADMIN));
             }
-            Boolean isExistRoleUser = roleRepository.existsRoleByName(ERole.ROLE_USER);
+            Boolean isExistRoleUser = roleRepository.existsRoleByName(ERole.USER);
             if(!isExistRoleUser){
-                roleRepository.save(new Role(ERole.ROLE_USER));
+                roleRepository.save(new Role(ERole.USER));
             }
             SignupRequest signupRequest = new SignupRequest();
-            signupRequest.setEmail("thaihn@gmail.com");
-            signupRequest.setUsername("admin");
+            signupRequest.setEmail("tmovie.email@gmail.com");
+            signupRequest.setUsername("admin1");
             signupRequest.setLastName("1");
             signupRequest.setFirstName("ADMIN");
             signupRequest.setPassword(Password.HIDDEN);
+//            signupRequest.
             Set<String> roles = new HashSet<>();
-            roles.add(ERole.ROLE_ADMIN.name());
+            roles.add(ERole.ADMIN.name());
             signupRequest.setRoles(roles);
 
             Boolean existsUserByEmail = userRepository.existsUserByEmail(signupRequest.getEmail());

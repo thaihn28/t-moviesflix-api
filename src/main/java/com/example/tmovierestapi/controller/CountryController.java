@@ -6,6 +6,7 @@ import com.example.tmovierestapi.service.ICountryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -23,11 +24,13 @@ public class CountryController {
     }
 
     @PostMapping("/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<CountryDTO> addCountry(@RequestBody @Valid CountryDTO countryDTO){
         return new ResponseEntity<>(iCountryService.addCountry(countryDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<CountryDTO> updateCountry(@PathVariable(value = "id") Long id, @RequestBody @Valid
                                                     CountryDTO countryDTO
                                                     ){
@@ -35,6 +38,7 @@ public class CountryController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> deleteCountry(@PathVariable(value = "id") Long id){
         iCountryService.deleteCountry(id);
         return new ResponseEntity<>("Deleted country with ID-" + id + " successfully", HttpStatus.OK);

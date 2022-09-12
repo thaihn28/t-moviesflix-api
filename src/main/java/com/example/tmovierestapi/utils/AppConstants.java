@@ -10,6 +10,11 @@ public class AppConstants {
     public static final String USERNAME_MAIL_SENDER = "thaihn2801@gmail.com";
     public static final String PASSWORD_MAIL_SENDER = "rhnteedisxonyvmj";
 
+    public static final String URL_PAYPAL_SUCCESS = "pay/success";
+    public static final String URL_PAYPAL_CANCEL = "pay/cancel";
+
+    public static final String PAYPAL_CURRENCY = "USD";
+
     public static final String SORT_BY_CREATED_DATE = "createdDate";
     public static final String SORT_BY_NAME = "name";
     public static final String SORT_DIRECTION = "asc";

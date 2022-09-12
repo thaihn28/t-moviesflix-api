@@ -22,7 +22,17 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private JwtUtils jwtUtils;
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
+
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
+
+
+    /*TODO:
+    What we do inside doFilterInternal():
+    – get JWT from the Authorization header (by removing Bearer prefix)
+    – if the request has JWT, validate it, parse username from it
+    – from username, get UserDetails to create an Authentication object
+    – set the current UserDetails in SecurityContext using setAuthentication(authentication) method.
+    After this, everytime you want to get UserDetails, just use SecurityContext like this:*/
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -34,13 +44,18 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                // After setting the Authentication in the context, we specify
+                // that the current user is authenticated. So it passes the
+                // Spring Security Configurations successfully.
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
-            logger.error("Cannot set user authentication: {}", e);
+            logger.error("Cannot set user authentication", e);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Cannot set user authentication");
         }
         filterChain.doFilter(request, response);
     }
+
     private String parseJwt(HttpServletRequest request) {
         String headerAuth = request.getHeader("Authorization");
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {

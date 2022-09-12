@@ -111,14 +111,17 @@ public class DirectorServiceImpl implements IDirectorService {
     }
 
     @Override
-    public DirectorDTO updateDirector(Long id, DirectorDTO directorDTO) {
+    public DirectorDTO updateDirector(Long id, DirectorDTO directorDTO, MultipartFile updateAvatar) {
         Director director = directorRepository.findDirectorById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", id));
 
         Director directorRequest = modelMapper.map(directorDTO, Director.class);
 
+        if(!updateAvatar.isEmpty()){
+            String url = cloudinaryService.uploadThumb(updateAvatar);
+            director.setAvatar(url);
+        }
         director.setName(directorRequest.getName());
-        director.setAvatar(directorRequest.getAvatar());
         director.setIsHot(directorRequest.getIsHot());
         director.setModifiedDate(LocalDateTime.now());
 

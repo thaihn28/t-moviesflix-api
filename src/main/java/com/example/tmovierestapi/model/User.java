@@ -48,7 +48,7 @@ public class User {
 
     private Boolean enable;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -60,6 +60,14 @@ public class User {
             orphanRemoval = true
     )
     private Set<Comment> comments = new HashSet<>();
+
+    public String fullName(){
+        return firstName + lastName;
+    }
+
+    public void removeRole(Role role){
+        this.roles.remove(role);
+    }
 
 
 }

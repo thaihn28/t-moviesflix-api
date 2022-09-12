@@ -8,6 +8,7 @@ import com.example.tmovierestapi.service.IRegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +40,12 @@ public class AuthController {
     @GetMapping("/confirm")
     public String confirm(@RequestParam("token") String token) {
         return iRegistrationService.confirmToken(token);
+    }
+
+    @PostMapping("/admin/sign-up")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<String> signupAdminAccount(@RequestBody @Valid SignupRequest signupRequest){
+        return new ResponseEntity<>(iRegistrationService.signupAdmin(signupRequest), HttpStatus.CREATED);
     }
 
 //    @ResponseStatus(HttpStatus.BAD_REQUEST)

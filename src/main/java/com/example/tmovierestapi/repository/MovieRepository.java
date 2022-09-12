@@ -20,6 +20,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     Page<Movie> findMoviesByActors(Actor actor, Pageable pageable);
     Page<Movie> findMoviesByDirectors(Director director, Pageable pageable);
     Page<Movie> findMoviesByType(String type, Pageable pageable);
+    Page<Movie> findMoviesByIsHot(Boolean isHot, Pageable pageable);
     Boolean existsMovieBySlug(String slug);
     //    @Query("SELECT a FROM Actor a WHERE a.name LIKE %?1%")
     @Query("SELECT m FROM Movie m WHERE " +
