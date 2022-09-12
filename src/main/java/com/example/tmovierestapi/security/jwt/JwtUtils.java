@@ -1,6 +1,6 @@
 package com.example.tmovierestapi.security.jwt;
 
-import com.example.tmovierestapi.security.services.UserDetailsImpl;
+import com.example.tmovierestapi.security.services.CustomUserDetails;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ public class JwtUtils {
     @Value("${app.jwtExpirationMs}")
     private int jwtExpirationMs;
     public String generateJwtToken(Authentication authentication) {
-        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+        CustomUserDetails userPrincipal = (CustomUserDetails) authentication.getPrincipal();
 
         return Jwts.builder()
                 .setSubject((userPrincipal.getUsername()))

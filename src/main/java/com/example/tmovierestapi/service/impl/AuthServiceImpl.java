@@ -1,11 +1,10 @@
 package com.example.tmovierestapi.service.impl;
 
 
-import com.example.tmovierestapi.model.User;
 import com.example.tmovierestapi.payload.request.LoginRequest;
 import com.example.tmovierestapi.payload.response.JwtResponse;
 import com.example.tmovierestapi.security.jwt.JwtUtils;
-import com.example.tmovierestapi.security.services.UserDetailsImpl;
+import com.example.tmovierestapi.security.services.CustomUserDetails;
 import com.example.tmovierestapi.service.IAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,9 +12,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class AuthServiceImpl implements IAuthService {
@@ -35,7 +31,7 @@ public class AuthServiceImpl implements IAuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 //        List<String> roles = userDetails.getAuthorities().stream()
 //                .map(item -> item.getAuthority())
 //                .collect(Collectors.toList());

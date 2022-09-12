@@ -5,7 +5,7 @@ import com.example.tmovierestapi.model.User;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.payload.response.UserResponse;
 import com.example.tmovierestapi.repository.UserRepository;
-import com.example.tmovierestapi.security.services.UserDetailsImpl;
+import com.example.tmovierestapi.security.services.CustomUserDetails;
 import com.example.tmovierestapi.service.IUserService;
 import com.example.tmovierestapi.utils.AppGetLoggedIn;
 import com.example.tmovierestapi.utils.AppUtils;
@@ -26,7 +26,6 @@ public class UserServiceImpl implements IUserService {
 
     @Autowired
     private UserRepository userRepository;
-
 
     @Override
     public PagedResponse<UserResponse> getAllUsers(int pageNo, int pageSize, String sortDir, String sortBy) {
@@ -61,7 +60,7 @@ public class UserServiceImpl implements IUserService {
     public void deleteUserByID(Long id) throws Exception {
         User user = userRepository.findUserById(id)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with ID" + id));
-        UserDetailsImpl userDetails = (UserDetailsImpl) AppGetLoggedIn.getLoggedIn().getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) AppGetLoggedIn.getLoggedIn().getPrincipal();
 
         if(user.getId() != userDetails.getId()){
             for(Role role : user.getRoles()){

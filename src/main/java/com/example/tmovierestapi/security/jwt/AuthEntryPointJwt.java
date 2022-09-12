@@ -24,7 +24,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
         logger.error("Unauthorized error: {}", authException.getMessage());
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED, "Bad credentials");
-        response.getOutputStream().println("{ \"Unauthorized error\": "  +  "\"Bad credentials" + "\" }");
+        response.getOutputStream().println("{ \"Unauthorized error\": "  +  authException.getMessage() + " \n }");
 //        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
 //                authException.getLocalizedMessage());
     }

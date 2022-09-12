@@ -17,13 +17,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class AuthTokenFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtils jwtUtils;
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
 
     /*TODO:
@@ -32,7 +32,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     – if the request has JWT, validate it, parse username from it
     – from username, get UserDetails to create an Authentication object
     – set the current UserDetails in SecurityContext using setAuthentication(authentication) method.
-    After this, everytime you want to get UserDetails, just use SecurityContext like this:*/
+    After this, everytime you want to get UserDetails, just use SecurityContext like this:
+    */
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

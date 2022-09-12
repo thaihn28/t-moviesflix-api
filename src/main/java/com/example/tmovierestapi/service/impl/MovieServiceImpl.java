@@ -105,7 +105,7 @@ public class MovieServiceImpl implements IMovieService {
         }
 
         if (movieDTO.getIsFree()) {
-            movieRequest.setPrice(0d);
+            movieRequest.setPrice(null);
         } else {
             movieRequest.setPrice(movieDTO.getPrice());
         }
@@ -176,6 +176,7 @@ public class MovieServiceImpl implements IMovieService {
         movie.setShowTimes(movieRequest.getShowTimes());
         movie.setIsFree(movieRequest.getIsFree());
         movie.setIsHot(movieRequest.getIsHot());
+        movie.setPrice(movieRequest.getPrice());
         movie.setModifiedDate(LocalDateTime.now());
 
         Set<Category> categorySet= new HashSet<>();

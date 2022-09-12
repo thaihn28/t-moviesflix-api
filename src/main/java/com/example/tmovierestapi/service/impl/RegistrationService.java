@@ -45,7 +45,7 @@ public class RegistrationService implements IRegistrationService {
     @Autowired
     private EmailSender emailSender;
 
-    private final String ADMIN_ACCOUNT= "hoangthai.solem2801@gmail.com";
+    private final String ADMIN_ACCOUNT = "hoangthai.solem2801@gmail.com";
 
     @Value("${app.authUrl}")
     private String authURL;
@@ -66,59 +66,36 @@ public class RegistrationService implements IRegistrationService {
         user.setEmail(signupRequest.getEmail());
         user.setPassword(encoder.encode(signupRequest.getPassword()));
 
-        Set<String> rolesRequest = signupRequest.getRoles();
         Set<Role> roles = new HashSet<>();
-        if (rolesRequest == null && rolesRequest.size() == 0) {
-            Role role = roleRepository.findRoleByName(ERole.USER)
-                    .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST, "Error:" + ERole.USER + " is not found"));
-            roles.add(role);
-        }
-//        else {
-//            rolesRequest.forEach((role -> {
-//                switch (role.toUpperCase()) {
-//                    case "ADMIN":
-//                        Role adminRole = roleRepository.findRoleByName(ERole.ADMIN)
-//                                .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST, "Error:" + ERole.ADMIN + " is not found"));
-//                        roles.add(adminRole);
-//                        user.setEnable(true);
-//                        break;
-//                    default:
-//                        Role userRole = roleRepository.findRoleByName(ERole.USER)
-//                                .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST, "Error:" + ERole.USER + " is not found"));
-//                        roles.add(userRole);
-//                        break;
-//                }
-//            }
-//            ));
-//        }
+        Role role = roleRepository.findRoleByName(ERole.USER)
+                .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST, "Error:" + ERole.USER + " is not found"));
+        roles.add(role);
+
         user.setRoles(roles);
         userRepository.save(user);
 
-        if (signupRequest.getRoles() == null || signupRequest.getRoles().contains("ROLE_USER")) {
-            String token = UUID.randomUUID().toString();
+        String token = UUID.randomUUID().toString();
 
-            ConfirmationToken confirmationToken = new ConfirmationToken(
-                    token,
-                    LocalDateTime.now(),
-                    LocalDateTime.now().plusMinutes(15),
-                    user
-            );
-            confirmationTokenService.saveConfirmationToken(
-                    confirmationToken);
+        ConfirmationToken confirmationToken = new ConfirmationToken(
+                token,
+                LocalDateTime.now(),
+                LocalDateTime.now().plusMinutes(15),
+                user
+        );
+        confirmationTokenService.saveConfirmationToken(
+                confirmationToken);
 //        TODO: SEND EMAIL
-            String link = authURL + "confirm?token=" + token;
-            try {
-                emailSender.send(
-                        signupRequest.getEmail(),
-                        signupRequest.fullName(),
-                        link
-                );
-            } catch (Exception e) {
-                throw new APIException(HttpStatus.BAD_REQUEST, "Can not send email!");
-            }
-            return "Registered successfully! An email will be sent in your inbox for confirming the verification, please check it!";
+        String link = authURL + "confirm?token=" + token;
+        try {
+            emailSender.send(
+                    signupRequest.getEmail(),
+                    signupRequest.fullName(),
+                    link
+            );
+        } catch (Exception e) {
+            throw new APIException(HttpStatus.BAD_REQUEST, "Can not send email!");
         }
-        return "Registered successfully!";
+        return "Registered successfully! An email will be sent in your inbox for confirming the verification, please check it!";
     }
 
     @Override
@@ -137,18 +114,11 @@ public class RegistrationService implements IRegistrationService {
         admin.setEmail(signupRequest.getEmail());
         admin.setPassword(encoder.encode(signupRequest.getPassword()));
 
-        Set<String> rolesRequest = signupRequest.getRoles();
         Set<Role> roles = new HashSet<>();
-        if (rolesRequest == null) {
-            rolesRequest.add(ERole.ADMIN.name());
-            rolesRequest.forEach((role -> {
-                Role userRole = roleRepository.findRoleByName(ERole.ADMIN)
-                        .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST, "Error:" + ERole.ADMIN + " is not found"));
-                roles.add(userRole);
-                admin.setEnable(true);
-            }
-            ));
-        }
+        Role role = roleRepository.findRoleByName(ERole.ADMIN)
+                        .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST,"Can not found ROLE ADMIN"));
+        roles.add(role);
+
         admin.setRoles(roles);
         userRepository.save(admin);
 

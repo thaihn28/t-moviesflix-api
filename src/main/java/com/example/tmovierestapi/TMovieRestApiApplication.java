@@ -17,7 +17,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import java.net.http.HttpRequest;
 import java.util.*;
 
 @SpringBootApplication
@@ -90,15 +89,11 @@ public class TMovieRestApiApplication {
             signupRequest.setLastName("1");
             signupRequest.setFirstName("ADMIN");
             signupRequest.setPassword(Password.HIDDEN);
-//            signupRequest.
-            Set<String> roles = new HashSet<>();
-            roles.add(ERole.ADMIN.name());
-            signupRequest.setRoles(roles);
 
             Boolean existsUserByEmail = userRepository.existsUserByEmail(signupRequest.getEmail());
             Boolean existsUserByUsername = userRepository.existsUserByUsername(signupRequest.getUsername());
             if(!existsUserByEmail && !existsUserByUsername){
-                iRegistrationService.signup(signupRequest);
+                iRegistrationService.signupAdmin(signupRequest);
             }
         };
     }

@@ -15,6 +15,8 @@ public class PaypalService {
     @Autowired
     private APIContext apiContext;
 
+    private List<Transaction> transactions = new ArrayList<>();
+
     public Payment createPayment(
             Movie movie,
             String currency,
@@ -32,8 +34,9 @@ public class PaypalService {
 
         Transaction transaction = new Transaction();
         transaction.setAmount(amount);
+        transaction.setPurchaseUnitReferenceId(movie.getId().toString());
 
-        List<Transaction> transactions = new ArrayList<>();
+//        List<Transaction> transactions = new ArrayList<>();
         transactions.add(transaction);
 
         Payer payer = new Payer();
@@ -48,13 +51,16 @@ public class PaypalService {
         redirectUrls.setReturnUrl(successUrl);
         payment.setRedirectUrls(redirectUrls);
 
-        return payment.create(apiContext);
+        Payment paymentResponse = payment.create(apiContext);
+
+        return paymentResponse;
 
     }
 
     public Payment executePayment(String paymentId, String payerId) throws PayPalRESTException{
         Payment payment = new Payment();
         payment.setId(paymentId);
+        payment.setTransactions(transactions);
         PaymentExecution paymentExecute = new PaymentExecution();
         paymentExecute.setPayerId(payerId);
         return payment.execute(apiContext, paymentExecute);

@@ -1,7 +1,7 @@
 package com.example.tmovierestapi.security;
 
 import com.example.tmovierestapi.security.jwt.AuthEntryPointJwt;
-import com.example.tmovierestapi.security.jwt.AuthTokenFilter;
+import com.example.tmovierestapi.security.jwt.JwtAuthenticationFilter;
 import com.example.tmovierestapi.security.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -38,8 +38,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthEntryPointJwt unauthorizedHandler;
 
     @Bean
-    public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
+    public JwtAuthenticationFilter authenticationJwtTokenFilter() {
+        return new JwtAuthenticationFilter();
     }
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
@@ -61,29 +61,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     It tells Spring Security how we configure CORS and CSRF, when we want to require all users to be authenticated or not,
     which filter (AuthTokenFilter) and when we want it to work (filter before UsernamePasswordAuthenticationFilter),
     which Exception Handler is chosen (AuthEntryPointJwt).
-    *  */
+    */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-//                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)//bỏ session
                 .and()
                 .authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers(HttpMethod.GET,"/api/v1/**/**/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/pay/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
                 .logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
+                .logoutSuccessUrl("/");
 
-        ;
-//                .anyRequest()
-//                .authenticated();
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
-
-
-
 }
