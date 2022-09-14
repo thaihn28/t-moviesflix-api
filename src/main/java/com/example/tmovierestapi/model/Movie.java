@@ -1,12 +1,9 @@
 package com.example.tmovierestapi.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -72,14 +69,12 @@ public class Movie {
     @Column(name = "is_hot")
     private Boolean isHot;
 
-    @Column(name = "is_free")
-    private Boolean isFree;
+    @Column(name = "is_premium")
+    private Boolean isPremium;
 
     @Column(name = "price")
     private Double price;
 
-    @Column(name = "is_payment")
-    private Boolean isPayment;
 
     //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern ="yyyy-MM-dd'T'HH:mm:ss.SSSZZ", timezone = "UTC")
     @Column(name = "created_date")

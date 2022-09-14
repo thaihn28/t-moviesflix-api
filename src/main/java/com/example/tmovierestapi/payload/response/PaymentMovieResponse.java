@@ -1,6 +1,7 @@
-package com.example.tmovierestapi.payload.dto;
+package com.example.tmovierestapi.payload.response;
 
-import com.example.tmovierestapi.model.*;
+import com.example.tmovierestapi.model.Comment;
+import com.example.tmovierestapi.model.Episode;
 import com.example.tmovierestapi.payload.request.ActorRequest;
 import com.example.tmovierestapi.payload.request.CategoryRequest;
 import com.example.tmovierestapi.payload.request.DirectorRequest;
@@ -14,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-public class MovieDTO {
+public class PaymentMovieResponse {
     private Long id;
 
     @NotEmpty
@@ -79,5 +80,4 @@ public class MovieDTO {
     private Set<Episode> episodes = new HashSet<>();
 
     private Set<Comment> comments = new HashSet<>();
-
 }

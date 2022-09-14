@@ -3,6 +3,9 @@ package com.example.tmovierestapi.service.paypal;
 import com.example.tmovierestapi.exception.APIException;
 import com.example.tmovierestapi.model.Movie;
 import com.example.tmovierestapi.repository.MovieRepository;
+import com.example.tmovierestapi.security.services.CustomUserDetails;
+import com.example.tmovierestapi.service.impl.PaymentService;
+import com.example.tmovierestapi.utils.AppGetLoggedIn;
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
@@ -20,27 +23,29 @@ public class PaypalService {
     private APIContext apiContext;
 
     private List<Transaction> transactions = new ArrayList<>();
-
     @Autowired
     private MovieRepository movieRepository;
 
+    @Autowired
+    private PaymentService paymentService;
+
+
     public String createPayment(
-            Movie movie,
+            Long movieID,
             String currency,
             String method,
             String intent,
             String cancelUrl,
             String successUrl) throws PayPalRESTException {
         try {
+            Movie movie = movieRepository.findMovieById(movieID)
+                    .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST , "Movie with ID" + movieID + " not found!"));
             Amount amount = new Amount();
             amount.setCurrency(currency);
-//        amount.setTotal(movie.getPrice().toString());
             amount.setTotal(String.format("%.2f", movie.getPrice()));
-//        Double price = new BigDecimal(movie.getPrice()).setScale(2, RoundingMode.HALF_UP).doubleValue();
             Transaction transaction = new Transaction();
             transaction.setAmount(amount);
             transaction.setPurchaseUnitReferenceId(movie.getId().toString());
-//        List<Transaction> transactions = new ArrayList<>();
             transactions.add(transaction);
 
             Payer payer = new Payer();
@@ -71,7 +76,7 @@ public class PaypalService {
 
     }
 
-    public Payment executePayment(String paymentId, String payerId) throws PayPalRESTException {
+    public Payment executePayment(String paymentId, String payerId, CustomUserDetails currentUser) throws PayPalRESTException {
         try {
             Payment payment = new Payment();
             payment.setId(paymentId);
@@ -81,29 +86,11 @@ public class PaypalService {
             Payment paymentResponse = payment.execute(apiContext, paymentExecute);
             paymentResponse.getTransactions().stream().filter(item -> item.getPurchaseUnitReferenceId() != null)
                     .collect(Collectors.toList());
+            paymentResponse.getPayer().getPayerInfo().setEmail(currentUser.getEmail());
             paymentResponse.setTransactions(payment.getTransactions());
             if (paymentResponse.getState().equals("approved")) {
-
-                for (Transaction transaction : paymentResponse.getTransactions()) {
-                    Long movieID = Long.valueOf(transaction.getPurchaseUnitReferenceId());
-                    Movie movie = movieRepository.findMovieById(movieID)
-                            .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST, "Can not found Movie ID-" + movieID));
-                    movie.setIsFree(true);
-//                    movie.setPrice(0d);
-                    movieRepository.save(movie);
-
-                    /*TODO: Add to Purchase table
-                     * paymentResponse.getPayer().getStatus() -> VERIFIED
-                     * paymentResponse.getPayer().getPaymentMethod() -> paypal
-                     * paymentResponse.getState() -> Approved
-                     *
-                     * paymentResponse.getPayer().getPayerInfo().getEmail() -> Email
-                     * paymentResponse.getPayer().getPayerInfo().getShippingAddress() -> Name, Address
-                     * transaction.getAmount.getTotal -> Price -> Transaction
-                     * transaction.getCurrency.getTotal -> Price -> Transaction
-                     */
-                    return paymentResponse;
-                }
+                paymentService.addPayment(paymentResponse);
+                return paymentResponse;
             }
         } catch (PayPalRESTException e) {
             throw new PayPalRESTException(e.getMessage());

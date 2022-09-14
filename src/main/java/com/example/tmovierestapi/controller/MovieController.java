@@ -5,6 +5,7 @@ import com.example.tmovierestapi.model.Movie;
 import com.example.tmovierestapi.model.User;
 import com.example.tmovierestapi.payload.dto.MovieDTO;
 import com.example.tmovierestapi.payload.response.PagedResponse;
+import com.example.tmovierestapi.payload.response.PaymentMovieResponse;
 import com.example.tmovierestapi.service.IMovieService;
 import com.example.tmovierestapi.utils.AppConstants;
 import com.example.tmovierestapi.utils.AppUtils;
@@ -43,17 +44,16 @@ public class MovieController {
     }
 
     @GetMapping("/{slug}")
-    public ResponseEntity<Movie> getMovieBySlug(@PathVariable(value = "slug") String slug) {
+    public ResponseEntity<PaymentMovieResponse> getMovieBySlug(@PathVariable(value = "slug") String slug) {
         return new ResponseEntity<>(iMovieService.getMovieBySlug(slug), HttpStatus.OK);
     }
 
     //    @PostMapping("/add")
-    @RequestMapping(path = "/add", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
-//    @RequestMapping(path = "/add", method = RequestMethod.POST,
-//                   consumes = MediaType.APPLICATION_JSON_VALUE,
-//                   produces = MediaType.APPLICATION_JSON_VALUE)
-//    @ExceptionHandler(Exception.class)
-//    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @RequestMapping(path = "/add", method = POST,
+            consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE},
+            produces = {MediaType.APPLICATION_JSON_VALUE}
+    )
+
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<MovieDTO> addMovie(@RequestPart(name = "movie") @Valid MovieDTO movieDTO,
                                              @RequestPart(name = "thumbFile") @ValidImage MultipartFile thumbFile,
@@ -66,13 +66,11 @@ public class MovieController {
     }
 
     @PutMapping("/update/{id}")
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<MovieDTO> updateMovie(@PathVariable(value = "id") Long id,
-                                                @ModelAttribute @Valid MovieDTO movieDTO,
-                                                @RequestPart(name = "thumbFile") @ValidImage MultipartFile thumbFile,
-                                                @RequestPart(name = "posterFile") @ValidImage MultipartFile posterFile
+                                                @RequestPart(name = "movie") @Valid MovieDTO movieDTO,
+                                                @RequestPart(name = "thumbFile", required = false) @ValidImage MultipartFile thumbFile,
+                                                @RequestPart(name = "posterFile", required = false) @ValidImage MultipartFile posterFile
     ) {
         return new ResponseEntity<>(iMovieService.updateMovie(id, movieDTO, thumbFile, posterFile), HttpStatus.CREATED);
     }

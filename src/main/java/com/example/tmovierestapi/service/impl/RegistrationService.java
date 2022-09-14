@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class RegistrationService implements IRegistrationService {
     @Autowired
     private RoleRepository roleRepository;

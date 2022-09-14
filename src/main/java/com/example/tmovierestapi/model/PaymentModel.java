@@ -5,28 +5,36 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Payment {
+public class PaymentModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
 
     @Column(name = "status")
     @NotBlank
     private String status;
 
-    @Column(name = "shipping_address")
+    @Column(name = "address")
     @NotBlank
-    private String shippingAddress;
+    private String address;
 
     @Column(name = "price")
-    @NotBlank
+    @DecimalMin(value = "0.0")
     private Double price;
+
+    private String currency;
+
+    @Column(name = "payment_method")
+    @NotBlank
+    private String paymentMethod;
 
     @OneToOne
     @JoinColumn(name = "movie_id")
@@ -35,5 +43,6 @@ public class Payment {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
 
 }

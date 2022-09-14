@@ -1,6 +1,5 @@
 package com.example.tmovierestapi.service.impl;
 
-import com.example.tmovierestapi.email.EmailSender;
 import com.example.tmovierestapi.exception.APIException;
 import com.example.tmovierestapi.exception.ResourceNotFoundException;
 import com.example.tmovierestapi.model.*;
@@ -9,26 +8,31 @@ import com.example.tmovierestapi.payload.request.CategoryRequest;
 import com.example.tmovierestapi.payload.dto.MovieDTO;
 import com.example.tmovierestapi.payload.request.DirectorRequest;
 import com.example.tmovierestapi.payload.response.PagedResponse;
-import com.example.tmovierestapi.payload.response.UserResponse;
+import com.example.tmovierestapi.payload.response.PaymentMovieResponse;
 import com.example.tmovierestapi.repository.*;
+import com.example.tmovierestapi.security.services.CustomUserDetails;
 import com.example.tmovierestapi.service.IMovieService;
 import com.example.tmovierestapi.service.cloudinary.CloudinaryService;
+import com.example.tmovierestapi.utils.AppGetLoggedIn;
 import com.example.tmovierestapi.utils.AppUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@Transactional
 public class MovieServiceImpl implements IMovieService {
     @Autowired
     private ModelMapper modelMapper;
@@ -51,6 +55,12 @@ public class MovieServiceImpl implements IMovieService {
     @Autowired
     private CloudinaryService cloudinaryService;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @Override
     public PagedResponse<Movie> getAllMovies(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
@@ -70,7 +80,7 @@ public class MovieServiceImpl implements IMovieService {
     @Override
     public MovieDTO addMovie(MovieDTO movieDTO, MultipartFile thumbFile, MultipartFile posterFile) {
         Boolean isExist = movieRepository.existsMovieBySlug(movieDTO.getSlug());
-        if(isExist){
+        if (isExist) {
             throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " slug is already exist!");
         }
         // Convert DTO to Entity
@@ -79,29 +89,29 @@ public class MovieServiceImpl implements IMovieService {
         Country country = countryRepository.findCountryByName(movieDTO.getCountryName())
                 .orElseThrow(() -> new ResourceNotFoundException("Country", "name", movieDTO.getCountryName()));
 
-        Set<Category> categorySet= new HashSet<>();
-        Set<Director> directorSet= new HashSet<>();
-        Set<Actor> actorSet= new HashSet<>();
+        Set<Category> categorySet = new HashSet<>();
+        Set<Director> directorSet = new HashSet<>();
+        Set<Actor> actorSet = new HashSet<>();
 
-        for(CategoryRequest c : movieDTO.getCategories()){
+        for (CategoryRequest c : movieDTO.getCategories()) {
             Category category = categoryRepository.findCategoryById(c.getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Category", "id", c.getId()));
             categorySet.add(category);
         }
 
-        for(ActorRequest a : movieDTO.getActors()){
+        for (ActorRequest a : movieDTO.getActors()) {
             Actor actor = actorRepository.findActorById(a.getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", a.getId()));
             actorSet.add(actor);
         }
 
-        for(DirectorRequest d : movieDTO.getDirectors()){
+        for (DirectorRequest d : movieDTO.getDirectors()) {
             Director director = directorRepository.findDirectorById(d.getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", d.getId()));
             directorSet.add(director);
         }
 
-        if (movieDTO.getIsFree()) {
+        if (movieDTO.getIsPremium()) {
             movieRequest.setPrice(0d);
         } else {
             movieRequest.setPrice(movieDTO.getPrice());
@@ -148,66 +158,72 @@ public class MovieServiceImpl implements IMovieService {
 
     @Override
     public MovieDTO updateMovie(Long id, MovieDTO movieDTO, MultipartFile thumbFile, MultipartFile posterFile) {
-        Movie movie = movieRepository.findMovieById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", id));
-        //  DTO -> Entity
-        Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
+        try {
+            Movie movie = movieRepository.findMovieById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", id));
+            //  DTO -> Entity
+            Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
 
-        if(!thumbFile.isEmpty()){
-            movie.setThumbURL(cloudinaryService.uploadThumb(thumbFile));
+            MultipartFile file = thumbFile;
+
+            if (thumbFile != null) {
+                movie.setThumbURL(cloudinaryService.uploadThumb(thumbFile));
+            }
+            if (posterFile != null) {
+                movie.setPosterURL(cloudinaryService.uploadPoster(posterFile));
+            }
+
+            movie.setName(movieRequest.getName());
+            movie.setContent(movieRequest.getContent());
+            movie.setType(movieRequest.getType());
+            movie.setTrailerURL(movieRequest.getTrailerURL());
+            movie.setTime(movieRequest.getTime());
+            movie.setEpisodeCurrent(movieRequest.getEpisodeCurrent());
+            movie.setEpisodeTotal(movieRequest.getEpisodeTotal());
+            movie.setQuality(movieRequest.getQuality());
+            movie.setSlug(movieRequest.getSlug());
+            movie.setYear(movieRequest.getYear());
+            movie.setShowTimes(movieRequest.getShowTimes());
+            movie.setIsPremium(movieRequest.getIsPremium());
+            movie.setIsHot(movieRequest.getIsHot());
+            movie.setPrice(movieRequest.getPrice());
+            movie.setModifiedDate(LocalDateTime.now());
+
+            Set<Category> categorySet = new HashSet<>();
+            Set<Director> directorSet = new HashSet<>();
+            Set<Actor> actorSet = new HashSet<>();
+
+            Country country = countryRepository.findCountryByName(movieDTO.getCountryName())
+                    .orElseThrow(() -> new ResourceNotFoundException("Country", "Name", movieDTO.getCountryName()));
+
+            for (ActorRequest a : movieDTO.getActors()) {
+                Actor actor = actorRepository.findActorById(a.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", a.getId()));
+                actorSet.add(actor);
+            }
+            for (CategoryRequest c : movieDTO.getCategories()) {
+                Category category = categoryRepository.findCategoryById(c.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Category", "id", c.getId()));
+                categorySet.add(category);
+            }
+
+            for (DirectorRequest d : movieDTO.getDirectors()) {
+                Director director = directorRepository.findDirectorById(d.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", d.getId()));
+                directorSet.add(director);
+            }
+            movie.setCountry(country);
+            movie.setCategories(categorySet);
+            movie.setActors(actorSet);
+            movie.setDirectors(directorSet);
+
+            Movie convertToDTO = movieRepository.save(movie);
+            MovieDTO movieResponse = modelMapper.map(convertToDTO, MovieDTO.class);
+
+            return movieResponse;
+        } catch (NullPointerException e) {
+            throw new NullPointerException(e.getMessage());
         }
-        if(!posterFile.isEmpty()){
-            movie.setThumbURL(cloudinaryService.uploadPoster(posterFile));
-        }
-
-        movie.setName(movieRequest.getName());
-        movie.setContent(movieRequest.getContent());
-        movie.setType(movieRequest.getType());
-        movie.setTrailerURL(movieRequest.getTrailerURL());
-        movie.setTime(movieRequest.getTime());
-        movie.setEpisodeCurrent(movieRequest.getEpisodeCurrent());
-        movie.setEpisodeTotal(movieRequest.getEpisodeTotal());
-        movie.setQuality(movieRequest.getQuality());
-        movie.setSlug(movieRequest.getSlug());
-        movie.setYear(movieRequest.getYear());
-        movie.setShowTimes(movieRequest.getShowTimes());
-        movie.setIsFree(movieRequest.getIsFree());
-        movie.setIsHot(movieRequest.getIsHot());
-        movie.setPrice(movieRequest.getPrice());
-        movie.setModifiedDate(LocalDateTime.now());
-
-        Set<Category> categorySet= new HashSet<>();
-        Set<Director> directorSet= new HashSet<>();
-        Set<Actor> actorSet= new HashSet<>();
-
-        Country country = countryRepository.findCountryByName(movieDTO.getCountryName())
-                .orElseThrow(() -> new ResourceNotFoundException("Country", "Name", movieDTO.getCountryName()));
-
-        for(ActorRequest a : movieDTO.getActors()){
-            Actor actor = actorRepository.findActorById(a.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", a.getId()));
-            actorSet.add(actor);
-        }
-        for(CategoryRequest c : movieDTO.getCategories()){
-            Category category = categoryRepository.findCategoryById(c.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Category", "id", c.getId()));
-            categorySet.add(category);
-        }
-
-        for(DirectorRequest d : movieDTO.getDirectors()){
-            Director director = directorRepository.findDirectorById(d.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", d.getId()));
-            directorSet.add(director);
-        }
-        movie.setCountry(country);
-        movie.setCategories(categorySet);
-        movie.setActors(actorSet);
-        movie.setDirectors(directorSet);
-
-        Movie convertToDTO =  movieRepository.save(movie);
-        MovieDTO movieResponse = modelMapper.map(convertToDTO, MovieDTO.class);
-
-        return movieResponse;
     }
 
     @Override
@@ -218,13 +234,28 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
-    public Movie getMovieBySlug(String slug) {
+    public PaymentMovieResponse getMovieBySlug(String slug) {
         Movie movie = movieRepository.findMovieBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie", "Slug", slug));
+        Object principal = AppGetLoggedIn.getLoggedIn().getPrincipal();
+        String userName;
 
+        if (principal instanceof CustomUserDetails) {
+            userName = ((CustomUserDetails) principal).getUsername();
+            User user = userRepository.findByUsername(userName)
+                    .orElseThrow(() -> new UsernameNotFoundException("Can not found user"));
+            PaymentModel paymentModel = paymentRepository.getPaymentModelByUserIdAndMovie(user.getId(), movie)
+                    .orElseThrow(() -> new ResourceNotFoundException("Movie Payment", "UserID", 1L));
 
-
-        return movie;
+            /*TODO: Convert Movie -> PaymentMovieRespone
+               -> Để lấy các field isPremium mà không ảnh hưởng database
+               */
+//            movieRes = paymentModel.getMovie();
+//            movieRes.setIsPremium(false);
+            return null;
+        } else {
+            return null;
+        }
     }
 
     @Override
