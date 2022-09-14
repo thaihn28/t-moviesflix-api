@@ -78,6 +78,9 @@ public class Movie {
     @Column(name = "price")
     private Double price;
 
+    @Column(name = "is_payment")
+    private Boolean isPayment;
+
     //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern ="yyyy-MM-dd'T'HH:mm:ss.SSSZZ", timezone = "UTC")
     @Column(name = "created_date")
     private LocalDateTime createdDate;

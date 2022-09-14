@@ -48,11 +48,14 @@ public class MovieController {
     }
 
     //    @PostMapping("/add")
-    @RequestMapping(path = "/add", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @RequestMapping(path = "/add", method = POST, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE}, produces = {MediaType.APPLICATION_JSON_VALUE})
+//    @RequestMapping(path = "/add", method = RequestMethod.POST,
+//                   consumes = MediaType.APPLICATION_JSON_VALUE,
+//                   produces = MediaType.APPLICATION_JSON_VALUE)
 //    @ExceptionHandler(Exception.class)
 //    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<MovieDTO> addMovie(@ModelAttribute(name = "movie") @Valid MovieDTO movieDTO,
+    public ResponseEntity<MovieDTO> addMovie(@RequestPart(name = "movie") @Valid MovieDTO movieDTO,
                                              @RequestPart(name = "thumbFile") @ValidImage MultipartFile thumbFile,
                                              @RequestPart(name = "posterFile") @ValidImage MultipartFile posterFile
 

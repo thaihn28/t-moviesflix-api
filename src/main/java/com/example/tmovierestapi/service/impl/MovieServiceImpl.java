@@ -51,9 +51,6 @@ public class MovieServiceImpl implements IMovieService {
     @Autowired
     private CloudinaryService cloudinaryService;
 
-
-
-
     @Override
     public PagedResponse<Movie> getAllMovies(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
@@ -105,7 +102,7 @@ public class MovieServiceImpl implements IMovieService {
         }
 
         if (movieDTO.getIsFree()) {
-            movieRequest.setPrice(null);
+            movieRequest.setPrice(0d);
         } else {
             movieRequest.setPrice(movieDTO.getPrice());
         }
@@ -224,6 +221,9 @@ public class MovieServiceImpl implements IMovieService {
     public Movie getMovieBySlug(String slug) {
         Movie movie = movieRepository.findMovieBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie", "Slug", slug));
+
+
+
         return movie;
     }
 
