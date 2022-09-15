@@ -235,26 +235,93 @@ public class MovieServiceImpl implements IMovieService {
 
     @Override
     public PaymentMovieResponse getMovieBySlug(String slug) {
+          /*TODO: If user is logged in
+                    -> find Payment by User
+                    -> if payment is founded
+                        get Movie from Payment
+                        convert Movie -> PaymentMovieResponse
+                       else
+                        return movie
+                else
+                    return movie
+        */
         Movie movie = movieRepository.findMovieBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie", "Slug", slug));
         Object principal = AppGetLoggedIn.getLoggedIn().getPrincipal();
         String userName;
 
+        PaymentMovieResponse movieResponse = new PaymentMovieResponse(
+                movie.getId(),
+                movie.getName(),
+                movie.getOriginName(),
+                movie.getContent(),
+                movie.getType(),
+                movie.getThumbURL(),
+                movie.getTrailerURL(),
+                movie.getTime(),
+                movie.getEpisodeCurrent(),
+                movie.getEpisodeTotal(),
+                movie.getQuality(),
+                movie.getSlug(),
+                movie.getPosterURL(),
+                movie.getYear(),
+                movie.getShowTimes(),
+                movie.getIsHot(),
+                movie.getIsPremium(),
+                movie.getPrice(),
+                movie.getCreatedDate(),
+                movie.getModifiedDate(),
+                movie.getCountry(),
+                movie.getActors(),
+                movie.getDirectors(),
+                movie.getCategories(),
+                movie.getEpisodes(),
+                movie.getComments()
+        );
+
         if (principal instanceof CustomUserDetails) {
             userName = ((CustomUserDetails) principal).getUsername();
             User user = userRepository.findByUsername(userName)
                     .orElseThrow(() -> new UsernameNotFoundException("Can not found user"));
-            PaymentModel paymentModel = paymentRepository.getPaymentModelByUserIdAndMovie(user.getId(), movie)
-                    .orElseThrow(() -> new ResourceNotFoundException("Movie Payment", "UserID", 1L));
 
-            /*TODO: Convert Movie -> PaymentMovieRespone
-               -> Để lấy các field isPremium mà không ảnh hưởng database
-               */
-//            movieRes = paymentModel.getMovie();
-//            movieRes.setIsPremium(false);
-            return null;
+            Optional<PaymentModel> paymentModel = paymentRepository.getPaymentModelByUserIdAndMovie(user.getId(), movie);
+            if (paymentModel.isPresent()) {
+                Movie movieInPaymentModel = paymentModel.get().getMovie();
+
+                PaymentMovieResponse paymentMovieResponse = new PaymentMovieResponse(
+                        movieInPaymentModel.getId(),
+                        movieInPaymentModel.getName(),
+                        movieInPaymentModel.getOriginName(),
+                        movieInPaymentModel.getContent(),
+                        movieInPaymentModel.getType(),
+                        movieInPaymentModel.getThumbURL(),
+                        movieInPaymentModel.getTrailerURL(),
+                        movieInPaymentModel.getTime(),
+                        movieInPaymentModel.getEpisodeCurrent(),
+                        movieInPaymentModel.getEpisodeTotal(),
+                        movieInPaymentModel.getQuality(),
+                        movieInPaymentModel.getSlug(),
+                        movieInPaymentModel.getPosterURL(),
+                        movieInPaymentModel.getYear(),
+                        movieInPaymentModel.getShowTimes(),
+                        movieInPaymentModel.getIsHot(),
+                        false,
+                        0d,
+                        movieInPaymentModel.getCreatedDate(),
+                        movieInPaymentModel.getModifiedDate(),
+                        movieInPaymentModel.getCountry(),
+                        movieInPaymentModel.getActors(),
+                        movieInPaymentModel.getDirectors(),
+                        movieInPaymentModel.getCategories(),
+                        movieInPaymentModel.getEpisodes(),
+                        movieInPaymentModel.getComments()
+                );
+                return paymentMovieResponse;
+            } else {
+                return movieResponse;
+            }
         } else {
-            return null;
+            return movieResponse;
         }
     }
 

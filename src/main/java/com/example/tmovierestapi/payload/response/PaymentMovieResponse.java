@@ -1,7 +1,6 @@
 package com.example.tmovierestapi.payload.response;
 
-import com.example.tmovierestapi.model.Comment;
-import com.example.tmovierestapi.model.Episode;
+import com.example.tmovierestapi.model.*;
 import com.example.tmovierestapi.payload.request.ActorRequest;
 import com.example.tmovierestapi.payload.request.CategoryRequest;
 import com.example.tmovierestapi.payload.request.DirectorRequest;
@@ -69,15 +68,44 @@ public class PaymentMovieResponse {
     private LocalDateTime modifiedDate;
 
     // Country
-    private String countryName;
+    private Country country;
 
-    private Set<ActorRequest> actors = new HashSet<>();
+    private Set<Actor> actors = new HashSet<>();
 
-    private Set<DirectorRequest> directors = new HashSet<>();
+    private Set<Director> directors = new HashSet<>();
 
-    private Set<CategoryRequest> categories = new HashSet<>();
+    private Set<Category> categories = new HashSet<>();
 
     private Set<Episode> episodes = new HashSet<>();
 
     private Set<Comment> comments = new HashSet<>();
+
+    public PaymentMovieResponse(Long id, String name, String originName, String content, String type, String thumbURL, String trailerURL, String time, String episodeCurrent, String episodeTotal, String quality, String slug, String posterURL, Integer year, String showTimes, Boolean isHot, Boolean isPremium, Double price, LocalDateTime createdDate, LocalDateTime modifiedDate, Country country, Set<Actor> actors, Set<Director> directors, Set<Category> categories, Set<Episode> episodes, Set<Comment> comments) {
+        this.id = id;
+        this.name = name;
+        this.originName = originName;
+        this.content = content;
+        this.type = type;
+        this.thumbURL = thumbURL;
+        this.trailerURL = trailerURL;
+        this.time = time;
+        this.episodeCurrent = episodeCurrent;
+        this.episodeTotal = episodeTotal;
+        this.quality = quality;
+        this.slug = slug;
+        this.posterURL = posterURL;
+        this.year = year;
+        this.showTimes = showTimes;
+        this.isHot = isHot;
+        this.isPremium = isPremium;
+        this.price = price;
+        this.createdDate = createdDate;
+        this.modifiedDate = modifiedDate;
+        this.country = country;
+        this.actors = actors;
+        this.directors = directors;
+        this.categories = categories;
+        this.episodes = episodes;
+        this.comments = comments;
+    }
 }
