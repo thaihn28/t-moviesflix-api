@@ -1,11 +1,8 @@
 package com.example.tmovierestapi.payload.dto;
 
-import com.example.tmovierestapi.model.Category;
-import com.example.tmovierestapi.model.Country;
 import com.example.tmovierestapi.payload.request.CategoryRequest;
 import lombok.Data;
 
-import javax.persistence.Column;
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -24,7 +21,6 @@ public class PlaylistDTO {
 
     @NotBlank(message = "Type must not be empty")
     private String type;
-
 
     @NotBlank(message = "Episode current must not be empty")
     private String episodeCurrent;

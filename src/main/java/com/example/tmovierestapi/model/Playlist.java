@@ -1,9 +1,7 @@
 package com.example.tmovierestapi.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.*;
@@ -71,16 +69,26 @@ public class Playlist {
     @JoinColumn(name = "country_id")
     private Country country;
 
+    @ManyToMany(mappedBy = "playlists")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
+    private Set<Favorite> favorites;
+
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 
     @Column(name = "modified_date")
     private LocalDateTime modifiedDate;
 
-
     public void removeCategory(Category category) {
         this.categories.remove(category);
         category.getMovies().remove(this);
+    }
+
+    public void removeFavorite(Favorite favorite){
+        this.favorites.remove(favorite);
+        favorite.getPlaylists().remove(this);
     }
 
 }

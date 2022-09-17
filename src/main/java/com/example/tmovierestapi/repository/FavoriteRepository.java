@@ -18,6 +18,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
     Page<Favorite> findFavoritesByUser(User user, Pageable pageable);
 
-    Optional<Favorite> findFavoritesByPlaylists(Playlist playlist);
+    Optional<Favorite> findFavoriteByPlaylistsAndUser(Playlist playlist, User user);
     Boolean existsFavoriteByPlaylists(Playlist playlist);
 }

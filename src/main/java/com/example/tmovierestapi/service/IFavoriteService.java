@@ -7,5 +7,5 @@ import com.example.tmovierestapi.payload.response.PagedResponse;
 public interface IFavoriteService {
     PagedResponse getAllFavoritesByUser(int pageNo, int pageSize, String sortDir, String sortBy);
     Favorite addFavorite(String slug);
-    void deletePlaylistInFavorite(Long playlistID);
+    String deletePlaylistInFavorite(Long playlistID);
 }

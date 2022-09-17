@@ -38,8 +38,8 @@ public class FavoriteController {
     }
 
     @DeleteMapping("/delete")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
     public ResponseEntity<String> deletePlaylistInFav(@RequestParam(name = "playlist-id") Long id){
-        iFavoriteService.deletePlaylistInFavorite(id);
-        return new ResponseEntity<>("Deleted Playlist with ID-" + id + " from favorite successfully!", HttpStatus.OK);
+        return new ResponseEntity<>(iFavoriteService.deletePlaylistInFavorite(id), HttpStatus.OK);
     }
 }

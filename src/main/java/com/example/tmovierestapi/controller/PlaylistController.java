@@ -89,7 +89,7 @@ public class PlaylistController {
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<PlaylistDTO> addPlaylist(@RequestPart(name = "playlist") @Valid PlaylistDTO playlistDTO,
-                                                   @RequestPart(name = "thumbFile") @ValidImage MultipartFile thumbFile
+                                                   @RequestPart(name = "thumbFile") @Valid @ValidImage MultipartFile thumbFile
     ) {
         return new ResponseEntity<>(iPlaylistService.addPlaylist(playlistDTO, thumbFile), HttpStatus.CREATED);
     }

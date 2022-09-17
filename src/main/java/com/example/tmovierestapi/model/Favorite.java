@@ -18,8 +18,11 @@ public class Favorite {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(
-            cascade = {CascadeType.MERGE, CascadeType.PERSIST}
+    @ManyToMany(fetch = FetchType.LAZY,
+            cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinTable(name = "favorite_playlist",
+            joinColumns = @JoinColumn(name = "favorite_id"),
+            inverseJoinColumns = @JoinColumn(name = "playlist_id")
     )
     @OrderBy("id ASC")
     private Set<Playlist> playlists = new HashSet<>();
@@ -33,8 +36,8 @@ public class Favorite {
     @Column(name = "modified_date")
     private LocalDateTime modifiedDate;
 
-    public void removePlaylist(Playlist playlist){
-        this.playlists.remove(playlist);
-    }
+//    public void removePlaylist(Playlist playlist){
+//        this.playlists.remove(playlist);
+//    }
 
 }
