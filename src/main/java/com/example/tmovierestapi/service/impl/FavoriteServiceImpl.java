@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class FavoriteServiceImpl implements IFavoriteService {
@@ -46,62 +47,74 @@ public class FavoriteServiceImpl implements IFavoriteService {
     private ModelMapper modelMapper;
 
     @Override
-    public PagedResponse getAllFavorite(int pageNo, int pageSize, String sortDir, String sortBy) {
+    public PagedResponse getAllFavoritesByUser(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
-        Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
-        Page<Favorite> favorites = favoriteRepository.findAll(pageable);
-        List<Favorite> data = favorites.getNumberOfElements() == 0 ? Collections.emptyList() : favorites.getContent();
+        Page<Favorite> favorites;
+        List<Favorite> data;
+
+        Authentication authentication = AppGetLoggedIn.getLoggedIn();
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            User currentUser = userRepository.findByUsername(customUserDetails.getUsername())
+                    .orElseThrow(() -> new UsernameNotFoundException(customUserDetails.getUsername() + " can not found"));
+
+            Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
+            favorites = favoriteRepository.findFavoritesByUser(currentUser, pageable);
+            data = favorites.getNumberOfElements() == 0 ? Collections.emptyList() : favorites.getContent();
+        } else {
+            throw new APIException(HttpStatus.UNAUTHORIZED, "Require user authentication");
+        }
 
         return new PagedResponse<>(data, favorites.getNumber(), favorites.getSize(), favorites.getTotalElements(),
                 favorites.getTotalPages(), favorites.isLast());
     }
 
     @Override
-    public Favorite addFavorite(FavoriteDTO favoriteDTO) {
-        Playlist playlist = playlistRepository.findPlaylistBySlug(favoriteDTO.getSlug())
-                .orElseThrow(() -> new ResourceNotFoundException("Playlist", "Slug", favoriteDTO.getSlug()));
-        Boolean isExistPlaylist = favoriteRepository.existsFavoriteByPlaylists(playlist);
+    public Favorite addFavorite(String slug) {
+        Playlist playlist = playlistRepository.findPlaylistBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Playlist", "Slug", slug));
 
-        Favorite favoriteRequest = modelMapper.map(favoriteDTO, Favorite.class);
+        Favorite favoriteRequest = new Favorite();
         Set<Playlist> playlistSet = new HashSet<>();
-        playlistSet.add(playlist);
+        Favorite favoriteResponse = null;
 
         Authentication authentication = AppGetLoggedIn.getLoggedIn();
-        if(!(authentication instanceof AnonymousAuthenticationToken)){
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
             User currentUser = userRepository.findByUsername(customUserDetails.getUsername())
                     .orElseThrow(() -> new UsernameNotFoundException(customUserDetails.getUsername() + " can not found"));
 
             Optional<Favorite> checkFavByUser = favoriteRepository.findFavoriteByUser(currentUser);
 
-            if(checkFavByUser.isPresent()){
+            if (checkFavByUser.isPresent()) {
                 Favorite favOfCurrentUser = checkFavByUser.get();
-                for(Playlist p : favOfCurrentUser.getPlaylists()){
-                    if(p.getSlug().equals(favoriteDTO.getSlug())){
-                        throw new APIException(HttpStatus.BAD_REQUEST, playlist.getName() + " is already exist in favorite!");
-                    }else{
-                        updateFavorite(favOfCurrentUser, playlist);
+                if (favOfCurrentUser.getPlaylists() != null && favOfCurrentUser.getPlaylists().size() > 0) {
+                    for (Playlist p : favOfCurrentUser.getPlaylists()) {
+                        String existSlug = p.getSlug();
+                        if (existSlug.equalsIgnoreCase(slug)) {
+                            throw new APIException(HttpStatus.BAD_REQUEST,"Movie " + playlist.getName() + " is already exist in favorite!");
+                        }
                     }
+                    return updateFavorite(favOfCurrentUser, playlist);
                 }
-            }else {
-                favoriteRequest.setUser(currentUser);
-                favoriteRequest.setPlaylists(playlistSet);
-                favoriteRequest.setCreatedDate(LocalDateTime.now());
-                Favorite favorite = favoriteRepository.save(favoriteRequest);
-                return favorite;
             }
+            playlistSet.add(playlist);
+            favoriteRequest.setUser(currentUser);
+            favoriteRequest.setPlaylists(playlistSet);
+            favoriteRequest.setCreatedDate(LocalDateTime.now());
+            favoriteResponse = favoriteRepository.save(favoriteRequest);
         }
-        return null;
+        return favoriteResponse;
     }
 
-    private Favorite updateFavorite(Favorite favorite, Playlist playlist){
+    private Favorite updateFavorite(Favorite favorite, Playlist playlist) {
         Favorite updateFav = favorite;
-        Set<Playlist> playlistSet = new HashSet<>();
+        Set<Playlist> playlistSet = updateFav.getPlaylists();
         playlistSet.add(playlist);
         updateFav.setPlaylists(playlistSet);
         updateFav.setModifiedDate(LocalDateTime.now());
@@ -110,7 +123,12 @@ public class FavoriteServiceImpl implements IFavoriteService {
     }
 
     @Override
-    public void deleteFavorite(Long id) {
-
+    public void deletePlaylistInFavorite(Long playlistID) {
+        Playlist playlist = playlistRepository.findById(playlistID)
+                .orElseThrow(() -> new ResourceNotFoundException("Playlist", "ID", playlistID));
+        Favorite favorite = favoriteRepository.findFavoritesByPlaylists(playlist)
+                .orElseThrow(() -> new ResourceNotFoundException("Favorite", "Playlist", playlist.getName()));
+        favorite.removePlaylist(playlist);
+        favoriteRepository.save(favorite);
     }
 }

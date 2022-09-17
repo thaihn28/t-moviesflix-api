@@ -21,6 +21,7 @@ public class Favorite {
     @OneToMany(
             cascade = {CascadeType.MERGE, CascadeType.PERSIST}
     )
+    @OrderBy("id ASC")
     private Set<Playlist> playlists = new HashSet<>();
 
     @OneToOne
@@ -31,5 +32,9 @@ public class Favorite {
 
     @Column(name = "modified_date")
     private LocalDateTime modifiedDate;
+
+    public void removePlaylist(Playlist playlist){
+        this.playlists.remove(playlist);
+    }
 
 }

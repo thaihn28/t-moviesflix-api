@@ -15,7 +15,6 @@ import java.util.Optional;
 @Repository
 public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
     Optional<Playlist> findById(Long id);
-
     Optional<Playlist> findPlaylistBySlug(String slug);
     Boolean existsPlaylistBySlug(String slug);
     Page<Playlist> findPlaylistsByIsHot(Boolean isHot, Pageable pageable);
