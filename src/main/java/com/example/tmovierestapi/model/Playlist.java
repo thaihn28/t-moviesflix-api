@@ -71,16 +71,11 @@ public class Playlist {
     @JoinColumn(name = "country_id")
     private Country country;
 
-    @ManyToOne
-    @JoinColumn(name = "favorite_id")
-    private Favorite favorite;
-
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 
     @Column(name = "modified_date")
     private LocalDateTime modifiedDate;
-
 
 
     public void removeCategory(Category category) {

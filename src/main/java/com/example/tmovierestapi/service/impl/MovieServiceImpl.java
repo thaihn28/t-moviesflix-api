@@ -163,8 +163,6 @@ public class MovieServiceImpl implements IMovieService {
             //  DTO -> Entity
             Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
 
-            MultipartFile file = thumbFile;
-
             if (thumbFile != null) {
                 movie.setThumbURL(cloudinaryService.uploadThumb(thumbFile));
             }

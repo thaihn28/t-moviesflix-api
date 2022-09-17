@@ -6,9 +6,7 @@ import com.example.tmovierestapi.payload.request.CategoryRequest;
 import lombok.Data;
 
 import javax.persistence.Column;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,6 +36,9 @@ public class PlaylistDTO {
     private String quality;
 
     @NotBlank(message = "Slug must not be empty")
+    @Pattern(message = "Alphanumeric words in slug separated by single dashes (ex: standard-slug-pattern)",
+            regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            flags = Pattern.Flag.UNICODE_CASE)
     private String slug;
 
     private int year;
@@ -48,6 +49,7 @@ public class PlaylistDTO {
     @NotNull(message = "Is Premium must not be blank")
     private Boolean isPremium;
 
+    @NotNull(message = "Category must not be blank")
     private Set<CategoryRequest> categories = new HashSet<>();
 
     @NotBlank(message = "Country name must not be blank")

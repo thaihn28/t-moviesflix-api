@@ -23,6 +23,7 @@ import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/movies")
 public class MovieController {

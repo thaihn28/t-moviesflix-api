@@ -1,16 +1,12 @@
 package com.example.tmovierestapi.payload.response;
 
 import com.example.tmovierestapi.model.*;
-import com.example.tmovierestapi.payload.request.ActorRequest;
-import com.example.tmovierestapi.payload.request.CategoryRequest;
-import com.example.tmovierestapi.payload.request.DirectorRequest;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -70,15 +66,15 @@ public class PaymentMovieResponse {
     // Country
     private Country country;
 
-    private Set<Actor> actors = new HashSet<>();
+    private Set<Actor> actors;
 
-    private Set<Director> directors = new HashSet<>();
+    private Set<Director> directors;
 
-    private Set<Category> categories = new HashSet<>();
+    private Set<Category> categories;
 
-    private Set<Episode> episodes = new HashSet<>();
+    private Set<Episode> episodes;
 
-    private Set<Comment> comments = new HashSet<>();
+    private Set<Comment> comments;
 
     public PaymentMovieResponse(Long id, String name, String originName, String content, String type, String thumbURL, String trailerURL, String time, String episodeCurrent, String episodeTotal, String quality, String slug, String posterURL, Integer year, String showTimes, Boolean isHot, Boolean isPremium, Double price, LocalDateTime createdDate, LocalDateTime modifiedDate, Country country, Set<Actor> actors, Set<Director> directors, Set<Category> categories, Set<Episode> episodes, Set<Comment> comments) {
         this.id = id;

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,6 +23,9 @@ public class Country {
     private String name;
 
     @NotEmpty(message = "Slug is required")
+    @Pattern(message = "Alphanumeric words in slug separated by single dashes (ex: standard-slug-pattern)",
+            regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$\n",
+            flags = Pattern.Flag.UNICODE_CASE)
     private String slug;
 
     @Column(name = "created_date")
