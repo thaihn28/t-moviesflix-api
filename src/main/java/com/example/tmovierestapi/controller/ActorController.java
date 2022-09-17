@@ -41,7 +41,7 @@ public class ActorController {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<ActorDTO> addActor(@ModelAttribute(name = "actor") @Valid ActorDTO actorDTO,
+    public ResponseEntity<ActorDTO> addActor(@RequestPart(name = "actor") @Valid ActorDTO actorDTO,
                                              @RequestPart(name = "avatarFile") @ValidImage MultipartFile avatar) {
         return new ResponseEntity<>(iActorService.addActor(actorDTO, avatar), HttpStatus.CREATED);
     }
@@ -51,7 +51,7 @@ public class ActorController {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ActorDTO> updateActor(@PathVariable(value = "id") Long id,
-                                                @ModelAttribute(name = "actor") @Valid ActorDTO actorDTO,
+                                                @RequestPart(name = "actor") @Valid ActorDTO actorDTO,
                                                 @RequestPart(name = "avatarFile", required = false) @ValidImage MultipartFile avatar
     ) {
         return new ResponseEntity<>(iActorService.updateActor(id, actorDTO, avatar), HttpStatus.CREATED);

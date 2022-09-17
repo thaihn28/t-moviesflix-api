@@ -37,9 +37,57 @@ public class PlaylistController {
         return new ResponseEntity<>(iPlaylistService.getPlaylistById(id), HttpStatus.OK);
     }
 
+    @GetMapping("/filter-by-category/{slug}")
+    public ResponseEntity<PagedResponse<Playlist>> getPlaylistsByCategory(@PathVariable(value = "slug") String slug,
+                                                                          @RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
+                                                                          @RequestParam(value = "pageSize", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize,
+                                                                          @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
+                                                                          @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIRECTION) String sortDir
+    ) {
+        return new ResponseEntity<>(iPlaylistService.getAllPlaylistByCategory(slug, pageNo, pageSize, sortDir, sortBy), HttpStatus.OK);
+    }
+
+    @GetMapping("/filter-by-type/{name}")
+    public ResponseEntity<PagedResponse<Playlist>> getPlaylistsByType(@PathVariable(value = "name") String type,
+                                                                      @RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
+                                                                      @RequestParam(value = "pageSize", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize,
+                                                                      @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
+                                                                      @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIRECTION) String sortDir
+    ) {
+        return new ResponseEntity<>(iPlaylistService.getAllPlaylistsBySeries(type, pageNo, pageSize, sortDir, sortBy), HttpStatus.OK);
+    }
+
+    @GetMapping("/filter-by-country/{slug}")
+    public ResponseEntity<PagedResponse<Playlist>> getPlaylistsByCountry(@PathVariable(value = "slug") String slug,
+                                                                      @RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
+                                                                      @RequestParam(value = "pageSize", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize,
+                                                                      @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
+                                                                      @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIRECTION) String sortDir
+    ) {
+        return new ResponseEntity<>(iPlaylistService.getAllPlaylistByCountry(slug, pageNo, pageSize, sortDir, sortBy), HttpStatus.OK);
+    }
+
+    @GetMapping("/hot-movie")
+    public ResponseEntity<PagedResponse<Playlist>> getAllHotMovies(@RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
+                                                                   @RequestParam(value = "pageSize", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize,
+                                                                   @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
+                                                                   @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIRECTION) String sortDir
+    ) {
+        return new ResponseEntity<>(iPlaylistService.getAllHotPlaylists(pageNo, pageSize, sortDir, sortBy), HttpStatus.OK);
+    }
+
+    @GetMapping("/premium-movie")
+    public ResponseEntity<PagedResponse<Playlist>> getAllPremiumMovies(@RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
+                                                                       @RequestParam(value = "pageSize", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize,
+                                                                       @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
+                                                                       @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIRECTION) String sortDir
+    ) {
+        return new ResponseEntity<>(iPlaylistService.getAllPremiumPlaylist(pageNo, pageSize, sortDir, sortBy), HttpStatus.OK);
+    }
+
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<PlaylistDTO> addPlaylist(@ModelAttribute(name = "playlist") @Valid PlaylistDTO playlistDTO,
+    public ResponseEntity<PlaylistDTO> addPlaylist(@RequestPart(name = "playlist") @Valid PlaylistDTO playlistDTO,
                                                    @RequestPart(name = "thumbFile") @ValidImage MultipartFile thumbFile
     ) {
         return new ResponseEntity<>(iPlaylistService.addPlaylist(playlistDTO, thumbFile), HttpStatus.CREATED);
@@ -48,7 +96,7 @@ public class PlaylistController {
     @PutMapping("/update/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<PlaylistDTO> updatePlaylist(@PathVariable(value = "id") Long id,
-                                                      @ModelAttribute(name = "playlist") @Valid PlaylistDTO playlistDTO,
+                                                      @RequestPart(name = "playlist") @Valid PlaylistDTO playlistDTO,
                                                       @RequestPart(name = "thumbFile", required = false) @ValidImage MultipartFile thumbFile
     ) {
         return new ResponseEntity<>(iPlaylistService.updatePlaylist(id, playlistDTO, thumbFile), HttpStatus.CREATED);

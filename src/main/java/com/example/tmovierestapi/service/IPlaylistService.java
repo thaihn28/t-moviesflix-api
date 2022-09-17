@@ -12,4 +12,9 @@ public interface IPlaylistService {
     PlaylistDTO getPlaylistById(Long id);
     PlaylistDTO updatePlaylist(Long id, PlaylistDTO playlistDTO, MultipartFile thumbFile);
     void deletePlaylistById(Long id);
+    PagedResponse<Playlist> getAllHotPlaylists(int pageNo, int pageSize, String sortDir, String sortBy);
+    PagedResponse<Playlist> getAllPlaylistsBySeries(String series ,int pageNo, int pageSize, String sortDir, String sortBy);
+    PagedResponse<Playlist> getAllPlaylistByCategory(String cateName ,int pageNo, int pageSize, String sortDir, String sortBy);
+    PagedResponse<Playlist> getAllPlaylistByCountry(String country,int pageNo, int pageSize, String sortDir, String sortBy);
+    PagedResponse<Playlist> getAllPremiumPlaylist(int pageNo, int pageSize, String sortDir, String sortBy);
 }

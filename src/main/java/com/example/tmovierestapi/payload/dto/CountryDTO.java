@@ -13,5 +13,8 @@ public class CountryDTO {
     @NotEmpty(message = "Country name is required")
     private String name;
 
+    @NotEmpty(message = "Slug is required")
+    private String slug;
+
     private LocalDateTime createdDate;
 }

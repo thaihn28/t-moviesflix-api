@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -21,6 +22,9 @@ public class Director {
 
     @NotBlank
     private String name;
+
+    @NotEmpty(message = "Slug is required")
+    private String slug;
 
     private String avatar;
 

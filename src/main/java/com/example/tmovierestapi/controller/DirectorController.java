@@ -42,7 +42,7 @@ public class DirectorController {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<DirectorDTO> addDirector(@ModelAttribute(name = "director") @Valid DirectorDTO directorDTO,
+    public ResponseEntity<DirectorDTO> addDirector(@RequestPart(name = "director") @Valid DirectorDTO directorDTO,
                                                    @RequestPart(name = "avatarFile") @Valid @ValidImage MultipartFile avatar) {
         return new ResponseEntity<>(iDirectorService.addDirector(directorDTO, avatar), HttpStatus.CREATED);
     }
@@ -52,7 +52,7 @@ public class DirectorController {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<DirectorDTO> updateDirector(@PathVariable(value = "id") Long id,
-                                                      @ModelAttribute @Valid DirectorDTO directorDTO,
+                                                      @RequestPart @Valid DirectorDTO directorDTO,
                                                       @RequestPart(name = "avatarFile", required = false) @ValidImage MultipartFile updateAvatar
     ) {
         return new ResponseEntity<>(iDirectorService.updateDirector(id, directorDTO, updateAvatar), HttpStatus.CREATED);

@@ -75,7 +75,6 @@ public class Movie {
     @Column(name = "price")
     private Double price;
 
-
     //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern ="yyyy-MM-dd'T'HH:mm:ss.SSSZZ", timezone = "UTC")
     @Column(name = "created_date")
     private LocalDateTime createdDate;
@@ -124,6 +123,7 @@ public class Movie {
             cascade = CascadeType.ALL,
             orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
+
 
     public void removeCategory(Category category) {
         this.categories.remove(category);

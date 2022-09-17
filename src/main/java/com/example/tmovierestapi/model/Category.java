@@ -5,6 +5,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -23,6 +24,9 @@ public class Category {
     @NotBlank
     private String name;
 
+    @NotEmpty(message = "Slug is required")
+    private String slug;
+
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 
@@ -39,5 +43,11 @@ public class Category {
     @EqualsAndHashCode.Exclude // không sử dụng trường này trong equals và hashcode
     @ToString.Exclude // Khoonhg sử dụng trong toString()
     private Set<Movie> movies = new HashSet<>();
+
+    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JsonIgnore
+    @EqualsAndHashCode.Exclude // không sử dụng trường này trong equals và hashcode
+    @ToString.Exclude // Khoonhg sử dụng trong toString()
+    private Set<Playlist> playlists = new HashSet<>();
 
 }

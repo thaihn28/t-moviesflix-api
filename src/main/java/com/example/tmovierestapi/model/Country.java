@@ -21,6 +21,9 @@ public class Country {
     @NotEmpty(message = "Country name is required")
     private String name;
 
+    @NotEmpty(message = "Slug is required")
+    private String slug;
+
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 

@@ -4,6 +4,7 @@ import com.example.tmovierestapi.exception.APIException;
 import com.example.tmovierestapi.exception.ResourceNotFoundException;
 import com.example.tmovierestapi.model.Category;
 import com.example.tmovierestapi.model.Movie;
+import com.example.tmovierestapi.model.Playlist;
 import com.example.tmovierestapi.payload.request.MovieRequest;
 import com.example.tmovierestapi.payload.dto.CategoryDTO;
 import com.example.tmovierestapi.payload.response.CategoryResponse;
@@ -122,6 +123,9 @@ public class CategoryServiceImpl implements ICategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "ID", id));
         for(Movie movie : category.getMovies()){
             movie.removeCategory(category);
+        }
+        for(Playlist playlist : category.getPlaylists()){
+            playlist.removeCategory(category);
         }
         categoryRepository.delete(category);
     }

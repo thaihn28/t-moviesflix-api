@@ -1,6 +1,5 @@
 package com.example.tmovierestapi.payload.response;
 
-import com.example.tmovierestapi.model.Movie;
 import com.example.tmovierestapi.payload.dto.UserDTO;
 import lombok.Data;
 

@@ -22,7 +22,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,7 +85,7 @@ public class MovieServiceImpl implements IMovieService {
         // Convert DTO to Entity
         Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
 
-        Country country = countryRepository.findCountryByName(movieDTO.getCountryName())
+        Country country = countryRepository.findCountryBySlug(movieDTO.getCountryName())
                 .orElseThrow(() -> new ResourceNotFoundException("Country", "name", movieDTO.getCountryName()));
 
         Set<Category> categorySet = new HashSet<>();
@@ -193,7 +192,7 @@ public class MovieServiceImpl implements IMovieService {
             Set<Director> directorSet = new HashSet<>();
             Set<Actor> actorSet = new HashSet<>();
 
-            Country country = countryRepository.findCountryByName(movieDTO.getCountryName())
+            Country country = countryRepository.findCountryBySlug(movieDTO.getCountryName())
                     .orElseThrow(() -> new ResourceNotFoundException("Country", "Name", movieDTO.getCountryName()));
 
             for (ActorRequest a : movieDTO.getActors()) {
