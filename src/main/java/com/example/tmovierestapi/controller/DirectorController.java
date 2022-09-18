@@ -8,6 +8,7 @@ import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.service.IDirectorService;
 import com.example.tmovierestapi.utils.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,7 +54,7 @@ public class DirectorController {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<DirectorDTO> updateDirector(@PathVariable(value = "id") Long id,
-                                                      @RequestPart @Valid DirectorDTO directorDTO,
+                                                      @RequestPart(name = "director") @Valid DirectorDTO directorDTO,
                                                       @RequestPart(name = "avatarFile", required = false) @ValidImage MultipartFile updateAvatar
     ) {
         return new ResponseEntity<>(iDirectorService.updateDirector(id, directorDTO, updateAvatar), HttpStatus.CREATED);

@@ -8,16 +8,19 @@ import com.example.tmovierestapi.repository.CountryRepository;
 import com.example.tmovierestapi.service.ICountryService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.Valid;
+import javax.xml.bind.ValidationException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(noRollbackFor = {ValidationException.class, APIException.class})
 public class CountryServiceImpl implements ICountryService {
     @Autowired
     private CountryRepository countryRepository;
@@ -31,9 +34,14 @@ public class CountryServiceImpl implements ICountryService {
     }
 
     @Override
+    @CacheEvict(value = {"playlists", "movies", "playlistsBySeries",
+            "playlistsByCate", "playlistsByCountry", "premiumPlaylists",
+            "moviesByActor", "moviesByDirector"
+    }
+            , allEntries = true)
     public CountryDTO addCountry(CountryDTO countryDTO) {
         Boolean existCountry = countryRepository.existsCountryByName(countryDTO.getName());
-        if(existCountry){
+        if (existCountry) {
             throw new APIException(
                     HttpStatus.BAD_REQUEST,
                     countryDTO.getName() + " is already exists"
@@ -50,6 +58,11 @@ public class CountryServiceImpl implements ICountryService {
     }
 
     @Override
+    @CacheEvict(value = {"playlists", "movies", "playlistsBySeries",
+            "playlistsByCate", "playlistsByCountry", "premiumPlaylists",
+            "moviesByActor", "moviesByDirector"
+    }
+            , allEntries = true)
     public CountryDTO updateCountry(Long id, CountryDTO countryDTO) {
         Country country = countryRepository.findCountryById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Country", "ID", id));
@@ -65,6 +78,11 @@ public class CountryServiceImpl implements ICountryService {
     }
 
     @Override
+    @CacheEvict(value = {"playlists", "movies", "playlistsBySeries",
+            "playlistsByCate", "playlistsByCountry", "premiumPlaylists",
+            "moviesByActor", "moviesByDirector"
+    }
+            , allEntries = true)
     public void deleteCountry(Long id) {
         Country country = countryRepository.findCountryById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Country", "ID", id));

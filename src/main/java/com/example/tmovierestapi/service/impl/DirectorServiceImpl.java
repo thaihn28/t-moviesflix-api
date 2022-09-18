@@ -19,6 +19,10 @@ import com.example.tmovierestapi.service.cloudinary.CloudinaryService;
 import com.example.tmovierestapi.utils.AppUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +48,10 @@ public class DirectorServiceImpl implements IDirectorService {
     @Autowired
     private CloudinaryService cloudinaryService;
 
+    private final String DIRECTOR_HASH_KEY = "director";
+
     @Override
+    @Cacheable(value = "directors")
     public PagedResponse<DirectorResponse> getAllDirectors(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
@@ -90,6 +97,11 @@ public class DirectorServiceImpl implements IDirectorService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = {"directors", "moviesByDirector", "movies"},
+                    allEntries = true)
+    })
+    @CachePut(value = DIRECTOR_HASH_KEY, key = "#result.id")
     public DirectorDTO addDirector(DirectorDTO directorDTO, MultipartFile avatar) {
         // Convert DTO to Entity
         Director directorRequest = modelMapper.map(directorDTO, Director.class);
@@ -113,6 +125,9 @@ public class DirectorServiceImpl implements IDirectorService {
     }
 
     @Override
+    @CacheEvict(value = {"directors", "moviesByDirector", "movies"}
+            , allEntries = true)
+    @CachePut(value = DIRECTOR_HASH_KEY, key = "#id")
     public DirectorDTO updateDirector(Long id, DirectorDTO directorDTO, MultipartFile updateAvatar) {
         Director director = directorRepository.findDirectorById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", id));
@@ -134,6 +149,11 @@ public class DirectorServiceImpl implements IDirectorService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = DIRECTOR_HASH_KEY, key = "#id"),
+            @CacheEvict(value = {"directors", "moviesByDirector", "movies"}
+                    , allEntries = true)
+    })
     public void deleteDirector(Long id) {
         Director director = directorRepository.findDirectorById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", id));
@@ -144,6 +164,7 @@ public class DirectorServiceImpl implements IDirectorService {
     }
 
     @Override
+    @Cacheable(value = DIRECTOR_HASH_KEY, key = "#id")
     public Director getDirectorByID(Long id) {
         Director director = directorRepository.findDirectorById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", id));

@@ -6,14 +6,19 @@ import com.example.tmovierestapi.payload.dto.PlaylistDTO;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.service.IPlaylistService;
 import com.example.tmovierestapi.utils.AppConstants;
+import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.resource.HttpResource;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -89,8 +94,11 @@ public class PlaylistController {
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<PlaylistDTO> addPlaylist(@RequestPart(name = "playlist") @Valid PlaylistDTO playlistDTO,
-                                                   @RequestPart(name = "thumbFile") @Valid @ValidImage MultipartFile thumbFile
-    ) {
+                                                   @RequestPart(name = "thumbFile") @ValidImage MultipartFile thumbFile
+    ) throws IOException {
+        if(thumbFile == null){
+            throw new FileNotFoundException("Thumb file is required");
+        }
         return new ResponseEntity<>(iPlaylistService.addPlaylist(playlistDTO, thumbFile), HttpStatus.CREATED);
     }
 

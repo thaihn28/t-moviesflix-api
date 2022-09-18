@@ -96,7 +96,7 @@ public class RegistrationService implements IRegistrationService {
         } catch (Exception e) {
             throw new APIException(HttpStatus.BAD_REQUEST, "Can not send email!");
         }
-        return "Registered successfully! An email will be sent in your inbox for confirming the verification, please check it!";
+        return "Registered successfully! An email will be sent to inbox in your email:" + signupRequest.getEmail() +" for confirming the verification, please check it!";
     }
 
     @Override

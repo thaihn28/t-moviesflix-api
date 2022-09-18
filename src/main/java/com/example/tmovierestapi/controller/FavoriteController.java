@@ -33,7 +33,7 @@ public class FavoriteController {
 
     @PostMapping("/add")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    public ResponseEntity<Favorite> addPlaylistToFav(@RequestParam(name = "slug") String slug){
+    public ResponseEntity<FavoriteDTO> addPlaylistToFav(@RequestParam(name = "slug") String slug){
         return new ResponseEntity<>(iFavoriteService.addFavorite(slug), HttpStatus.CREATED);
     }
 

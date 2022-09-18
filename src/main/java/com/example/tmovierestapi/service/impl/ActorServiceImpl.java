@@ -13,6 +13,10 @@ import com.example.tmovierestapi.service.cloudinary.CloudinaryService;
 import com.example.tmovierestapi.utils.AppUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,8 +41,11 @@ public class ActorServiceImpl implements IActorService {
     @Autowired
     private CloudinaryService cloudinaryService;
 
+    private final String ACTOR_HASH_KEY = "actor";
+
 
     @Override
+    @Cacheable(value = "actors")
     public PagedResponse<ActorResponse> getAllActors(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
@@ -82,6 +89,11 @@ public class ActorServiceImpl implements IActorService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = {"actors", "moviesByActor", "movies"},
+                    allEntries = true)
+    })
+    @CachePut(value = ACTOR_HASH_KEY, key = "#result.id")
     public ActorDTO addActor(ActorDTO actorDTO, MultipartFile avatar) {
         // Convert DTO to Entity
         Actor actor = modelMapper.map(actorDTO, Actor.class);
@@ -105,6 +117,11 @@ public class ActorServiceImpl implements IActorService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = {"actors", "moviesByActor", "movies"},
+                    allEntries = true)
+    })
+    @CachePut(value = ACTOR_HASH_KEY, key = "#id")
     public ActorDTO updateActor(Long id, ActorDTO actorDTO, MultipartFile avatar) {
         Actor actor = actorRepository.findActorById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", id));
@@ -127,6 +144,11 @@ public class ActorServiceImpl implements IActorService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = ACTOR_HASH_KEY, key = "#id"),
+            @CacheEvict(value = {"actors", "moviesByActor", "movies"},
+                    allEntries = true)
+    })
     public void deleteActor(Long id) {
         Actor actor = actorRepository.findActorById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", id));
@@ -137,6 +159,7 @@ public class ActorServiceImpl implements IActorService {
     }
 
     @Override
+    @Cacheable(value = ACTOR_HASH_KEY, key = "#id")
     public Actor getActorByID(Long id) {
         Actor actor = actorRepository.findActorById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", id));

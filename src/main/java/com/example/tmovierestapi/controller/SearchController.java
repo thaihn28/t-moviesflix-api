@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("api/v1/search")
 public class SearchController {
@@ -16,7 +18,7 @@ public class SearchController {
 
     @GetMapping()
     public ResponseEntity<SearchResultsResponse> searchByKeyword(
-            @RequestParam(value = "keyword") String keyword,
+            @RequestParam(value = "keyword") @Valid String keyword,
             @RequestParam(value = "pageNo", defaultValue = "0") int pageNo,
             @RequestParam(value = "pageSize", defaultValue = "5") int pageSize
     ){

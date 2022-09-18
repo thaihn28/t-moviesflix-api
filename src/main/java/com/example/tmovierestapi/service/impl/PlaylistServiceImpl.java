@@ -51,7 +51,7 @@ public class PlaylistServiceImpl implements IPlaylistService {
     @Autowired
     private CloudinaryService cloudinaryService;
 
-    public static final String PLAYLIST_HASH_KEY = "playlist";
+    private final String PLAYLIST_HASH_KEY = "playlist";
 
 
     @Override
@@ -93,8 +93,8 @@ public class PlaylistServiceImpl implements IPlaylistService {
                     .orElseThrow(() -> new ResourceNotFoundException("Category", "ID", c.getId()));
             categorySet.add(category);
         }
-        Country country = countryRepository.findCountryBySlug(playlistDTO.getCountryName())
-                .orElseThrow(() -> new ResourceNotFoundException("Country", "Name", playlistDTO.getCountryName()));
+        Country country = countryRepository.findCountryBySlug(playlistDTO.getCountrySlug())
+                .orElseThrow(() -> new ResourceNotFoundException("Country", "Name", playlistDTO.getCountrySlug()));
 
         playlistRequest.setCreatedDate(LocalDateTime.now());
         playlistRequest.setCategories(categorySet);
@@ -148,8 +148,8 @@ public class PlaylistServiceImpl implements IPlaylistService {
                     .orElseThrow(() -> new ResourceNotFoundException("Category", "ID", c.getId()));
             categorySet.add(category);
         }
-        Country country = countryRepository.findCountryBySlug(playlistDTO.getCountryName())
-                .orElseThrow(() -> new ResourceNotFoundException("Country", "Name", playlistDTO.getCountryName()));
+        Country country = countryRepository.findCountryBySlug(playlistDTO.getCountrySlug())
+                .orElseThrow(() -> new ResourceNotFoundException("Country", "Name", playlistDTO.getCountrySlug()));
         playlist.setCategories(categorySet);
         playlist.setCountry(country);
         playlist.setModifiedDate(LocalDateTime.now());

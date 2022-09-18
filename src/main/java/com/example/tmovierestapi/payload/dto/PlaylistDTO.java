@@ -48,8 +48,8 @@ public class PlaylistDTO {
     @NotNull(message = "Category must not be blank")
     private Set<CategoryRequest> categories = new HashSet<>();
 
-    @NotBlank(message = "Country name must not be blank")
-    private String countryName;
+    @NotBlank(message = "Country slug must not be blank")
+    private String countrySlug;
 
     private LocalDateTime createdDate;
 

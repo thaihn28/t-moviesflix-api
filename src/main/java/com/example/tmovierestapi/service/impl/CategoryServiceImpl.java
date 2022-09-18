@@ -14,6 +14,8 @@ import com.example.tmovierestapi.service.ICategoryService;
 import com.example.tmovierestapi.utils.AppUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,14 +51,14 @@ public class CategoryServiceImpl implements ICategoryService {
         List<Category> categories = categoryPage.getNumberOfElements() == 0 ? Collections.emptyList() : categoryPage.getContent();
 
         List<CategoryResponse> categoriesDTOResponse = new ArrayList<>();
-        for(Category c : categories){
+        for (Category c : categories) {
             CategoryResponse categoryResponseObj = new CategoryResponse();
             categoryResponseObj.setId(c.getId());
             categoryResponseObj.setName(c.getName());
             categoryResponseObj.setCreatedDate(c.getCreatedDate());
             categoryResponseObj.setModifiedDate(c.getModifiedDate());
             Set<MovieResponse> movieResponseSet = new HashSet<>();
-            for(Movie m : c.getMovies()){
+            for (Movie m : c.getMovies()) {
                 MovieResponse movieResponseObj = new MovieResponse();
                 movieResponseObj.setId(m.getId());
                 movieResponseObj.setName(m.getName());
@@ -74,8 +76,13 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
+    @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector",
+            "playlists", "hotPlaylists", "playlistsBySeries",
+            "playlistsByCate", "playlistsByCountry", "premiumPlaylists"
+    }
+            , allEntries = true)
     public CategoryDTO addCategory(CategoryDTO categoryDTO) {
-        if(categoryRepository.existsCategoryByName(categoryDTO.getName())){
+        if (categoryRepository.existsCategoryByName(categoryDTO.getName())) {
             throw new APIException(HttpStatus.BAD_REQUEST, categoryDTO.getName() + " is already exist");
         }
         // Convert DTO to Entity
@@ -100,6 +107,11 @@ public class CategoryServiceImpl implements ICategoryService {
     }
 
     @Override
+    @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector",
+            "playlists", "hotPlaylists", "playlistsBySeries",
+            "playlistsByCate", "playlistsByCountry", "premiumPlaylists"
+    }
+            , allEntries = true)
     public CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO) {
         Category category = categoryRepository.findCategoryById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "ID", id));
@@ -107,22 +119,28 @@ public class CategoryServiceImpl implements ICategoryService {
         Category categoryRequest = modelMapper.map(categoryDTO, Category.class);
 
         category.setName(categoryRequest.getName());
+        category.setSlug(categoryRequest.getSlug());
         category.setModifiedDate(LocalDateTime.now());
 
-        Category categoryResponse = categoryRepository.save(categoryRequest);
+        Category categoryResponse = categoryRepository.save(category);
         CategoryDTO categoryDTOResponse = modelMapper.map(categoryResponse, CategoryDTO.class);
 
         return categoryDTOResponse;
     }
 
     @Override
+    @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector",
+            "playlists", "hotPlaylists", "playlistsBySeries",
+            "playlistsByCate", "playlistsByCountry", "premiumPlaylists"
+    }
+            , allEntries = true)
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findCategoryById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "ID", id));
-        for(Movie movie : category.getMovies()){
+        for (Movie movie : category.getMovies()) {
             movie.removeCategory(category);
         }
-        for(Playlist playlist : category.getPlaylists()){
+        for (Playlist playlist : category.getPlaylists()) {
             playlist.removeCategory(category);
         }
         categoryRepository.delete(category);

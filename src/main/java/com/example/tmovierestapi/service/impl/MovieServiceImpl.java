@@ -17,6 +17,10 @@ import com.example.tmovierestapi.utils.AppGetLoggedIn;
 import com.example.tmovierestapi.utils.AppUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -60,7 +64,13 @@ public class MovieServiceImpl implements IMovieService {
     @Autowired
     private PaymentRepository paymentRepository;
 
+    @Autowired
+    private PlaylistRepository playlistRepository;
+
+    private final String MOVIE_HASH_KEY = "movie";
+
     @Override
+    @Cacheable(value = "movies", key = "#pageSize")
     public PagedResponse<Movie> getAllMovies(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
@@ -77,16 +87,25 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
+    @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector"}
+            , allEntries = true)
+    @CachePut(value = MOVIE_HASH_KEY, key = "#result.id")
     public MovieDTO addMovie(MovieDTO movieDTO, MultipartFile thumbFile, MultipartFile posterFile) {
         Boolean isExist = movieRepository.existsMovieBySlug(movieDTO.getSlug());
         if (isExist) {
             throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " slug is already exist!");
         }
+
+        Boolean isSlugExistInPlaylist = playlistRepository.existsPlaylistBySlug(movieDTO.getSlug());
+        if(!isSlugExistInPlaylist){
+            throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " is not match with slug in Playlist!");
+        }
+
         // Convert DTO to Entity
         Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
 
-        Country country = countryRepository.findCountryBySlug(movieDTO.getCountryName())
-                .orElseThrow(() -> new ResourceNotFoundException("Country", "name", movieDTO.getCountryName()));
+        Country country = countryRepository.findCountryBySlug(movieDTO.getCountrySlug())
+                .orElseThrow(() -> new ResourceNotFoundException("Country", "name", movieDTO.getCountrySlug()));
 
         Set<Category> categorySet = new HashSet<>();
         Set<Director> directorSet = new HashSet<>();
@@ -156,6 +175,9 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
+    @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector"}
+            , allEntries = true)
+    @CachePut(value = MOVIE_HASH_KEY, key = "#id")
     public MovieDTO updateMovie(Long id, MovieDTO movieDTO, MultipartFile thumbFile, MultipartFile posterFile) {
         try {
             Movie movie = movieRepository.findMovieById(id)
@@ -190,8 +212,8 @@ public class MovieServiceImpl implements IMovieService {
             Set<Director> directorSet = new HashSet<>();
             Set<Actor> actorSet = new HashSet<>();
 
-            Country country = countryRepository.findCountryBySlug(movieDTO.getCountryName())
-                    .orElseThrow(() -> new ResourceNotFoundException("Country", "Name", movieDTO.getCountryName()));
+            Country country = countryRepository.findCountryBySlug(movieDTO.getCountrySlug())
+                    .orElseThrow(() -> new ResourceNotFoundException("Country", "Name", movieDTO.getCountrySlug()));
 
             for (ActorRequest a : movieDTO.getActors()) {
                 Actor actor = actorRepository.findActorById(a.getId())
@@ -224,6 +246,11 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = MOVIE_HASH_KEY, key = "#id"),
+            @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector"}
+                    , allEntries = true)
+    })
     public void deleteMovie(Long id) {
         Movie movie = movieRepository.findMovieById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", id));
@@ -323,6 +350,7 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
+    @Cacheable(value = "moviesByActor")
     public PagedResponse<Movie> getMoviesByActor(Long actorID, int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
@@ -343,6 +371,7 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
+    @Cacheable(value = "moviesByDirector")
     public PagedResponse<Movie> getMoviesByDirector(Long directorID, int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 

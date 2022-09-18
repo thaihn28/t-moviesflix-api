@@ -83,15 +83,15 @@ public class MovieController {
         return new ResponseEntity<>("Deleted movie with ID-" + id + " successfully!", HttpStatus.OK);
     }
 
-//    @GetMapping("/filter-by-category/{id}")
-//    public ResponseEntity<PagedResponse<Movie>> getMoviesByCategory(@PathVariable(value = "id") Long cateID,
-//                                                                    @RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
-//                                                                    @RequestParam(value = "pageSize", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize,
-//                                                                    @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
-//                                                                    @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIRECTION) String sortDir
-//    ) {
-//        return new ResponseEntity<>(iMovieService.getMoviesByCategory(cateID, pageNo, pageSize, sortDir, sortBy), HttpStatus.OK);
-//    }
+    @GetMapping("/filter-by-category/{id}")
+    public ResponseEntity<PagedResponse<Movie>> getMoviesByCategory(@PathVariable(value = "id") Long cateID,
+                                                                    @RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
+                                                                    @RequestParam(value = "pageSize", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize,
+                                                                    @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
+                                                                    @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIRECTION) String sortDir
+    ) {
+        return new ResponseEntity<>(iMovieService.getMoviesByCategory(cateID, pageNo, pageSize, sortDir, sortBy), HttpStatus.OK);
+    }
 
     @GetMapping("/filter-by-actor/{id}")
     public ResponseEntity<PagedResponse<Movie>> getMoviesByActor(@PathVariable(value = "id") Long actorID,
@@ -113,24 +113,24 @@ public class MovieController {
         return new ResponseEntity<>(iMovieService.getMoviesByDirector(directorID, pageNo, pageSize, sortDir, sortBy), HttpStatus.OK);
     }
 
-//    @GetMapping("/filter-by-type")
-//    public ResponseEntity<PagedResponse<Movie>> getMoviesByType(@RequestParam(value = "type") String type,
-//                                                                @RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
-//                                                                @RequestParam(value = "pageSize", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize,
-//                                                                @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
-//                                                                @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIRECTION) String sortDir
-//    ) {
-//        return new ResponseEntity<>(iMovieService.getMoviesByType(type, pageNo, pageSize, sortDir, sortBy), HttpStatus.OK);
-//    }
-//
-//    @GetMapping("/filter-by-hot")
-//    public ResponseEntity<PagedResponse<Movie>> getHotMovies(@RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
-//                                                             @RequestParam(value = "pageSize", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize,
-//                                                             @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
-//                                                             @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIRECTION) String sortDir
-//    ) {
-//        return new ResponseEntity<>(iMovieService.getAllHotMovies(pageNo, pageSize, sortDir, sortBy), HttpStatus.OK);
-//    }
+    @GetMapping("/filter-by-type")
+    public ResponseEntity<PagedResponse<Movie>> getMoviesByType(@RequestParam(value = "type") String type,
+                                                                @RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
+                                                                @RequestParam(value = "pageSize", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize,
+                                                                @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
+                                                                @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIRECTION) String sortDir
+    ) {
+        return new ResponseEntity<>(iMovieService.getMoviesByType(type, pageNo, pageSize, sortDir, sortBy), HttpStatus.OK);
+    }
+
+    @GetMapping("/filter-by-hot")
+    public ResponseEntity<PagedResponse<Movie>> getHotMovies(@RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
+                                                             @RequestParam(value = "pageSize", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize,
+                                                             @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
+                                                             @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIRECTION) String sortDir
+    ) {
+        return new ResponseEntity<>(iMovieService.getAllHotMovies(pageNo, pageSize, sortDir, sortBy), HttpStatus.OK);
+    }
 
 
 }

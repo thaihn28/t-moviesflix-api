@@ -16,7 +16,7 @@ public class CountryDTO {
 
     @NotEmpty(message = "Slug is required")
     @Pattern(message = "Alphanumeric words in slug separated by single dashes (ex: standard-slug-pattern)",
-            regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$\n",
+            regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$",
             flags = Pattern.Flag.UNICODE_CASE)
     private String slug;
 

@@ -68,7 +68,7 @@ public class MovieDTO {
     private LocalDateTime modifiedDate;
 
     // Country
-    private String countryName;
+    private String countrySlug;
 
     private Set<ActorRequest> actors = new HashSet<>();
 

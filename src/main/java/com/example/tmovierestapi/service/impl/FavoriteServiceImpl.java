@@ -107,18 +107,19 @@ public class FavoriteServiceImpl implements IFavoriteService {
 
     /*TODO: Convert response Favorite DTO*/
     @Override
-    public Favorite addFavorite(String slug) {
+    public FavoriteDTO addFavorite(String slug) {
         Playlist playlist = playlistRepository.findPlaylistBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Playlist", "Slug", slug));
 
         Favorite favoriteRequest = new Favorite();
         Set<Playlist> playlistSet = new HashSet<>();
         Favorite favoriteResponse = null;
+        User currentUser = null;
 
         Authentication authentication = AppGetLoggedIn.getLoggedIn();
         if (!(authentication instanceof AnonymousAuthenticationToken)) {
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-            User currentUser = userRepository.findByUsername(customUserDetails.getUsername())
+            currentUser = userRepository.findByUsername(customUserDetails.getUsername())
                     .orElseThrow(() -> new UsernameNotFoundException(customUserDetails.getUsername() + " can not found"));
 
             Optional<Favorite> checkFavByUser = favoriteRepository.findFavoriteByUser(currentUser);
@@ -141,17 +142,68 @@ public class FavoriteServiceImpl implements IFavoriteService {
             favoriteRequest.setCreatedDate(LocalDateTime.now());
             favoriteResponse = favoriteRepository.save(favoriteRequest);
         }
-        return favoriteResponse;
+        FavoriteDTO favoriteDTOResponse = new FavoriteDTO();
+        favoriteDTOResponse.setId(favoriteResponse.getId());
+
+        UserDTO userDTO = new UserDTO(currentUser.getId(), currentUser.getUsername(), currentUser.getEmail(), currentUser.fullName());
+        favoriteDTOResponse.setUser(userDTO);
+
+        Set<PlaylistResponse> playlistResponses = new HashSet<>();
+
+        for (Playlist p : favoriteResponse.getPlaylists()) {
+            PlaylistResponse response = new PlaylistResponse(
+                    p.getId(),
+                    p.getName(),
+                    p.getOriginName(),
+                    p.getThumbURL(),
+                    p.getYear(),
+                    p.getType(),
+                    p.getSlug()
+            );
+            playlistResponses.add(response);
+        }
+        favoriteDTOResponse.setPlaylists(playlistResponses);
+        favoriteDTOResponse.setCreatedDate(favoriteRequest.getCreatedDate());
+
+        return favoriteDTOResponse;
     }
 
-    private Favorite updateFavorite(Favorite favorite, Playlist playlist) {
+    private FavoriteDTO updateFavorite(Favorite favorite, Playlist playlist) {
         Favorite updateFav = favorite;
+
         Set<Playlist> playlistSet = updateFav.getPlaylists();
         playlistSet.add(playlist);
+
         updateFav.setPlaylists(playlistSet);
         updateFav.setModifiedDate(LocalDateTime.now());
+
+        User currentUser = updateFav.getUser();
+
         Favorite updatePlaylistInFav = favoriteRepository.save(updateFav);
-        return updatePlaylistInFav;
+
+        FavoriteDTO favoriteDTOResponse = new FavoriteDTO();
+
+        UserDTO userDTO = new UserDTO(currentUser.getId(), currentUser.getUsername(), currentUser.getEmail(), currentUser.fullName());
+        favoriteDTOResponse.setUser(userDTO);
+
+        Set<PlaylistResponse> playlistResponses = new HashSet<>();
+
+        for (Playlist p : updatePlaylistInFav.getPlaylists()) {
+            PlaylistResponse response = new PlaylistResponse(
+                    p.getId(),
+                    p.getName(),
+                    p.getOriginName(),
+                    p.getThumbURL(),
+                    p.getYear(),
+                    p.getType(),
+                    p.getSlug()
+            );
+            playlistResponses.add(response);
+        }
+        favoriteDTOResponse.setPlaylists(playlistResponses);
+        favoriteDTOResponse.setModifiedDate(updatePlaylistInFav.getModifiedDate());
+
+        return favoriteDTOResponse;
     }
 
     @Override
@@ -167,15 +219,15 @@ public class FavoriteServiceImpl implements IFavoriteService {
                     .orElseThrow(() -> new UsernameNotFoundException(customUserDetails.getUsername() + " can not found"));
 
             Favorite favorite = favoriteRepository.findFavoriteByPlaylistsAndUser(playlist, currentUser)
-                    .orElseThrow(() -> new ResourceNotFoundException("Favorite", "Playlist", playlist.getName()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Favorite", "Playlist ID", playlist.getId()));
 
             if (favorite.getPlaylists().size() <= 1) {
                 favoriteRepository.delete(favorite);
             } else {
                 playlist.removeFavorite(favorite);
-                Set<Playlist> playlists = favorite.getPlaylists();
-                playlists.remove(playlist);
-                favorite.setPlaylists(playlists);
+//                Set<Playlist> playlists = favorite.getPlaylists();
+//                playlists.remove(playlist);
+//                favorite.setPlaylists(playlists);
                 favoriteRepository.save(favorite);
             }
         }
