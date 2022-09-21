@@ -1,12 +1,12 @@
 package com.example.tmovierestapi.payload.dto;
 
+import com.example.tmovierestapi.model.Comment;
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-import java.time.Instant;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 public class CommentDTO {
@@ -16,12 +16,8 @@ public class CommentDTO {
     @Size(min = 1, max = 255, message = "Content must be minimum 1 characters and maximum 255 characters")
     private String content;
 
-    private Instant createdDate;
+    private Comment commentID;
 
-    @Min(value = 0L, message = "User ID is invalid")
-    private Long userID;
-
-    @Min(value = 0L, message = "Movie ID is invalid")
-    private Long movieID;
+    private Set<CommentDTO> comments = new HashSet<>();
 
 }

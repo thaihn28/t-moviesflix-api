@@ -8,5 +8,6 @@ import com.paypal.api.payments.Payment;
 
 public interface IPaymentService {
     PagedResponse<PaymentModelResponse> getAllPayments(int pageNo, int pageSize, String sortDir, String sortBy);
-    PaymentModel addPayment(Payment payment);
+    String addPayment(Payment payment);
+    void deletePayment(Movie movie);
 }

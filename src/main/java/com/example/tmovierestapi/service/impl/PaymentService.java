@@ -26,6 +26,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -90,12 +91,13 @@ public class PaymentService implements IPaymentService {
     }
 
     @Override
-    public PaymentModel addPayment(Payment payment) {
+    public String addPayment(Payment payment) {
         PaymentModel paymentModel = new PaymentModel();
+        Movie movie = null;
 
         for (Transaction transaction : payment.getTransactions()) {
             Long movieID = Long.valueOf(transaction.getPurchaseUnitReferenceId());
-            Movie movie = movieRepository.findMovieById(movieID)
+            movie = movieRepository.findMovieById(movieID)
                     .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", movieID));
 
             String payerEmail = payment.getPayer().getPayerInfo().getEmail();
@@ -117,20 +119,22 @@ public class PaymentService implements IPaymentService {
             Amount amount = transaction.getAmount();
             paymentModel.setPrice(Double.parseDouble(amount.getTotal()));
             paymentModel.setCurrency(amount.getCurrency());
+            paymentModel.setCreatedAt(LocalDateTime.now());
 
             paymentRepository.save(paymentModel);
         }
-        /*TODO: Add to Purchase table
-         * paymentResponse.getPayer().getStatus() -> VERIFIED
-         * paymentResponse.getPayer().getPaymentMethod() -> paypal
-         * paymentResponse.getState() -> Approved
-         *
-         * paymentResponse.getPayer().getPayerInfo().getEmail() -> Email
-         * paymentResponse.getPayer().getPayerInfo().getShippingAddress() -> Name, Address
-         * transaction.getAmount.getTotal -> Price -> Transaction
-         * transaction.getCurrency.getTotal -> Price -> Transaction
-         */
-        return paymentModel;
+        String url = "movie/" + movie.getSlug();
+
+        return url;
     }
+
+    @Override
+    public void deletePayment(Movie movie) {
+        List<PaymentModel> paymentModels = paymentRepository.findPaymentsModelByMovie(movie)
+                        .orElseThrow(() -> new ResourceNotFoundException("List payment", "movie-" + movie.getName(), " not found"));
+
+        paymentRepository.deleteAll(paymentModels);
+    }
+
 
 }

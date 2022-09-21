@@ -62,6 +62,7 @@ public class SearchServiceImpl implements ISearchService {
                 SearchMovieResponse searchMovieResponse = new SearchMovieResponse();
                 searchMovieResponse.setId(m.getId());
                 searchMovieResponse.setName(m.getName());
+                searchMovieResponse.setSlug(m.getSlug());
                 searchMovieResponse.setYear(m.getYear());
                 searchMovieResponse.setOriginName(m.getOriginName());
                 searchMovieResponse.setThumbURL(m.getThumbURL());
@@ -76,6 +77,7 @@ public class SearchServiceImpl implements ISearchService {
                 SearchActorResponse searchActorResponse = new SearchActorResponse();
                 searchActorResponse.setId(a.getId());
                 searchActorResponse.setName(a.getName());
+                searchActorResponse.setSlug(a.getSlug());
                 searchActorResponse.setAvatar(a.getAvatar());
 
                 searchActorResponseSet.add(searchActorResponse);
@@ -87,6 +89,7 @@ public class SearchServiceImpl implements ISearchService {
                 SearchDirectorResponse searchDirectorResponse = new SearchDirectorResponse();
                 searchDirectorResponse.setId(d.getId());
                 searchDirectorResponse.setName(d.getName());
+                searchDirectorResponse.setSlug(d.getSlug());
                 searchDirectorResponse.setAvatar(d.getAvatar());
 
                 searchDirectorResponseSet.add(searchDirectorResponse);

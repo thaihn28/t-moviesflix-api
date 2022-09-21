@@ -1,6 +1,5 @@
 package com.example.tmovierestapi.payload.response;
 
-import com.example.tmovierestapi.model.Movie;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -12,6 +11,7 @@ public class ActorResponse {
     private Long id;
     private String name;
     private String avatar;
+    private String slug;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
     private Boolean isHot;

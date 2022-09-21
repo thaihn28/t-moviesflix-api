@@ -6,6 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,6 +15,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+//@JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class Actor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,6 +27,9 @@ public class Actor {
     private String avatar;
 
     @NotEmpty(message = "Slug is required")
+    @Pattern(message = "Alphanumeric words in slug separated by single dashes (ex: standard-slug-pattern)",
+            regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            flags = Pattern.Flag.UNICODE_CASE)
     private String slug;
 
     @Column(name = "created_date")
@@ -33,7 +38,7 @@ public class Actor {
     @Column(name = "modified_date")
     private LocalDateTime modifiedDate;
 
-    @Column(name = "is_hot")
+    @Column(name = "is_hot", columnDefinition = "boolean default true")
     private Boolean isHot;
 
     @ManyToMany(mappedBy = "actors", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})

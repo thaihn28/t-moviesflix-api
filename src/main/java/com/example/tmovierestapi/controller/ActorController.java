@@ -2,11 +2,19 @@ package com.example.tmovierestapi.controller;
 
 import com.example.tmovierestapi.anotation.ValidImage;
 import com.example.tmovierestapi.model.Actor;
+import com.example.tmovierestapi.model.Movie;
 import com.example.tmovierestapi.payload.dto.ActorDTO;
 import com.example.tmovierestapi.payload.response.ActorResponse;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.service.IActorService;
 import com.example.tmovierestapi.utils.AppConstants;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +27,19 @@ import javax.validation.Valid;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/actors")
+@Tag(name = "actor")
 public class ActorController {
     @Autowired
     private IActorService iActorService;
+
+    @Operation(description = "View all list actors", responses = {
+            @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = Actor.class))), responseCode = "200") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode  = "200", description = "OK"),
+            @ApiResponse(responseCode  = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode  = "403", description = "Forbidden"),
+            @ApiResponse(responseCode  = "404", description = "Not found")
+    })
 
     @GetMapping
     public ResponseEntity<PagedResponse<ActorResponse>> getAllActors(
@@ -42,7 +60,7 @@ public class ActorController {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ActorDTO> addActor(@RequestPart(name = "actor") @Valid ActorDTO actorDTO,
-                                             @RequestPart(name = "avatarFile") @ValidImage MultipartFile avatar) {
+                                             @RequestPart(name = "avatar") @ValidImage MultipartFile avatar) {
         return new ResponseEntity<>(iActorService.addActor(actorDTO, avatar), HttpStatus.CREATED);
     }
 
@@ -52,7 +70,7 @@ public class ActorController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ActorDTO> updateActor(@PathVariable(value = "id") Long id,
                                                 @RequestPart(name = "actor") @Valid ActorDTO actorDTO,
-                                                @RequestPart(name = "avatarFile", required = false) @ValidImage MultipartFile avatar
+                                                @RequestPart(name = "avatar", required = false) @ValidImage MultipartFile avatar
     ) {
         return new ResponseEntity<>(iActorService.updateActor(id, actorDTO, avatar), HttpStatus.CREATED);
     }

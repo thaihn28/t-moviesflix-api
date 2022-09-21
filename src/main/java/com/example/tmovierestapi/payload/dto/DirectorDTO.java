@@ -4,17 +4,21 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Data
 public class DirectorDTO {
     private Long id;
-    @NotBlank
-    @Size(min = 2, max = 200, message = "Category name must be minimum 2 characters and maximum 200 characters")
+    @NotBlank(message = "Director name must not be empty")
+    @Size(min = 2, max = 200, message = "Director name must be minimum 2 characters and maximum 200 characters")
     private String name;
 
-    @NotEmpty(message = "Slug is required")
+    @NotEmpty(message = "Slug must not be empty")
+    @Pattern(message = "Alphanumeric words in slug separated by single dashes (ex: standard-slug-pattern)",
+            regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            flags = Pattern.Flag.UNICODE_CASE)
     private String slug;
 
     private String avatar;

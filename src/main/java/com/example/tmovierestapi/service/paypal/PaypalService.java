@@ -31,15 +31,15 @@ public class PaypalService {
 
 
     public String createPayment(
-            Long movieID,
+            String slug,
             String currency,
             String method,
             String intent,
             String cancelUrl,
             String successUrl) throws PayPalRESTException {
         try {
-            Movie movie = movieRepository.findMovieById(movieID)
-                    .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST , "Movie with ID" + movieID + " not found!"));
+            Movie movie = movieRepository.findMovieBySlug(slug)
+                    .orElseThrow(() -> new APIException(HttpStatus.BAD_REQUEST, "Movie with slug" + slug + " not found!"));
             Amount amount = new Amount();
             amount.setCurrency(currency);
             amount.setTotal(String.format("%.2f", movie.getPrice()));
@@ -65,37 +65,42 @@ public class PaypalService {
 //            System.out.println(paymentResponse.toJSON());
 
             for (Links link : paymentResponse.getLinks()) {
-                if (link.getRel().equals("approval_url")) {
+                if (link.getRel().equals("approval_url"))
                     return link.getHref();
-                }
             }
+            return null;
         } catch (PayPalRESTException e) {
-           throw new PayPalRESTException(e.getMessage());
+            throw new PayPalRESTException(e.getMessage());
         }
-        return null;
-
     }
 
-    public Payment executePayment(String paymentId, String payerId, CustomUserDetails currentUser) throws PayPalRESTException {
+    public String executePayment(String paymentId, String payerId, CustomUserDetails currentUser) throws PayPalRESTException {
         try {
+            StringBuilder content = new StringBuilder();
+            String response = "";
+            Payment paymentResponse;
+
             Payment payment = new Payment();
             payment.setId(paymentId);
             payment.setTransactions(transactions);
+
             PaymentExecution paymentExecute = new PaymentExecution();
             paymentExecute.setPayerId(payerId);
-            Payment paymentResponse = payment.execute(apiContext, paymentExecute);
+
+            paymentResponse = payment.execute(apiContext, paymentExecute);
             paymentResponse.getTransactions().stream().filter(item -> item.getPurchaseUnitReferenceId() != null)
                     .collect(Collectors.toList());
             paymentResponse.getPayer().getPayerInfo().setEmail(currentUser.getEmail());
             paymentResponse.setTransactions(payment.getTransactions());
+
             if (paymentResponse.getState().equals("approved")) {
-                paymentService.addPayment(paymentResponse);
-                return paymentResponse;
+                response = paymentService.addPayment(paymentResponse);
+                content.append(response);
             }
+            return content.toString();
         } catch (PayPalRESTException e) {
             throw new PayPalRESTException(e.getMessage());
         }
-        return null;
     }
 
 }

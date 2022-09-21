@@ -11,5 +11,6 @@ public interface CountryRepository extends JpaRepository<Country, Long> {
     Optional<Country> findCountryById(Long id);
     Optional<Country> findCountryBySlug(String slug);
     Boolean existsCountryByName(String name);
+    Boolean existsCountryBySlug(String slug);
 
 }

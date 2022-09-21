@@ -64,6 +64,7 @@ public class ActorServiceImpl implements IActorService {
             ActorResponse actorResponseObj = new ActorResponse();
             actorResponseObj.setId(a.getId());
             actorResponseObj.setName(a.getName());
+            actorResponseObj.setSlug(a.getSlug());
             actorResponseObj.setAvatar(a.getAvatar());
             actorResponseObj.setIsHot(a.getIsHot());
             actorResponseObj.setCreatedDate(a.getCreatedDate());
@@ -77,6 +78,8 @@ public class ActorServiceImpl implements IActorService {
                 movieResponseObj.setThumbURL(m.getThumbURL());
                 movieResponseObj.setYear(m.getYear());
                 movieResponseObj.setOriginName(m.getOriginName());
+                movieResponseObj.setType(m.getType());
+                movieResponseObj.setSlug(m.getSlug());
 
                 movieResponseSet.add(movieResponseObj);
             }
@@ -132,8 +135,8 @@ public class ActorServiceImpl implements IActorService {
             String url = cloudinaryService.uploadThumb(avatar);
             actor.setAvatar(url);
         }
-
         actor.setName(actorRequest.getName());
+        actor.setSlug(actorRequest.getSlug());
         actor.setIsHot(actorRequest.getIsHot());
         actor.setModifiedDate(LocalDateTime.now());
 

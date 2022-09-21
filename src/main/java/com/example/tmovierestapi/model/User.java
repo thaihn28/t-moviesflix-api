@@ -21,6 +21,7 @@ import java.util.Set;
                 @UniqueConstraint(columnNames = "username"),
                 @UniqueConstraint(columnNames = "email")
         })
+//@JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class User {
 
     @Id

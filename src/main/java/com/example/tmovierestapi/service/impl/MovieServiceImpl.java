@@ -7,11 +7,13 @@ import com.example.tmovierestapi.payload.request.ActorRequest;
 import com.example.tmovierestapi.payload.request.CategoryRequest;
 import com.example.tmovierestapi.payload.dto.MovieDTO;
 import com.example.tmovierestapi.payload.request.DirectorRequest;
+import com.example.tmovierestapi.payload.response.MovieResponse;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.payload.response.PaymentMovieResponse;
 import com.example.tmovierestapi.repository.*;
 import com.example.tmovierestapi.security.services.CustomUserDetails;
 import com.example.tmovierestapi.service.IMovieService;
+import com.example.tmovierestapi.service.IPaymentService;
 import com.example.tmovierestapi.service.cloudinary.CloudinaryService;
 import com.example.tmovierestapi.utils.AppGetLoggedIn;
 import com.example.tmovierestapi.utils.AppUtils;
@@ -67,6 +69,9 @@ public class MovieServiceImpl implements IMovieService {
     @Autowired
     private PlaylistRepository playlistRepository;
 
+    @Autowired
+    private IPaymentService iPaymentService;
+
     private final String MOVIE_HASH_KEY = "movie";
 
     @Override
@@ -91,79 +96,84 @@ public class MovieServiceImpl implements IMovieService {
             , allEntries = true)
     @CachePut(value = MOVIE_HASH_KEY, key = "#result.id")
     public MovieDTO addMovie(MovieDTO movieDTO, MultipartFile thumbFile, MultipartFile posterFile) {
-        Boolean isExist = movieRepository.existsMovieBySlug(movieDTO.getSlug());
-        if (isExist) {
-            throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " slug is already exist!");
+        try {
+            Boolean isExist = movieRepository.existsMovieBySlug(movieDTO.getSlug());
+            if (isExist) {
+                throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " slug is already exist!");
+            }
+
+            Boolean isSlugExistInPlaylist = playlistRepository.existsPlaylistBySlug(movieDTO.getSlug());
+            if(!isSlugExistInPlaylist){
+                throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " is not match with slug in Playlist!");
+            }
+
+            // Convert DTO to Entity
+            Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
+
+            Country country = countryRepository.findCountryBySlug(movieDTO.getCountrySlug())
+                    .orElseThrow(() -> new ResourceNotFoundException("Country", "name", movieDTO.getCountrySlug()));
+
+            Set<Category> categorySet = new HashSet<>();
+            Set<Director> directorSet = new HashSet<>();
+            Set<Actor> actorSet = new HashSet<>();
+
+            for (CategoryRequest c : movieDTO.getCategories()) {
+                Category category = categoryRepository.findCategoryById(c.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Category", "id", c.getId()));
+                categorySet.add(category);
+            }
+
+            for (ActorRequest a : movieDTO.getActors()) {
+                Actor actor = actorRepository.findActorById(a.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", a.getId()));
+                actorSet.add(actor);
+            }
+
+            for (DirectorRequest d : movieDTO.getDirectors()) {
+                Director director = directorRepository.findDirectorById(d.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", d.getId()));
+                directorSet.add(director);
+            }
+
+            if (movieDTO.getIsPremium()) {
+                movieRequest.setPrice(0d);
+            } else {
+                movieRequest.setPrice(movieDTO.getPrice());
+            }
+
+            String thumbURL = cloudinaryService.uploadThumb(thumbFile);
+            movieRequest.setThumbURL(thumbURL);
+
+            String posterURL = cloudinaryService.uploadPoster(posterFile);
+            movieRequest.setPosterURL(posterURL);
+
+            movieRequest.setCountry(country);
+            movieRequest.setCategories(categorySet);
+            movieRequest.setCreatedDate(LocalDateTime.now());
+            movieRequest.setActors(actorSet);
+            movieRequest.setDirectors(directorSet);
+
+            Movie movie = movieRepository.save(movieRequest);
+            // Convert Entiry to DTO
+            MovieDTO movieRespone = modelMapper.map(movie, MovieDTO.class);
+
+            return movieRespone;
+        }catch (APIException e){
+           throw new APIException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
 
-        Boolean isSlugExistInPlaylist = playlistRepository.existsPlaylistBySlug(movieDTO.getSlug());
-        if(!isSlugExistInPlaylist){
-            throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " is not match with slug in Playlist!");
-        }
-
-        // Convert DTO to Entity
-        Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
-
-        Country country = countryRepository.findCountryBySlug(movieDTO.getCountrySlug())
-                .orElseThrow(() -> new ResourceNotFoundException("Country", "name", movieDTO.getCountrySlug()));
-
-        Set<Category> categorySet = new HashSet<>();
-        Set<Director> directorSet = new HashSet<>();
-        Set<Actor> actorSet = new HashSet<>();
-
-        for (CategoryRequest c : movieDTO.getCategories()) {
-            Category category = categoryRepository.findCategoryById(c.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Category", "id", c.getId()));
-            categorySet.add(category);
-        }
-
-        for (ActorRequest a : movieDTO.getActors()) {
-            Actor actor = actorRepository.findActorById(a.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", a.getId()));
-            actorSet.add(actor);
-        }
-
-        for (DirectorRequest d : movieDTO.getDirectors()) {
-            Director director = directorRepository.findDirectorById(d.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", d.getId()));
-            directorSet.add(director);
-        }
-
-        if (movieDTO.getIsPremium()) {
-            movieRequest.setPrice(0d);
-        } else {
-            movieRequest.setPrice(movieDTO.getPrice());
-        }
-
-        String thumbURL = cloudinaryService.uploadThumb(thumbFile);
-        movieRequest.setThumbURL(thumbURL);
-
-        String posterURL = cloudinaryService.uploadPoster(posterFile);
-        movieRequest.setPosterURL(posterURL);
-
-        movieRequest.setCountry(country);
-        movieRequest.setCategories(categorySet);
-        movieRequest.setCreatedDate(LocalDateTime.now());
-        movieRequest.setActors(actorSet);
-        movieRequest.setDirectors(directorSet);
-
-        Movie movie = movieRepository.save(movieRequest);
-        // Convert Entiry to DTO
-        MovieDTO movieRespone = modelMapper.map(movie, MovieDTO.class);
-
-        return movieRespone;
     }
 
     @Override
-    public PagedResponse<Movie> getMoviesByCategory(Long categoryID, int pageNo, int pageSize, String sortDir, String sortBy) {
+    public PagedResponse<Movie> getMoviesByCategory(String slug, int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
-        Category category = categoryRepository.findCategoryById(categoryID)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "ID", categoryID));
+        Category category = categoryRepository.findCategoryBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "slug", slug));
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
         Page<Movie> movieResponse = movieRepository.findMoviesByCategories(category, pageable);
@@ -254,6 +264,8 @@ public class MovieServiceImpl implements IMovieService {
     public void deleteMovie(Long id) {
         Movie movie = movieRepository.findMovieById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", id));
+
+        iPaymentService.deletePayment(movie);
         movieRepository.delete(movie);
     }
 
@@ -351,48 +363,80 @@ public class MovieServiceImpl implements IMovieService {
 
     @Override
     @Cacheable(value = "moviesByActor")
-    public PagedResponse<Movie> getMoviesByActor(Long actorID, int pageNo, int pageSize, String sortDir, String sortBy) {
+    public PagedResponse<MovieResponse> getMoviesByActor(String slug, int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
-        Actor actor = actorRepository.findActorById(actorID)
-                .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", actorID));
+        Actor actor = actorRepository.findActorsBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Actor", "slug", slug));
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
         Page<Movie> movieResponse = movieRepository.findMoviesByActors(actor, pageable);
 
         List<Movie> contents = movieResponse.getTotalElements() == 0 ? Collections.emptyList() : movieResponse.getContent();
 
-        return new PagedResponse<>(contents, movieResponse.getNumber(), movieResponse.getSize(),
+        List<MovieResponse> movieResponses = new ArrayList<>();
+
+        for (Movie m : contents){
+            MovieResponse movieResponseObj = new MovieResponse();
+
+            movieResponseObj.setId(m.getId());
+            movieResponseObj.setName(m.getName());
+            movieResponseObj.setOriginName(m.getOriginName());
+            movieResponseObj.setThumbURL(m.getThumbURL());
+            movieResponseObj.setYear(m.getYear());
+            movieResponseObj.setType(m.getType());
+            movieResponseObj.setSlug(m.getSlug());
+
+            movieResponses.add(movieResponseObj);
+        }
+
+        return new PagedResponse<>(movieResponses, movieResponse.getNumber(), movieResponse.getSize(),
                 movieResponse.getTotalElements(), movieResponse.getTotalPages(), movieResponse.isLast());
     }
 
     @Override
     @Cacheable(value = "moviesByDirector")
-    public PagedResponse<Movie> getMoviesByDirector(Long directorID, int pageNo, int pageSize, String sortDir, String sortBy) {
+    public PagedResponse<MovieResponse> getMoviesByDirector(String slug, int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
-        Director director = directorRepository.findDirectorById(directorID)
-                .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", directorID));
+        Director director = directorRepository.findDirectorBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Director", "slug", slug));
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
         Page<Movie> movieResponse = movieRepository.findMoviesByDirectors(director, pageable);
 
         List<Movie> contents = movieResponse.getTotalElements() == 0 ? Collections.emptyList() : movieResponse.getContent();
 
-        return new PagedResponse<>(contents, movieResponse.getNumber(), movieResponse.getSize(),
+        List<MovieResponse> movieResponses = new ArrayList<>();
+
+        for (Movie m : contents){
+            MovieResponse movieResponseObj = new MovieResponse();
+
+            movieResponseObj.setId(m.getId());
+            movieResponseObj.setName(m.getName());
+            movieResponseObj.setOriginName(m.getOriginName());
+            movieResponseObj.setThumbURL(m.getThumbURL());
+            movieResponseObj.setYear(m.getYear());
+            movieResponseObj.setType(m.getType());
+            movieResponseObj.setSlug(m.getSlug());
+
+            movieResponses.add(movieResponseObj);
+        }
+
+        return new PagedResponse<>(movieResponses, movieResponse.getNumber(), movieResponse.getSize(),
                 movieResponse.getTotalElements(), movieResponse.getTotalPages(), movieResponse.isLast());
     }
 
     @Override
-    public PagedResponse<Movie> getMoviesByType(String type, int pageNo, int pageSize, String sortDir, String sortBy) {
+    public PagedResponse<MovieResponse> getMoviesByType(String type, int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
@@ -403,12 +447,28 @@ public class MovieServiceImpl implements IMovieService {
         Page<Movie> movieResponse = movieRepository.findMoviesByType(type, pageable);
         List<Movie> contents = movieResponse.getTotalElements() == 0 ? Collections.emptyList() : movieResponse.getContent();
 
-        return new PagedResponse<>(contents, movieResponse.getNumber(), movieResponse.getSize(),
+        List<MovieResponse> movieResponses = new ArrayList<>();
+
+        for (Movie m : contents){
+            MovieResponse movieResponseObj = new MovieResponse();
+
+            movieResponseObj.setId(m.getId());
+            movieResponseObj.setName(m.getName());
+            movieResponseObj.setOriginName(m.getOriginName());
+            movieResponseObj.setThumbURL(m.getThumbURL());
+            movieResponseObj.setYear(m.getYear());
+            movieResponseObj.setType(m.getType());
+            movieResponseObj.setSlug(m.getSlug());
+
+            movieResponses.add(movieResponseObj);
+        }
+
+        return new PagedResponse<>(movieResponses, movieResponse.getNumber(), movieResponse.getSize(),
                 movieResponse.getTotalElements(), movieResponse.getTotalPages(), movieResponse.isLast());
     }
 
     @Override
-    public PagedResponse<Movie> getAllHotMovies(int pageNo, int pageSize, String sortDir, String sortBy) {
+    public PagedResponse<MovieResponse> getAllHotMovies(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
@@ -421,7 +481,23 @@ public class MovieServiceImpl implements IMovieService {
         Page<Movie> movieResponse = movieRepository.findMoviesByIsHot(isHot, pageable);
         List<Movie> contents = movieResponse.getTotalElements() == 0 ? Collections.emptyList() : movieResponse.getContent();
 
-        return new PagedResponse<>(contents, movieResponse.getNumber(), movieResponse.getSize(),
+        List<MovieResponse> movieResponses = new ArrayList<>();
+
+        for (Movie m : contents){
+            MovieResponse movieResponseObj = new MovieResponse();
+
+            movieResponseObj.setId(m.getId());
+            movieResponseObj.setName(m.getName());
+            movieResponseObj.setOriginName(m.getOriginName());
+            movieResponseObj.setThumbURL(m.getThumbURL());
+            movieResponseObj.setYear(m.getYear());
+            movieResponseObj.setType(m.getType());
+            movieResponseObj.setSlug(m.getSlug());
+
+            movieResponses.add(movieResponseObj);
+        }
+
+        return new PagedResponse<>(movieResponses, movieResponse.getNumber(), movieResponse.getSize(),
                 movieResponse.getTotalElements(), movieResponse.getTotalPages(), movieResponse.isLast());
     }
 

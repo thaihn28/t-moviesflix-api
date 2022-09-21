@@ -7,16 +7,17 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+//@JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class PaymentModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
 
     @Column(name = "status")
     @NotBlank
@@ -35,6 +36,9 @@ public class PaymentModel {
     @Column(name = "payment_method")
     @NotBlank
     private String paymentMethod;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     @OneToOne
     @JoinColumn(name = "movie_id")

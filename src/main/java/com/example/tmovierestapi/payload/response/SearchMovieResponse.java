@@ -13,6 +13,6 @@ public class SearchMovieResponse {
     private String posterURL;
     //    private String time;
 //    private String quality;
-//    private String slug;
+    private String slug;
     private Integer year;
 }

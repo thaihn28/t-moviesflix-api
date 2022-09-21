@@ -11,7 +11,8 @@ import java.util.Optional;
 @Repository
 public interface ActorRepository extends JpaRepository<Actor, Long> {
     Optional<Actor> findActorById(Long id);
-    Boolean existsActorByName(String name);
+    Boolean existsActorBySlug(String slug);
+    Optional<Actor> findActorsBySlug(String slug);
 
 //    @Query("SELECT a FROM Actor a WHERE a.name LIKE %?1%")
     @Query("SELECT a FROM Actor a WHERE " +

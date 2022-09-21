@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +13,8 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+//@JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
+//@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Movie {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,7 +53,10 @@ public class Movie {
     @NotBlank
     private String quality;
 
-    @NotBlank
+    @NotBlank(message = "Slug must not empty")
+    @Pattern(message = "Alphanumeric words in slug separated by single dashes (ex: standard-slug-pattern)",
+            regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            flags = Pattern.Flag.UNICODE_CASE)
     private String slug;
 
     private Integer year;
@@ -66,13 +72,13 @@ public class Movie {
     @Column(name = "show_times")
     private String showTimes;
 
-    @Column(name = "is_hot")
+    @Column(name = "is_hot",columnDefinition = "boolean default true")
     private Boolean isHot;
 
-    @Column(name = "is_premium")
+    @Column(name = "is_premium", nullable = false)
     private Boolean isPremium;
 
-    @Column(name = "price")
+    @Column(name = "price", nullable = false)
     private Double price;
 
     //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern ="yyyy-MM-dd'T'HH:mm:ss.SSSZZ", timezone = "UTC")
@@ -123,7 +129,6 @@ public class Movie {
             cascade = CascadeType.ALL,
             orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
-
 
     public void removeCategory(Category category) {
         this.categories.remove(category);

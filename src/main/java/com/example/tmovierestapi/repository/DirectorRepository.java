@@ -12,7 +12,8 @@ import java.util.Optional;
 @Repository
 public interface DirectorRepository extends JpaRepository<Director, Long> {
     Optional<Director> findDirectorById(Long id);
-    Boolean existsDirectorByName(String name);
+    Boolean existsActorBySlug(String slug);
+    Optional<Director> findDirectorBySlug(String slug);
     //    @Query("SELECT a FROM Actor a WHERE a.name LIKE %?1%")
     @Query("SELECT d FROM Director d WHERE " +
             "d.name LIKE CONCAT('%', :keyword, '%')")

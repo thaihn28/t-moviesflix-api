@@ -1,23 +1,23 @@
 package com.example.tmovierestapi.payload.dto;
 
-import com.example.tmovierestapi.payload.request.MovieRequest;
 import lombok.Data;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 public class CategoryDTO {
     private Long id;
 
-    @NotBlank
+    @NotBlank(message = "Category name must not be empty")
     @Size(min = 2, max = 200, message = "Category name must be minimum 2 characters and maximum 200 characters")
     private String name;
 
-    @NotEmpty(message = "Slug is required")
+    @NotBlank(message = "Slug must not be empty")
+    @Pattern(message = "Alphanumeric words in slug separated by single dashes (ex: standard-slug-pattern)",
+            regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            flags = Pattern.Flag.UNICODE_CASE)
     private String slug;
 
     private LocalDateTime createdDate;

@@ -9,6 +9,9 @@ import com.example.tmovierestapi.repository.RoleRepository;
 import com.example.tmovierestapi.repository.UserRepository;
 import com.example.tmovierestapi.service.IRegistrationService;
 import com.example.tmovierestapi.utils.admin.Password;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +25,7 @@ import java.util.*;
 
 @SpringBootApplication
 @EnableCaching
+@SecurityScheme(name = "tmovieapi", scheme = "bearer", type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER)
 public class TMovieRestApiApplication {
     @Autowired
     private IRegistrationService iRegistrationService;

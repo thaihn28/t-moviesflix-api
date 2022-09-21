@@ -73,6 +73,8 @@ public class EpisodeServiceImpl implements IEpisodeService {
             movieResponseObj.setOriginName(movieObj.getOriginName());
             movieResponseObj.setThumbURL(movieObj.getThumbURL());
             movieResponseObj.setYear(movieObj.getYear());
+            movieResponseObj.setType(movieObj.getType());
+            movieResponseObj.setSlug(movieObj.getSlug());
 
             episodeResponseObj.setMovie(movieResponseObj);
 

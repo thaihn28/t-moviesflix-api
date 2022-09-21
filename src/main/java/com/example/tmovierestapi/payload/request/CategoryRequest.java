@@ -6,7 +6,7 @@ import javax.validation.constraints.NotEmpty;
 
 @Data
 public class CategoryRequest {
-    @NotEmpty(message = "Category ID is required")
+    @NotEmpty(message = "Category ID must not be empty")
     private Long id;
 
     private String name;

@@ -11,6 +11,7 @@ public class DirectorResponse {
     private Long id;
     private String name;
     private String avatar;
+    private String slug;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
     private Boolean isHot;

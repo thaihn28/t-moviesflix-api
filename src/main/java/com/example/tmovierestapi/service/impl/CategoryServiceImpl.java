@@ -55,6 +55,7 @@ public class CategoryServiceImpl implements ICategoryService {
             CategoryResponse categoryResponseObj = new CategoryResponse();
             categoryResponseObj.setId(c.getId());
             categoryResponseObj.setName(c.getName());
+            categoryResponseObj.setSlug(c.getSlug());
             categoryResponseObj.setCreatedDate(c.getCreatedDate());
             categoryResponseObj.setModifiedDate(c.getModifiedDate());
             Set<MovieResponse> movieResponseSet = new HashSet<>();
@@ -65,6 +66,8 @@ public class CategoryServiceImpl implements ICategoryService {
                 movieResponseObj.setYear(m.getYear());
                 movieResponseObj.setOriginName(m.getOriginName());
                 movieResponseObj.setThumbURL(m.getThumbURL());
+                movieResponseObj.setType(m.getType());
+                movieResponseObj.setSlug(m.getSlug());
 
                 movieResponseSet.add(movieResponseObj);
             }

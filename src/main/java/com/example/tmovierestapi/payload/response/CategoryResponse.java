@@ -1,7 +1,5 @@
 package com.example.tmovierestapi.payload.response;
 
-import com.example.tmovierestapi.model.Movie;
-import com.example.tmovierestapi.payload.request.MovieRequest;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -17,6 +15,8 @@ public class CategoryResponse {
     @NotBlank
     @Size(min = 2, max = 200, message = "Category name must be minimum 2 characters and maximum 200 characters")
     private String name;
+
+    private String slug;
 
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;

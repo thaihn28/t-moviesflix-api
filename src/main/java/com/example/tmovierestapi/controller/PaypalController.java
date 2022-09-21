@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
 
@@ -30,30 +31,35 @@ public class PaypalController {
 
     CustomUserDetails currentUser;
 
+    @Value("${app.frontend.url}")
+    private String frontendURL;
 
     @PostMapping("/pay")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public ResponseEntity<String> payment(@Valid @RequestParam(name = "movie-id") Long movieID) throws PayPalRESTException {
-            String processPaymentLink = paypalService.createPayment(movieID,
-                    AppConstants.PAYPAL_CURRENCY,
-                    PaypalPaymentMethod.PAYPAL.name(),
-                    PaypalPaymentIntent.SALE.name(),
-                    rootURL + AppConstants.URL_PAYPAL_CANCEL,
-                    rootURL + AppConstants.URL_PAYPAL_SUCCESS);
+    public ResponseEntity<String> payment(@Valid @RequestParam(name = "slug") String slug) throws PayPalRESTException {
+        String processPaymentLink = paypalService.createPayment(slug,
+                AppConstants.PAYPAL_CURRENCY,
+                PaypalPaymentMethod.PAYPAL.name(),
+                PaypalPaymentIntent.SALE.name(),
+                rootURL + AppConstants.URL_PAYPAL_CANCEL,
+                rootURL + AppConstants.URL_PAYPAL_SUCCESS);
         currentUser = (CustomUserDetails) AppGetLoggedIn.getLoggedIn().getPrincipal();
 
-        return new ResponseEntity<>(processPaymentLink ,HttpStatus.OK);
+        return new ResponseEntity<>(processPaymentLink, HttpStatus.OK);
     }
+
     @GetMapping(value = AppConstants.URL_PAYPAL_CANCEL)
     public String cancelPay() {
-        return "Cancel payment";
+        return "Cancel!! Payment failed...";
     }
 
     @GetMapping(value = AppConstants.URL_PAYPAL_SUCCESS)
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ResponseEntity<Payment> successPay(@Valid @RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId) throws PayPalRESTException {
-        return new ResponseEntity<>(paypalService.executePayment(paymentId, payerId, currentUser), HttpStatus.OK);
-
+    public RedirectView successPay(@Valid @RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId) throws PayPalRESTException {
+        String url = paypalService.executePayment(paymentId, payerId, currentUser);
+        RedirectView redirectView = new RedirectView();
+        redirectView.setUrl(frontendURL + url);
+        return redirectView;
     }
 
 }

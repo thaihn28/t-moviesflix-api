@@ -72,6 +72,7 @@ public class DirectorServiceImpl implements IDirectorService {
             directorResponseObj.setId(d.getId());
             directorResponseObj.setName(d.getName());
             directorResponseObj.setAvatar(d.getAvatar());
+            directorResponseObj.setSlug(d.getSlug());
             directorResponseObj.setIsHot(d.getIsHot());
             directorResponseObj.setCreatedDate(d.getCreatedDate());
             directorResponseObj.setModifiedDate(d.getModifiedDate());
@@ -84,6 +85,8 @@ public class DirectorServiceImpl implements IDirectorService {
                 movieResponseObj.setThumbURL(m.getThumbURL());
                 movieResponseObj.setYear(m.getYear());
                 movieResponseObj.setOriginName(m.getOriginName());
+                movieResponseObj.setType(m.getType());
+                movieResponseObj.setSlug(m.getSlug());
 
                 movieResponseSet.add(movieResponseObj);
             }
@@ -139,6 +142,7 @@ public class DirectorServiceImpl implements IDirectorService {
             director.setAvatar(url);
         }
         director.setName(directorRequest.getName());
+        director.setSlug(directorRequest.getSlug());
         director.setIsHot(directorRequest.getIsHot());
         director.setModifiedDate(LocalDateTime.now());
 

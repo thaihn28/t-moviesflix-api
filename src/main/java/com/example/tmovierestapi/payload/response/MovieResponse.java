@@ -9,4 +9,6 @@ public class MovieResponse {
     private String originName;
     private String thumbURL;
     private Integer year;
+    private String type;
+    private String slug;
 }

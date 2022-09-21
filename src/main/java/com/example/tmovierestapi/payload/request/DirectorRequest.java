@@ -6,7 +6,7 @@ import javax.validation.constraints.NotEmpty;
 
 @Data
 public class DirectorRequest {
-    @NotEmpty(message = "Director ID is required")
+    @NotEmpty(message = "Director ID must not be empty")
     private Long id;
 
     private String name;

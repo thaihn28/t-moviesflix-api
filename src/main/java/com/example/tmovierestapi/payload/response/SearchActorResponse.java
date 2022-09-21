@@ -6,5 +6,6 @@ import lombok.Data;
 public class SearchActorResponse {
     private Long id;
     private String name;
+    private String slug;
     private String avatar;
 }

@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+//@JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class Country {
 
     @Id

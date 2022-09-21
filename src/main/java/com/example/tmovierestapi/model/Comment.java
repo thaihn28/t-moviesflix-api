@@ -1,16 +1,19 @@
 package com.example.tmovierestapi.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+//@JsonNaming(value = PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class Comment {
 
     @Id
@@ -27,6 +30,14 @@ public class Comment {
     @Column(name = "modified_date")
     private LocalDateTime modifiedDate;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Comment comment;
+
+    @OneToMany(fetch = FetchType.LAZY,mappedBy = "comment")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Setter
+    private Set<Comment> children;
+
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private User user;
 
@@ -34,4 +45,5 @@ public class Comment {
     @EqualsAndHashCode.Exclude // không sử dụng trường này trong equals và hashcode
     @ToString.Exclude // Khoonhg sử dụng trong toString()
     private Movie movie;
+
 }

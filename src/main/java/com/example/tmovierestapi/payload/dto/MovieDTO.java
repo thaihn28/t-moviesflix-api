@@ -6,9 +6,8 @@ import com.example.tmovierestapi.payload.request.CategoryRequest;
 import com.example.tmovierestapi.payload.request.DirectorRequest;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
+import javax.persistence.Column;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,38 +16,41 @@ import java.util.Set;
 public class MovieDTO {
     private Long id;
 
-    @NotEmpty
+    @NotBlank(message = "Movie name must not be empty")
     @Size(min = 2, max = 200, message = "Movie name must be minimum 2 characters and maximum 200 characters")
     private String name;
 
-    @NotEmpty
+    @NotBlank
     @Size(min = 2, max = 200, message = "Movie origin name must be minimum 2 characters and maximum 200 characters")
     private String originName;
 
-    @NotEmpty(message = "Content should not be null or empty")
+    @NotBlank(message = "content should not be null or empty")
     private String content;
 
-    @NotBlank
+    @NotBlank(message = "type should not be null or empty")
     private String type;
 
     private String thumbURL;
 
-    @NotBlank
+    @NotBlank(message = "trailerURL should not be null or empty")
     private String trailerURL;
 
-    @NotBlank
+    @NotBlank(message = "time should not be null or empty")
     private String time;
 
-    @NotBlank
+    @NotBlank(message = "episodeCurrent should not be null or empty")
     private String episodeCurrent;
 
-    @NotBlank
+    @NotBlank(message = "episodeTotal should not be null or empty")
     private String episodeTotal;
 
-    @NotBlank
+    @NotBlank(message = "quality should not be null or empty")
     private String quality;
 
-    @NotBlank
+    @NotBlank(message = "Slug must not be empty")
+    @Pattern(message = "Alphanumeric words in slug separated by single dashes (ex: standard-slug-pattern)",
+            regexp = "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            flags = Pattern.Flag.UNICODE_CASE)
     private String slug;
 
     private String posterURL;
@@ -59,8 +61,10 @@ public class MovieDTO {
 
     private Boolean isHot;
 
+    @Column(name = "is_premium", nullable = false)
     private Boolean isPremium;
 
+    @NotNull(message = "Price must not be null")
     private Double price;
 
     private LocalDateTime createdDate;
@@ -75,9 +79,5 @@ public class MovieDTO {
     private Set<DirectorRequest> directors = new HashSet<>();
 
     private Set<CategoryRequest> categories = new HashSet<>();
-
-    private Set<Episode> episodes = new HashSet<>();
-
-    private Set<Comment> comments = new HashSet<>();
 
 }

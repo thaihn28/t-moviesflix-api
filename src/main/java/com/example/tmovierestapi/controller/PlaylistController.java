@@ -6,16 +6,20 @@ import com.example.tmovierestapi.payload.dto.PlaylistDTO;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.service.IPlaylistService;
 import com.example.tmovierestapi.utils.AppConstants;
-import org.apache.http.HttpResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.resource.HttpResource;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,9 +27,19 @@ import java.io.IOException;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/v1/playlists")
+@Tag(name = "playlist")
 public class PlaylistController {
     @Autowired
     private IPlaylistService iPlaylistService;
+
+    @Operation(description = "View all list playlists", responses = {
+            @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = Playlist.class))), responseCode = "200") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode  = "200", description = "OK"),
+            @ApiResponse(responseCode  = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode  = "403", description = "Forbidden"),
+            @ApiResponse(responseCode  = "404", description = "Not found")
+    })
 
     @GetMapping
     public ResponseEntity<PagedResponse<Playlist>> getAllPlaylists(
@@ -94,7 +108,7 @@ public class PlaylistController {
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<PlaylistDTO> addPlaylist(@RequestPart(name = "playlist") @Valid PlaylistDTO playlistDTO,
-                                                   @RequestPart(name = "thumbFile") @ValidImage MultipartFile thumbFile
+                                                   @RequestPart(name = "thumb") @ValidImage MultipartFile thumbFile
     ) throws IOException {
         if(thumbFile == null){
             throw new FileNotFoundException("Thumb file is required");
@@ -106,7 +120,7 @@ public class PlaylistController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<PlaylistDTO> updatePlaylist(@PathVariable(value = "id") Long id,
                                                       @RequestPart(name = "playlist") @Valid PlaylistDTO playlistDTO,
-                                                      @RequestPart(name = "thumbFile", required = false) @ValidImage MultipartFile thumbFile
+                                                      @RequestPart(name = "thumb", required = false) @ValidImage MultipartFile thumbFile
     ) {
         return new ResponseEntity<>(iPlaylistService.updatePlaylist(id, playlistDTO, thumbFile), HttpStatus.CREATED);
     }

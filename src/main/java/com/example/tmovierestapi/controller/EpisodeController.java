@@ -1,10 +1,19 @@
 package com.example.tmovierestapi.controller;
 
+import com.example.tmovierestapi.model.Episode;
+import com.example.tmovierestapi.model.Movie;
 import com.example.tmovierestapi.payload.dto.EpisodeDTO;
 import com.example.tmovierestapi.payload.response.EpisodeResponse;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.service.IEpisodeService;
 import com.example.tmovierestapi.utils.AppConstants;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +24,19 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/episodes")
+@Tag(name = "episode")
 public class EpisodeController {
     @Autowired
     private IEpisodeService iEpisodeService;
+
+    @Operation(description = "View all list episodes", responses = {
+            @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = Episode.class))), responseCode = "200") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode  = "200", description = "OK"),
+            @ApiResponse(responseCode  = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode  = "403", description = "Forbidden"),
+            @ApiResponse(responseCode  = "404", description = "Not found")
+    })
 
     @GetMapping
     public ResponseEntity<PagedResponse<EpisodeResponse>> getAllEpisodes(

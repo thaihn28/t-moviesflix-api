@@ -1,10 +1,19 @@
 package com.example.tmovierestapi.controller;
 
+import com.example.tmovierestapi.model.Category;
+import com.example.tmovierestapi.model.Movie;
 import com.example.tmovierestapi.payload.dto.CategoryDTO;
 import com.example.tmovierestapi.payload.response.CategoryResponse;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.service.ICategoryService;
 import com.example.tmovierestapi.utils.AppConstants;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +24,19 @@ import javax.validation.Valid;
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/api/v1/categories")
+@Tag(name = "category")
 public class CategoryController {
     @Autowired
     private ICategoryService iCategoryService;
+
+    @Operation(description = "View all list categories", responses = {
+            @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = Category.class))), responseCode = "200") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode  = "200", description = "OK"),
+            @ApiResponse(responseCode  = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode  = "403", description = "Forbidden"),
+            @ApiResponse(responseCode  = "404", description = "Not found")
+    })
 
     @GetMapping
     public ResponseEntity<PagedResponse<CategoryResponse>> getAllCategories(

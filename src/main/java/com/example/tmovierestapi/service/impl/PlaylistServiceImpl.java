@@ -9,6 +9,7 @@ import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.repository.CategoryRepository;
 import com.example.tmovierestapi.repository.CountryRepository;
 import com.example.tmovierestapi.repository.PlaylistRepository;
+import com.example.tmovierestapi.service.IFavoriteService;
 import com.example.tmovierestapi.service.IPlaylistService;
 import com.example.tmovierestapi.service.cloudinary.CloudinaryService;
 import com.example.tmovierestapi.utils.AppUtils;
@@ -52,6 +53,9 @@ public class PlaylistServiceImpl implements IPlaylistService {
     private CloudinaryService cloudinaryService;
 
     private final String PLAYLIST_HASH_KEY = "playlist";
+
+    @Autowired
+    private IFavoriteService iFavoriteService;
 
 
     @Override
@@ -170,6 +174,7 @@ public class PlaylistServiceImpl implements IPlaylistService {
     public void deletePlaylistById(Long id) {
         Playlist playlist = playlistRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Playlist", "id", id));
+        iFavoriteService.deletePlaylistInFavorite(id);
 
         playlistRepository.delete(playlist);
     }

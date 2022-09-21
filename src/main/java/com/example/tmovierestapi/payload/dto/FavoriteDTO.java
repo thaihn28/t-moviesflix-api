@@ -3,7 +3,6 @@ package com.example.tmovierestapi.payload.dto;
 import com.example.tmovierestapi.payload.response.PlaylistResponse;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;

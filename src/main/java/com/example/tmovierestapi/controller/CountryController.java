@@ -3,6 +3,13 @@ package com.example.tmovierestapi.controller;
 import com.example.tmovierestapi.model.Country;
 import com.example.tmovierestapi.payload.dto.CountryDTO;
 import com.example.tmovierestapi.service.ICountryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +21,19 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/countries")
+@Tag(name = "country")
 public class CountryController {
     @Autowired
     private ICountryService iCountryService;
+
+    @Operation(description = "View all list countries", responses = {
+            @ApiResponse(content = @Content(array = @ArraySchema(schema = @Schema(implementation = Country.class))), responseCode = "200") })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode  = "200", description = "OK"),
+            @ApiResponse(responseCode  = "401", description = "Unauthorized"),
+            @ApiResponse(responseCode  = "403", description = "Forbidden"),
+            @ApiResponse(responseCode  = "404", description = "Not found")
+    })
 
     @GetMapping
     public ResponseEntity<List<Country>> getAllCountries(){

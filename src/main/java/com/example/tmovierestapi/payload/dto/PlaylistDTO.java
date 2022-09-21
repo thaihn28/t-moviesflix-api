@@ -11,11 +11,11 @@ import java.util.Set;
 @Data
 public class PlaylistDTO {
     private Long id;
-    @NotBlank
+    @NotBlank(message = "Movie name must not be empty")
     @Size(min = 2, max = 200, message = "Movie name must be minimum 2 characters and maximum 200 characters")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "Movie origin name must not be empty")
     @Size(min = 2, max = 200, message = "Movie origin name must be minimum 2 characters and maximum 200 characters")
     private String originName;
 

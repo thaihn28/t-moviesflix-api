@@ -13,24 +13,24 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SignupRequest {
-    @NotBlank
+    @NotBlank(message = "Username must not be empty")
     @Size(min = 3, max = 20)
     private String username;
 
-    @NotBlank
+    @NotBlank(message = "Firstname must not be empty")
     @Size( max = 20)
     private String firstName;
 
-    @NotBlank
+    @NotBlank(message = "Lastname must not be empty")
     @Size( max = 20)
     private String lastName;
 
-    @NotBlank
+    @NotBlank(message = "Email must not be empty")
     @Size(max = 50)
     @Email
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "Password must not be empty")
     @Size(min = 6, max = 40)
     private String password;
 
