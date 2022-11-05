@@ -21,8 +21,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@CrossOrigin(origins = "*")
 @RequestMapping("/api/v1/categories")
 @Tag(name = "category")
 public class CategoryController {

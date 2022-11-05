@@ -59,7 +59,7 @@ public class PlaylistServiceImpl implements IPlaylistService {
 
 
     @Override
-    @Cacheable(value = "playlists", key = "#pageSize")
+    @Cacheable(value = "playlists", key = "{#pageSize, #pageNo, #sortDir, #sortBy}")
     public PagedResponse<Playlist> getAllPlaylists(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
@@ -80,7 +80,7 @@ public class PlaylistServiceImpl implements IPlaylistService {
     @CacheEvict(value = {"playlists", "hotPlaylists", "playlistsBySeries", "playlistsByCate", "playlistsByCountry", "premiumPlaylists"}
             , allEntries = true)
     @CachePut(value = PLAYLIST_HASH_KEY, key = "#result.id")
-    public PlaylistDTO addPlaylist(PlaylistDTO playlistDTO, MultipartFile thumbFile) {
+    public PlaylistDTO addPlaylist(PlaylistDTO playlistDTO, MultipartFile thumbFile, MultipartFile posterFile) {
         Boolean isExist = playlistRepository.existsPlaylistBySlug(playlistDTO.getSlug());
         if (isExist) {
             throw new APIException(HttpStatus.BAD_REQUEST, playlistDTO.getSlug() + " is already exist");
@@ -89,6 +89,9 @@ public class PlaylistServiceImpl implements IPlaylistService {
         Playlist playlistRequest = modelMapper.map(playlistDTO, Playlist.class);
         if (!thumbFile.isEmpty()) {
             playlistRequest.setThumbURL(cloudinaryService.uploadThumb(thumbFile));
+        }
+        if(!posterFile.isEmpty()){
+            playlistRequest.setPosterURL(cloudinaryService.uploadPoster(posterFile));
         }
         Set<Category> categorySet = new HashSet<>();
 

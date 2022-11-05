@@ -45,7 +45,7 @@ public class ActorServiceImpl implements IActorService {
 
 
     @Override
-    @Cacheable(value = "actors")
+    @Cacheable(value = "actors", key = "{#pageSize, #pageNo, #sortDir, #sortBy}")
     public PagedResponse<ActorResponse> getAllActors(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 

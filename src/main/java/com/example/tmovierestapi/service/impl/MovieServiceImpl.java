@@ -75,7 +75,7 @@ public class MovieServiceImpl implements IMovieService {
     private final String MOVIE_HASH_KEY = "movie";
 
     @Override
-    @Cacheable(value = "movies", key = "#pageSize")
+    @Cacheable(value = "movies", key = "{#pageSize, #pageNo, #sortDir, #sortBy}")
     public PagedResponse<Movie> getAllMovies(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
@@ -95,17 +95,18 @@ public class MovieServiceImpl implements IMovieService {
     @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector"}
             , allEntries = true)
     @CachePut(value = MOVIE_HASH_KEY, key = "#result.id")
-    public MovieDTO addMovie(MovieDTO movieDTO, MultipartFile thumbFile, MultipartFile posterFile) {
+    public MovieDTO addMovie(MovieDTO movieDTO) {
         try {
             Boolean isExist = movieRepository.existsMovieBySlug(movieDTO.getSlug());
             if (isExist) {
                 throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " slug is already exist!");
             }
 
-            Boolean isSlugExistInPlaylist = playlistRepository.existsPlaylistBySlug(movieDTO.getSlug());
-            if(!isSlugExistInPlaylist){
-                throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " is not match with slug in Playlist!");
-            }
+            Playlist isSlugExistInPlaylist = playlistRepository.findPlaylistBySlug(movieDTO.getSlug())
+                    .orElseThrow(() -> new ResourceNotFoundException("Playlist", "slug",movieDTO.getSlug()));
+//            if(!isSlugExistInPlaylist){
+//                throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " is not match with slug in Playlist!");
+//            }
 
             // Convert DTO to Entity
             Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
@@ -141,11 +142,11 @@ public class MovieServiceImpl implements IMovieService {
                 movieRequest.setPrice(movieDTO.getPrice());
             }
 
-            String thumbURL = cloudinaryService.uploadThumb(thumbFile);
-            movieRequest.setThumbURL(thumbURL);
+//            String thumbURL = cloudinaryService.uploadThumb(thumbFile);
+            movieRequest.setThumbURL(isSlugExistInPlaylist.getThumbURL());
 
-            String posterURL = cloudinaryService.uploadPoster(posterFile);
-            movieRequest.setPosterURL(posterURL);
+//            String posterURL = cloudinaryService.uploadPoster(posterFile);
+            movieRequest.setPosterURL(isSlugExistInPlaylist.getPosterURL());
 
             movieRequest.setCountry(country);
             movieRequest.setCategories(categorySet);

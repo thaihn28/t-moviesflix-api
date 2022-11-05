@@ -38,7 +38,7 @@ public class Director {
     @Column(name = "modified_date")
     private LocalDateTime modifiedDate;
 
-    @Column(name = "is_hot", columnDefinition = "boolean default true")
+    @Column(name = "is_hot")
     private Boolean isHot;
 
     @ManyToMany(mappedBy = "directors", fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST})

@@ -35,6 +35,10 @@ public class Playlist {
     private String thumbURL;
 
     @NotBlank
+    @Column(name = "poster_url")
+    private String posterURL;
+
+    @NotBlank
     private String episodeCurrent;
 
     @NotBlank

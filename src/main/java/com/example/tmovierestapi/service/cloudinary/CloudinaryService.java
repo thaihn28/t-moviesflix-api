@@ -42,7 +42,7 @@ public class CloudinaryService {
             String publicID = uploadResult.get("public_id").toString();
             String format = "." + uploadResult.get("format").toString();
             String posterURL = cloudinaryConfig.url().transformation(
-                    new Transformation().width(720).height(480).crop("fill")).generate(publicID + format);
+                    new Transformation().width(1920).height(1080).crop("fill")).generate(publicID + format);
             return posterURL;
         } catch (Exception e) {
             deleteFile(file.getOriginalFilename());

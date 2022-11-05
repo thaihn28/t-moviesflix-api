@@ -3,8 +3,10 @@ package com.example.tmovierestapi;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
 import com.example.tmovierestapi.enums.ERole;
+import com.example.tmovierestapi.model.Comment;
 import com.example.tmovierestapi.model.Role;
 import com.example.tmovierestapi.payload.request.SignupRequest;
+import com.example.tmovierestapi.repository.CommentRepository;
 import com.example.tmovierestapi.repository.RoleRepository;
 import com.example.tmovierestapi.repository.UserRepository;
 import com.example.tmovierestapi.service.IRegistrationService;
@@ -45,6 +47,9 @@ public class TMovieRestApiApplication {
     @Value("${com.cloudinary.api_secret}")
     private String apiSecret;
 
+    @Autowired
+    private CommentRepository commentRepository;
+
     @Bean
     public ModelMapper modelMapper() {
         return new ModelMapper();
@@ -74,11 +79,6 @@ public class TMovieRestApiApplication {
     @Bean
     CommandLineRunner run() {
         return args -> {
-//            try {
-//                emailSender.send("hoangthai.solem2801@gmail.com", "Thai", "GGGG");
-//            }catch (Exception e){
-//                throw new Exception(e.getMessage());
-//            }
             Boolean isExistRole = roleRepository.existsRoleByName(ERole.ADMIN);
             if(!isExistRole){
                 roleRepository.save(new Role(ERole.ADMIN));
@@ -89,7 +89,7 @@ public class TMovieRestApiApplication {
             }
             SignupRequest signupRequest = new SignupRequest();
             signupRequest.setEmail("tmovie.email@gmail.com");
-            signupRequest.setUsername("admin1");
+            signupRequest.setUsername("admin");
             signupRequest.setLastName("1");
             signupRequest.setFirstName("ADMIN");
             signupRequest.setPassword(Password.HIDDEN);

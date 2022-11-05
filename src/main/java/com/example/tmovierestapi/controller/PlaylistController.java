@@ -108,12 +108,16 @@ public class PlaylistController {
     @PostMapping("/add")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<PlaylistDTO> addPlaylist(@RequestPart(name = "playlist") @Valid PlaylistDTO playlistDTO,
-                                                   @RequestPart(name = "thumb") @ValidImage MultipartFile thumbFile
+                                                   @RequestPart(name = "thumb") @ValidImage MultipartFile thumbFile,
+                                                   @RequestPart(name = "poster") @ValidImage MultipartFile posterFile
     ) throws IOException {
         if(thumbFile == null){
             throw new FileNotFoundException("Thumb file is required");
         }
-        return new ResponseEntity<>(iPlaylistService.addPlaylist(playlistDTO, thumbFile), HttpStatus.CREATED);
+        if(posterFile == null){
+            throw new FileNotFoundException("Poster file is required");
+        }
+        return new ResponseEntity<>(iPlaylistService.addPlaylist(playlistDTO, thumbFile, posterFile), HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")

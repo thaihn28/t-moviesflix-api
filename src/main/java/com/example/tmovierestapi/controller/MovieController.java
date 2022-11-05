@@ -77,12 +77,12 @@ public class MovieController {
     )
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<MovieDTO> addMovie(@RequestPart(name = "movie") @Valid MovieDTO movieDTO,
-                                             @RequestPart(name = "thumb") @ValidImage MultipartFile thumbFile,
-                                             @RequestPart(name = "poster") @ValidImage MultipartFile posterFile
+    public ResponseEntity<MovieDTO> addMovie(@RequestPart(name = "movie") @Valid MovieDTO movieDTO
+//                                             @RequestPart(name = "thumb") @ValidImage MultipartFile thumbFile,
+//                                             @RequestPart(name = "poster") @ValidImage MultipartFile posterFile
 
     ) {
-        MovieDTO response = iMovieService.addMovie(movieDTO, thumbFile, posterFile);
+        MovieDTO response = iMovieService.addMovie(movieDTO);
         appUtils.notifyNewMovie(response);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }

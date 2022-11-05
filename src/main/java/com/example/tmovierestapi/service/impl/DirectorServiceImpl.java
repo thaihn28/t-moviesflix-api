@@ -51,7 +51,7 @@ public class DirectorServiceImpl implements IDirectorService {
     private final String DIRECTOR_HASH_KEY = "director";
 
     @Override
-    @Cacheable(value = "directors")
+    @Cacheable(value = "directors", key = "{#pageSize, #pageNo, #sortDir, #sortBy}")
     public PagedResponse<DirectorResponse> getAllDirectors(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 

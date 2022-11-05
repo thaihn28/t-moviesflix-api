@@ -72,7 +72,7 @@ public class Movie {
     @Column(name = "show_times")
     private String showTimes;
 
-    @Column(name = "is_hot",columnDefinition = "boolean default true")
+    @Column(name = "is_hot")
     private Boolean isHot;
 
     @Column(name = "is_premium", nullable = false)

@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface IPlaylistService {
     PagedResponse<Playlist> getAllPlaylists(int pageNo, int pageSize, String sortDir, String sortBy);
-    PlaylistDTO addPlaylist(PlaylistDTO playlistDTO, MultipartFile thumbFile);
+    PlaylistDTO addPlaylist(PlaylistDTO playlistDTO, MultipartFile thumbFile, MultipartFile posterFile);
     PlaylistDTO getPlaylistById(Long id);
     PlaylistDTO updatePlaylist(Long id, PlaylistDTO playlistDTO, MultipartFile thumbFile);
     void deletePlaylistById(Long id);
