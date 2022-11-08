@@ -77,7 +77,7 @@ public class MovieController {
     )
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<MovieDTO> addMovie(@RequestPart(name = "movie") @Valid MovieDTO movieDTO
+    public ResponseEntity<MovieDTO> addMovie(@RequestBody @Valid MovieDTO movieDTO
 //                                             @RequestPart(name = "thumb") @ValidImage MultipartFile thumbFile,
 //                                             @RequestPart(name = "poster") @ValidImage MultipartFile posterFile
 
