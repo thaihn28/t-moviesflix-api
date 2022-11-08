@@ -80,7 +80,7 @@ public class RegistrationService implements IRegistrationService {
         ConfirmationToken confirmationToken = new ConfirmationToken(
                 token,
                 LocalDateTime.now(),
-                LocalDateTime.now().plusMinutes(15),
+                LocalDateTime.now().plusDays(1),
                 user
         );
         confirmationTokenService.saveConfirmationToken(
