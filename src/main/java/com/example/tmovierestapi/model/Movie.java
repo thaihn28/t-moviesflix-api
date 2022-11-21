@@ -5,6 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,6 +29,7 @@ public class Movie {
     private String originName;
 
     @NotBlank
+    @Size(max = 4000, message = "Content cannot greater than 4000 letter")
     private String content;
 
     @NotBlank

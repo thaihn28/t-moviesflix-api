@@ -13,7 +13,7 @@ public class ActorDTO {
     private Long id;
 
     @NotBlank
-    @Size(min = 2, max = 200, message = "Category name must be minimum 2 characters and maximum 200 characters")
+    @Size(min = 2, max = 200, message = "Actor name must be minimum 2 characters and maximum 200 characters")
     private String name;
 
     @NotEmpty(message = "Slug must not be empty")

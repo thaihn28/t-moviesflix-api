@@ -114,7 +114,9 @@ public class MovieServiceImpl implements IMovieService {
             Country country = countryRepository.findCountryBySlug(movieDTO.getCountrySlug())
                     .orElseThrow(() -> new ResourceNotFoundException("Country", "name", movieDTO.getCountrySlug()));
 
-            Set<Category> categorySet = new HashSet<>();
+            if(movieDTO.getId() != null) movieRequest.setId(movieDTO.getId());
+
+                Set<Category> categorySet = new HashSet<>();
             Set<Director> directorSet = new HashSet<>();
             Set<Actor> actorSet = new HashSet<>();
 
