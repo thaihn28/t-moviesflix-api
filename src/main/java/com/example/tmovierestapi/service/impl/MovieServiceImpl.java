@@ -102,8 +102,8 @@ public class MovieServiceImpl implements IMovieService {
                 throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " slug is already exist!");
             }
 
-            Playlist isSlugExistInPlaylist = playlistRepository.findPlaylistBySlug(movieDTO.getSlug())
-                    .orElseThrow(() -> new ResourceNotFoundException("Playlist", "slug",movieDTO.getSlug()));
+//            Playlist isSlugExistInPlaylist = playlistRepository.findPlaylistBySlug(movieDTO.getSlug())
+//                    .orElseThrow(() -> new ResourceNotFoundException("Playlist", "slug",movieDTO.getSlug()));
 //            if(!isSlugExistInPlaylist){
 //                throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " is not match with slug in Playlist!");
 //            }
@@ -137,16 +137,17 @@ public class MovieServiceImpl implements IMovieService {
             }
 
             if (movieDTO.getIsPremium()) {
-                movieRequest.setPrice(0d);
+                movieRequest.setPrice(1d);
             } else {
                 movieRequest.setPrice(movieDTO.getPrice());
             }
 
 //            String thumbURL = cloudinaryService.uploadThumb(thumbFile);
-            movieRequest.setThumbURL(isSlugExistInPlaylist.getThumbURL());
+//            movieRequest.setThumbURL(isSlugExistInPlaylist.getThumbURL());
+            movieRequest.setThumbURL(movieDTO.getThumbURL());
 
 //            String posterURL = cloudinaryService.uploadPoster(posterFile);
-            movieRequest.setPosterURL(isSlugExistInPlaylist.getPosterURL());
+            movieRequest.setPosterURL(movieRequest.getPosterURL());
 
             movieRequest.setCountry(country);
             movieRequest.setCategories(categorySet);
@@ -159,8 +160,8 @@ public class MovieServiceImpl implements IMovieService {
             MovieDTO movieRespone = modelMapper.map(movie, MovieDTO.class);
 
             return movieRespone;
-        }catch (APIException e){
-           throw new APIException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (APIException e) {
+            throw new APIException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
 
     }
@@ -381,7 +382,7 @@ public class MovieServiceImpl implements IMovieService {
 
         List<MovieResponse> movieResponses = new ArrayList<>();
 
-        for (Movie m : contents){
+        for (Movie m : contents) {
             MovieResponse movieResponseObj = new MovieResponse();
 
             movieResponseObj.setId(m.getId());
@@ -418,7 +419,7 @@ public class MovieServiceImpl implements IMovieService {
 
         List<MovieResponse> movieResponses = new ArrayList<>();
 
-        for (Movie m : contents){
+        for (Movie m : contents) {
             MovieResponse movieResponseObj = new MovieResponse();
 
             movieResponseObj.setId(m.getId());
@@ -450,7 +451,7 @@ public class MovieServiceImpl implements IMovieService {
 
         List<MovieResponse> movieResponses = new ArrayList<>();
 
-        for (Movie m : contents){
+        for (Movie m : contents) {
             MovieResponse movieResponseObj = new MovieResponse();
 
             movieResponseObj.setId(m.getId());
@@ -484,7 +485,7 @@ public class MovieServiceImpl implements IMovieService {
 
         List<MovieResponse> movieResponses = new ArrayList<>();
 
-        for (Movie m : contents){
+        for (Movie m : contents) {
             MovieResponse movieResponseObj = new MovieResponse();
 
             movieResponseObj.setId(m.getId());
