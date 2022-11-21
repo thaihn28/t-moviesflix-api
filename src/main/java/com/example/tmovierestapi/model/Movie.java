@@ -29,7 +29,7 @@ public class Movie {
     private String originName;
 
     @NotBlank
-    @Size(max = 4000, message = "Content cannot greater than 4000 letter")
+    @Size(max = 10000, message = "Content cannot greater than 4000 letter")
     private String content;
 
     @NotBlank

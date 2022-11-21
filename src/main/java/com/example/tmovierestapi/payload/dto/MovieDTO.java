@@ -25,6 +25,7 @@ public class MovieDTO {
     private String originName;
 
     @NotBlank(message = "content should not be null or empty")
+    @Size(max = 10000, message = "Content cannot greater than 4000 letter")
     private String content;
 
     @NotBlank(message = "type should not be null or empty")
