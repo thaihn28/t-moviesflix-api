@@ -67,14 +67,14 @@ public class MovieController {
         return new ResponseEntity<>(iMovieService.getMovieBySlug(slug), HttpStatus.OK);
     }
 
-    //    @PostMapping("/add")
-    @RequestMapping(path = "/add", method = POST,
-            consumes = {
-                    MediaType.MULTIPART_FORM_DATA_VALUE,
-                    MediaType.APPLICATION_JSON_VALUE
-            }
+        @PostMapping("/add")
+//    @RequestMapping(path = "/add", method = POST,
+//            consumes = {
+//                    MediaType.MULTIPART_FORM_DATA_VALUE,
+//                    MediaType.APPLICATION_JSON_VALUE
+//            }
 //            ,produces = {MediaType.APPLICATION_JSON_VALUE}
-    )
+//    )
 
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<MovieDTO> addMovie(@RequestBody @Valid MovieDTO movieDTO
