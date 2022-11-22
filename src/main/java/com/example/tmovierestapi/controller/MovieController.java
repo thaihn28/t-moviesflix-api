@@ -97,6 +97,17 @@ public class MovieController {
         return new ResponseEntity<>(iMovieService.updateMovie(id, movieDTO, thumbFile, posterFile), HttpStatus.CREATED);
     }
 
+    @PatchMapping("/update/patch/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<MovieDTO> updatePartialMovieField(@PathVariable(value = "id") Long id,
+                                                @RequestBody @Valid MovieDTO movieDTO
+    ) {
+        return new ResponseEntity<>(iMovieService.updatePartialMovieField(id, movieDTO), HttpStatus.CREATED);
+    }
+
+
+
+
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<String> deleteMovie(@PathVariable(value = "id") Long id) {
