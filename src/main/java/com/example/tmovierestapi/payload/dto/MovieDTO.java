@@ -16,6 +16,9 @@ import java.util.Set;
 public class MovieDTO {
     private Long id;
 
+    @NotBlank(message = "IMDB ID must not be empty")
+    private Long imdbID;
+
     @NotBlank(message = "Movie name must not be empty")
     @Size(min = 2, max = 200, message = "Movie name must be minimum 2 characters and maximum 200 characters")
     private String name;

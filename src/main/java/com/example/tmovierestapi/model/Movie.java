@@ -21,6 +21,9 @@ public class Movie {
     private Long id;
 
     @NotBlank
+    private Long imdbID;
+
+    @NotBlank
     private String name;
 
     @NotBlank
