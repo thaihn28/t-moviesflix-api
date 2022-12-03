@@ -260,6 +260,67 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
+    public MovieDTO updatePartialMovieField(Long id, MovieDTO movieDTO) {
+        try {
+            Movie movie = movieRepository.findMovieById(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", id));
+            //  DTO -> Entity
+//            Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
+//
+//            movie.setName(movieRequest.getName());
+//            movie.setContent(movieRequest.getContent());
+//            movie.setType(movieRequest.getType());
+//            movie.setTrailerURL(movieRequest.getTrailerURL());
+//            movie.setTime(movieRequest.getTime());
+//            movie.setEpisodeCurrent(movieRequest.getEpisodeCurrent());
+//            movie.setEpisodeTotal(movieRequest.getEpisodeTotal());
+//            movie.setQuality(movieRequest.getQuality());
+//            movie.setSlug(movieRequest.getSlug());
+//            movie.setYear(movieRequest.getYear());
+//            movie.setShowTimes(movieRequest.getShowTimes());
+//            movie.setIsPremium(movieRequest.getIsPremium());
+//            movie.setIsHot(movieRequest.getIsHot());
+//            movie.setPrice(movieRequest.getPrice());
+//            movie.setModifiedDate(LocalDateTime.now());
+
+            Set<Category> categorySet = new HashSet<>();
+            Set<Director> directorSet = new HashSet<>();
+            Set<Actor> actorSet = new HashSet<>();
+
+            Country country = countryRepository.findCountryBySlug(movieDTO.getCountrySlug())
+                    .orElseThrow(() -> new ResourceNotFoundException("Country", "Name", movieDTO.getCountrySlug()));
+
+            for (ActorRequest a : movieDTO.getActors()) {
+                Actor actor = actorRepository.findActorById(a.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", a.getId()));
+                actorSet.add(actor);
+            }
+            for (CategoryRequest c : movieDTO.getCategories()) {
+                Category category = categoryRepository.findCategoryById(c.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Category", "id", c.getId()));
+                categorySet.add(category);
+            }
+
+            for (DirectorRequest d : movieDTO.getDirectors()) {
+                Director director = directorRepository.findDirectorById(d.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", d.getId()));
+                directorSet.add(director);
+            }
+            movie.setCountry(country);
+            movie.setCategories(categorySet);
+            movie.setActors(actorSet);
+            movie.setDirectors(directorSet);
+
+            Movie convertToDTO = movieRepository.save(movie);
+            MovieDTO movieResponse = modelMapper.map(convertToDTO, MovieDTO.class);
+
+            return movieResponse;
+        } catch (NullPointerException e) {
+            throw new NullPointerException(e.getMessage());
+        }
+    }
+
+    @Override
     @Caching(evict = {
             @CacheEvict(value = MOVIE_HASH_KEY, key = "#id"),
             @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector"}

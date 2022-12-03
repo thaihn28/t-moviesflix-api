@@ -12,6 +12,7 @@ public interface IMovieService {
     MovieDTO addMovie(MovieDTO movieDTO);
     PagedResponse<Movie> getMoviesByCategory(String slug, int pageNo, int pageSize, String sortDir, String sortBy);
     MovieDTO updateMovie(Long id, MovieDTO movieDTO, MultipartFile thumbFile, MultipartFile posterFile);
+    MovieDTO updatePartialMovieField(Long id, MovieDTO movieDTO);
     void deleteMovie(Long id);
     PaymentMovieResponse getMovieBySlug(String slug);
     PagedResponse<MovieResponse> getMoviesByActor(String slug, int pageNo, int pageSize, String sortDir, String sortBy);
