@@ -36,12 +36,6 @@ public class PaymentMovieResponse {
     private String time;
 
     @NotBlank
-    private String episodeCurrent;
-
-    @NotBlank
-    private String episodeTotal;
-
-    @NotBlank
     private String quality;
 
     @NotBlank
@@ -51,7 +45,6 @@ public class PaymentMovieResponse {
 
     private Integer year;
 
-    private String showTimes;
 
     private Boolean isHot;
 
@@ -76,7 +69,7 @@ public class PaymentMovieResponse {
 
     private Set<Comment> comments;
 
-    public PaymentMovieResponse(Long id, String name, String originName, String content, String type, String thumbURL, String trailerURL, String time, String episodeCurrent, String episodeTotal, String quality, String slug, String posterURL, Integer year, String showTimes, Boolean isHot, Boolean isPremium, Double price, LocalDateTime createdDate, LocalDateTime modifiedDate, Country country, Set<Actor> actors, Set<Director> directors, Set<Category> categories, Set<Episode> episodes, Set<Comment> comments) {
+    public PaymentMovieResponse(Long id, String name, String originName, String content, String type, String thumbURL, String trailerURL, String time, String quality, String slug, String posterURL, Integer year, Boolean isHot, Boolean isPremium, Double price, LocalDateTime createdDate, LocalDateTime modifiedDate, Country country, Set<Actor> actors, Set<Director> directors, Set<Category> categories, Set<Episode> episodes, Set<Comment> comments) {
         this.id = id;
         this.name = name;
         this.originName = originName;
@@ -85,13 +78,10 @@ public class PaymentMovieResponse {
         this.thumbURL = thumbURL;
         this.trailerURL = trailerURL;
         this.time = time;
-        this.episodeCurrent = episodeCurrent;
-        this.episodeTotal = episodeTotal;
         this.quality = quality;
         this.slug = slug;
         this.posterURL = posterURL;
         this.year = year;
-        this.showTimes = showTimes;
         this.isHot = isHot;
         this.isPremium = isPremium;
         this.price = price;

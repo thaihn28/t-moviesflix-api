@@ -93,7 +93,7 @@ public class ActorServiceImpl implements IActorService {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = {"actors", "moviesByActor", "movies"},
+            @CacheEvict(value = {"actors", "moviesByActor", "movies", "moviesByType", "hotMovies"},
                     allEntries = true)
     })
     @CachePut(value = ACTOR_HASH_KEY, key = "#result.id")
@@ -121,7 +121,34 @@ public class ActorServiceImpl implements IActorService {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = {"actors", "moviesByActor", "movies"},
+            @CacheEvict(value = {"actors", "moviesByActor", "movies", "moviesByType", "hotMovies"},
+                    allEntries = true)
+    })
+    @CachePut(value = ACTOR_HASH_KEY, key = "#result.id")
+    public ActorDTO addActor(ActorDTO actorDTO) {
+            // Convert DTO to Entity
+            Actor actor = modelMapper.map(actorDTO, Actor.class);
+
+//        Set<Movie> movieSet = new HashSet<>();
+
+//        for(MovieRequest m : actorDTO.getMovies()){
+//            Movie movie = movieRepository.findMovieById(m.getId())
+//                    .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", m.getId()));
+//            movieSet.add(movie);
+//        }
+            //        actor.setMovies(movieSet);
+            actor.setAvatar(actorDTO.getAvatar());
+            actor.setCreatedDate(LocalDateTime.now());
+            Actor actorRequest = actorRepository.save(actor);
+            // Convert Entity to DTO
+            ActorDTO actorResponse = modelMapper.map(actorRequest, ActorDTO.class);
+
+            return actorResponse;
+    }
+
+    @Override
+    @Caching(evict = {
+            @CacheEvict(value = {"actors", "moviesByActor", "movies", "moviesByType", "hotMovies"},
                     allEntries = true)
     })
     @CachePut(value = ACTOR_HASH_KEY, key = "#id")
@@ -148,8 +175,32 @@ public class ActorServiceImpl implements IActorService {
 
     @Override
     @Caching(evict = {
+            @CacheEvict(value = {"actors", "moviesByActor", "movies", "moviesByType", "hotMovies"},
+                    allEntries = true)
+    })
+    @CachePut(value = ACTOR_HASH_KEY, key = "#id")
+    public ActorDTO updateActor(Long id, ActorDTO actorDTO) {
+        Actor actor = actorRepository.findActorById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", id));
+
+        Actor actorRequest = modelMapper.map(actorDTO, Actor.class);
+
+        actor.setAvatar(actorRequest.getAvatar());
+        actor.setName(actorRequest.getName());
+        actor.setSlug(actorRequest.getSlug());
+        actor.setIsHot(actorRequest.getIsHot());
+        actor.setModifiedDate(LocalDateTime.now());
+
+        Actor actorResponse = actorRepository.save(actor);
+        ActorDTO actorDTOResponse = modelMapper.map(actorResponse, ActorDTO.class);
+
+        return actorDTOResponse;
+    }
+
+    @Override
+    @Caching(evict = {
             @CacheEvict(value = ACTOR_HASH_KEY, key = "#id"),
-            @CacheEvict(value = {"actors", "moviesByActor", "movies"},
+            @CacheEvict(value = {"actors", "moviesByActor", "movies", "moviesByType", "hotMovies"},
                     allEntries = true)
     })
     public void deleteActor(Long id) {

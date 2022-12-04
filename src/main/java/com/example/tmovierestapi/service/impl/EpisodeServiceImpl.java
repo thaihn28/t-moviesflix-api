@@ -14,6 +14,7 @@ import com.example.tmovierestapi.service.IEpisodeService;
 import com.example.tmovierestapi.utils.AppUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -87,6 +88,8 @@ public class EpisodeServiceImpl implements IEpisodeService {
     }
 
     @Override
+    @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector", "moviesByType", "hotMovies"}
+            , allEntries = true)
     public EpisodeDTO addEpisode(EpisodeDTO episodeDTO) {
         Boolean existFileName = episodeRepository.existsEpisodeByFilename(episodeDTO.getFilename());
         Boolean existLinkEmbed = episodeRepository.existsEpisodeByLinkEmbed(episodeDTO.getLinkEmbed());
@@ -121,6 +124,8 @@ public class EpisodeServiceImpl implements IEpisodeService {
     }
 
     @Override
+    @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector", "moviesByType", "hotMovies"}
+            , allEntries = true)
     public EpisodeDTO updateEpisode(Long id, EpisodeDTO episodeDTO) {
         Episode episode = episodeRepository.findEpisodeById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Episode", "ID", id));
@@ -144,6 +149,8 @@ public class EpisodeServiceImpl implements IEpisodeService {
     }
 
     @Override
+    @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector", "moviesByType", "hotMovies"}
+            , allEntries = true)
     public void deleteByID(Long id) {
         Episode episode = episodeRepository.findEpisodeById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Episode", "ID", id));

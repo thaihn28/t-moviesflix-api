@@ -81,7 +81,7 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector",
             "playlists", "hotPlaylists", "playlistsBySeries",
-            "playlistsByCate", "playlistsByCountry", "premiumPlaylists"
+            "playlistsByCate", "playlistsByCountry", "premiumPlaylists", "moviesByType", "hotMovies"
     }
             , allEntries = true)
     public CategoryDTO addCategory(CategoryDTO categoryDTO) {
@@ -112,7 +112,7 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector",
             "playlists", "hotPlaylists", "playlistsBySeries",
-            "playlistsByCate", "playlistsByCountry", "premiumPlaylists"
+            "playlistsByCate", "playlistsByCountry", "premiumPlaylists", "moviesByType", "hotMovies"
     }
             , allEntries = true)
     public CategoryDTO updateCategory(Long id, CategoryDTO categoryDTO) {
@@ -134,7 +134,7 @@ public class CategoryServiceImpl implements ICategoryService {
     @Override
     @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector",
             "playlists", "hotPlaylists", "playlistsBySeries",
-            "playlistsByCate", "playlistsByCountry", "premiumPlaylists"
+            "playlistsByCate", "playlistsByCountry", "premiumPlaylists", "moviesByType", "hotMovies"
     }
             , allEntries = true)
     public void deleteCategory(Long id) {

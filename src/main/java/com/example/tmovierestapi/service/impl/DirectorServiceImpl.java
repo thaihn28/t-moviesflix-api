@@ -101,7 +101,7 @@ public class DirectorServiceImpl implements IDirectorService {
 
     @Override
     @Caching(evict = {
-            @CacheEvict(value = {"directors", "moviesByDirector", "movies"},
+            @CacheEvict(value = {"directors", "moviesByDirector", "movies", "moviesByType", "hotMovies"},
                     allEntries = true)
     })
     @CachePut(value = DIRECTOR_HASH_KEY, key = "#result.id")
@@ -128,7 +128,34 @@ public class DirectorServiceImpl implements IDirectorService {
     }
 
     @Override
-    @CacheEvict(value = {"directors", "moviesByDirector", "movies"}
+    @Caching(evict = {
+            @CacheEvict(value = {"directors", "moviesByDirector", "movies", "moviesByType", "hotMovies"},
+                    allEntries = true)
+    })
+    @CachePut(value = DIRECTOR_HASH_KEY, key = "#result.id")
+    public DirectorDTO addDirector(DirectorDTO directorDTO) {
+        // Convert DTO to Entity
+        Director directorRequest = modelMapper.map(directorDTO, Director.class);
+        directorRequest.setCreatedDate(LocalDateTime.now());
+
+//        Set<Movie> movieSet = new HashSet<>();
+//
+//        for(MovieRequest m : directorDTO.getMovies()){
+//            Movie movie = movieRepository.findMovieById(m.getId())
+//                    .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", m.getId()));
+//            movieSet.add(movie);
+//        }
+//        directorRequest.setMovies(movieSet);
+
+        directorRequest.setAvatar(directorDTO.getAvatar());
+        Director director = directorRepository.save(directorRequest);
+
+        DirectorDTO directorResponse = modelMapper.map(director, DirectorDTO.class);
+        return directorResponse;
+    }
+
+    @Override
+    @CacheEvict(value = {"directors", "moviesByDirector", "movies", "moviesByType", "hotMovies"}
             , allEntries = true)
     @CachePut(value = DIRECTOR_HASH_KEY, key = "#id")
     public DirectorDTO updateDirector(Long id, DirectorDTO directorDTO, MultipartFile updateAvatar) {
@@ -153,9 +180,31 @@ public class DirectorServiceImpl implements IDirectorService {
     }
 
     @Override
+    @CacheEvict(value = {"directors", "moviesByDirector", "movies", "moviesByType", "hotMovies"}
+            , allEntries = true)
+    @CachePut(value = DIRECTOR_HASH_KEY, key = "#id")
+    public DirectorDTO updateDirector(Long id, DirectorDTO directorDTO) {
+        Director director = directorRepository.findDirectorById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", id));
+
+        Director directorRequest = modelMapper.map(directorDTO, Director.class);
+
+        director.setAvatar(directorRequest.getAvatar());
+        director.setName(directorRequest.getName());
+        director.setSlug(directorRequest.getSlug());
+        director.setIsHot(directorRequest.getIsHot());
+        director.setModifiedDate(LocalDateTime.now());
+
+        Director directorResponse = directorRepository.save(director);
+        DirectorDTO directorDTOResponse = modelMapper.map(directorResponse, DirectorDTO.class);
+
+        return directorDTOResponse;
+    }
+
+    @Override
     @Caching(evict = {
             @CacheEvict(value = DIRECTOR_HASH_KEY, key = "#id"),
-            @CacheEvict(value = {"directors", "moviesByDirector", "movies"}
+            @CacheEvict(value = {"directors", "moviesByDirector", "movies", "moviesByType", "hotMovies"}
                     , allEntries = true)
     })
     public void deleteDirector(Long id) {

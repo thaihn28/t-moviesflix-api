@@ -101,7 +101,6 @@ public class MovieServiceImpl implements IMovieService {
             if (isExist) {
                 throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " slug is already exist!");
             }
-
 //            Playlist isSlugExistInPlaylist = playlistRepository.findPlaylistBySlug(movieDTO.getSlug())
 //                    .orElseThrow(() -> new ResourceNotFoundException("Playlist", "slug",movieDTO.getSlug()));
 //            if(!isSlugExistInPlaylist){
@@ -165,7 +164,71 @@ public class MovieServiceImpl implements IMovieService {
         } catch (APIException e) {
             throw new APIException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
+    }
 
+    @Override
+    public MovieDTO addMovieWithUploadFile(MovieDTO movieDTO, MultipartFile thumbFile, MultipartFile posterFile) {
+        try {
+            Boolean isExist = movieRepository.existsMovieBySlug(movieDTO.getSlug());
+            if (isExist) {
+                throw new APIException(HttpStatus.BAD_REQUEST, movieDTO.getSlug() + " slug is already exist!");
+            }
+            // Convert DTO to Entity
+            Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
+
+            Country country = countryRepository.findCountryBySlug(movieDTO.getCountrySlug())
+                    .orElseThrow(() -> new ResourceNotFoundException("Country", "name", movieDTO.getCountrySlug()));
+
+            if (movieDTO.getId() != null) movieRequest.setId(movieDTO.getId());
+
+            Set<Category> categorySet = new HashSet<>();
+            Set<Director> directorSet = new HashSet<>();
+            Set<Actor> actorSet = new HashSet<>();
+
+            for (CategoryRequest c : movieDTO.getCategories()) {
+                Category category = categoryRepository.findCategoryById(c.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Category", "id", c.getId()));
+                categorySet.add(category);
+            }
+
+            for (ActorRequest a : movieDTO.getActors()) {
+                Actor actor = actorRepository.findActorById(a.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", a.getId()));
+                actorSet.add(actor);
+            }
+
+            for (DirectorRequest d : movieDTO.getDirectors()) {
+                Director director = directorRepository.findDirectorById(d.getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Director", "ID", d.getId()));
+                directorSet.add(director);
+            }
+
+            if (movieDTO.getIsPremium()) {
+                movieRequest.setPrice(1d);
+            } else {
+                movieRequest.setPrice(movieDTO.getPrice());
+            }
+
+            String thumbURL = cloudinaryService.uploadThumb(thumbFile);
+            movieRequest.setThumbURL(thumbURL);
+
+            String posterURL = cloudinaryService.uploadPoster(posterFile);
+            movieRequest.setPosterURL(posterURL);
+
+            movieRequest.setCountry(country);
+            movieRequest.setCategories(categorySet);
+            movieRequest.setCreatedDate(LocalDateTime.now());
+            movieRequest.setActors(actorSet);
+            movieRequest.setDirectors(directorSet);
+
+            Movie movie = movieRepository.save(movieRequest);
+            // Convert Entiry to DTO
+            MovieDTO movieRespone = modelMapper.map(movie, MovieDTO.class);
+
+            return movieRespone;
+        } catch (APIException e) {
+            throw new APIException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
     }
 
     @Override
@@ -211,12 +274,9 @@ public class MovieServiceImpl implements IMovieService {
             movie.setType(movieRequest.getType());
             movie.setTrailerURL(movieRequest.getTrailerURL());
             movie.setTime(movieRequest.getTime());
-            movie.setEpisodeCurrent(movieRequest.getEpisodeCurrent());
-            movie.setEpisodeTotal(movieRequest.getEpisodeTotal());
             movie.setQuality(movieRequest.getQuality());
             movie.setSlug(movieRequest.getSlug());
             movie.setYear(movieRequest.getYear());
-            movie.setShowTimes(movieRequest.getShowTimes());
             movie.setIsPremium(movieRequest.getIsPremium());
             movie.setIsHot(movieRequest.getIsHot());
             movie.setPrice(movieRequest.getPrice());
@@ -265,23 +325,20 @@ public class MovieServiceImpl implements IMovieService {
             Movie movie = movieRepository.findMovieById(id)
                     .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", id));
             //  DTO -> Entity
-//            Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
+            Movie movieRequest = modelMapper.map(movieDTO, Movie.class);
 //
-//            movie.setName(movieRequest.getName());
-//            movie.setContent(movieRequest.getContent());
-//            movie.setType(movieRequest.getType());
-//            movie.setTrailerURL(movieRequest.getTrailerURL());
-//            movie.setTime(movieRequest.getTime());
-//            movie.setEpisodeCurrent(movieRequest.getEpisodeCurrent());
-//            movie.setEpisodeTotal(movieRequest.getEpisodeTotal());
-//            movie.setQuality(movieRequest.getQuality());
-//            movie.setSlug(movieRequest.getSlug());
-//            movie.setYear(movieRequest.getYear());
-//            movie.setShowTimes(movieRequest.getShowTimes());
-//            movie.setIsPremium(movieRequest.getIsPremium());
-//            movie.setIsHot(movieRequest.getIsHot());
-//            movie.setPrice(movieRequest.getPrice());
-//            movie.setModifiedDate(LocalDateTime.now());
+            movie.setName(movieRequest.getName());
+            movie.setContent(movieRequest.getContent());
+            movie.setType(movieRequest.getType());
+            movie.setTrailerURL(movieRequest.getTrailerURL());
+            movie.setTime(movieRequest.getTime());
+            movie.setQuality(movieRequest.getQuality());
+            movie.setSlug(movieRequest.getSlug());
+            movie.setYear(movieRequest.getYear());
+            movie.setIsPremium(movieRequest.getIsPremium());
+            movie.setIsHot(movieRequest.getIsHot());
+            movie.setPrice(movieRequest.getPrice());
+            movie.setModifiedDate(LocalDateTime.now());
 
             Set<Category> categorySet = new HashSet<>();
             Set<Director> directorSet = new HashSet<>();
@@ -360,13 +417,10 @@ public class MovieServiceImpl implements IMovieService {
                 movie.getThumbURL(),
                 movie.getTrailerURL(),
                 movie.getTime(),
-                movie.getEpisodeCurrent(),
-                movie.getEpisodeTotal(),
                 movie.getQuality(),
                 movie.getSlug(),
                 movie.getPosterURL(),
                 movie.getYear(),
-                movie.getShowTimes(),
                 movie.getIsHot(),
                 movie.getIsPremium(),
                 movie.getPrice(),
@@ -398,13 +452,10 @@ public class MovieServiceImpl implements IMovieService {
                         movieInPaymentModel.getThumbURL(),
                         movieInPaymentModel.getTrailerURL(),
                         movieInPaymentModel.getTime(),
-                        movieInPaymentModel.getEpisodeCurrent(),
-                        movieInPaymentModel.getEpisodeTotal(),
                         movieInPaymentModel.getQuality(),
                         movieInPaymentModel.getSlug(),
                         movieInPaymentModel.getPosterURL(),
                         movieInPaymentModel.getYear(),
-                        movieInPaymentModel.getShowTimes(),
                         movieInPaymentModel.getIsHot(),
                         false,
                         0d,
@@ -501,6 +552,7 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
+    @Cacheable(value = "moviesByType")
     public PagedResponse<MovieResponse> getMoviesByType(String type, int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
@@ -533,6 +585,7 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
+    @Cacheable(value = "hotMovies")
     public PagedResponse<MovieResponse> getAllHotMovies(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 

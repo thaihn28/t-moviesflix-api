@@ -67,19 +67,29 @@ public class MovieController {
         return new ResponseEntity<>(iMovieService.getMovieBySlug(slug), HttpStatus.OK);
     }
 
-        @PostMapping("/add")
-//    @RequestMapping(path = "/add", method = POST,
-//            consumes = {
-//                    MediaType.MULTIPART_FORM_DATA_VALUE,
-//                    MediaType.APPLICATION_JSON_VALUE
-//            }
-//            ,produces = {MediaType.APPLICATION_JSON_VALUE}
-//    )
+    @RequestMapping(path = "/add/upload", method = POST,
+            consumes = {
+                    MediaType.MULTIPART_FORM_DATA_VALUE,
+                    MediaType.APPLICATION_JSON_VALUE
+            }
+            ,produces = {MediaType.APPLICATION_JSON_VALUE}
+    )
 
     @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<MovieDTO> addMovieWithUploadFile(@RequestPart(name = "movie") @Valid MovieDTO movieDTO,
+                                             @RequestPart(name = "thumbFile") @ValidImage MultipartFile thumbFile,
+                                             @RequestPart(name = "posterFile") @ValidImage MultipartFile posterFile
+
+    ) {
+        MovieDTO response = iMovieService.addMovieWithUploadFile(movieDTO, thumbFile, posterFile);
+        appUtils.notifyNewMovie(response);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+
+    @PostMapping("/add")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<MovieDTO> addMovie(@RequestBody @Valid MovieDTO movieDTO
-//                                             @RequestPart(name = "thumb") @ValidImage MultipartFile thumbFile,
-//                                             @RequestPart(name = "poster") @ValidImage MultipartFile posterFile
 
     ) {
         MovieDTO response = iMovieService.addMovie(movieDTO);
@@ -87,26 +97,23 @@ public class MovieController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/update/{id}/upload")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<MovieDTO> updateMovie(@PathVariable(value = "id") Long id,
+    public ResponseEntity<MovieDTO> updateMovieWithUploadFile(@PathVariable(value = "id") Long id,
                                                 @RequestPart(name = "movie") @Valid MovieDTO movieDTO,
-                                                @RequestPart(name = "thumb", required = false) @ValidImage MultipartFile thumbFile,
-                                                @RequestPart(name = "poster", required = false) @ValidImage MultipartFile posterFile
+                                                @RequestPart(name = "thumbFile", required = false) @ValidImage MultipartFile thumbFile,
+                                                @RequestPart(name = "posterFile", required = false) @ValidImage MultipartFile posterFile
     ) {
         return new ResponseEntity<>(iMovieService.updateMovie(id, movieDTO, thumbFile, posterFile), HttpStatus.CREATED);
     }
 
-    @PatchMapping("/update/patch/{id}")
+    @PutMapping("/update/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<MovieDTO> updatePartialMovieField(@PathVariable(value = "id") Long id,
+    public ResponseEntity<MovieDTO> updateMovie(@PathVariable(value = "id") Long id,
                                                 @RequestBody @Valid MovieDTO movieDTO
     ) {
         return new ResponseEntity<>(iMovieService.updatePartialMovieField(id, movieDTO), HttpStatus.CREATED);
     }
-
-
-
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")

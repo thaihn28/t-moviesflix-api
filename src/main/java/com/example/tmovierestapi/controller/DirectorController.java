@@ -56,13 +56,32 @@ public class DirectorController {
         return new ResponseEntity<>(iDirectorService.getDirectorByID(id), HttpStatus.OK);
     }
 
+    @PostMapping("/add/upload")
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<DirectorDTO> addDirectorWithUploadFile(@RequestPart(name = "director") @Valid DirectorDTO directorDTO,
+                                                   @RequestPart(name = "avatar") @Valid @ValidImage MultipartFile avatar) {
+        return new ResponseEntity<>(iDirectorService.addDirector(directorDTO, avatar), HttpStatus.CREATED);
+    }
+
     @PostMapping("/add")
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<DirectorDTO> addDirector(@RequestPart(name = "director") @Valid DirectorDTO directorDTO,
-                                                   @RequestPart(name = "avatar") @Valid @ValidImage MultipartFile avatar) {
-        return new ResponseEntity<>(iDirectorService.addDirector(directorDTO, avatar), HttpStatus.CREATED);
+    public ResponseEntity<DirectorDTO> addDirector(@RequestBody @Valid DirectorDTO directorDTO) {
+        return new ResponseEntity<>(iDirectorService.addDirector(directorDTO), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/update/{id}/upload")
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<DirectorDTO> updateDirectorWithUploadFile(@PathVariable(value = "id") Long id,
+                                                      @RequestPart(name = "director") @Valid DirectorDTO directorDTO,
+                                                      @RequestPart(name = "avatar", required = false) @ValidImage MultipartFile updateAvatar
+    ) {
+        return new ResponseEntity<>(iDirectorService.updateDirector(id, directorDTO, updateAvatar), HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
@@ -70,10 +89,9 @@ public class DirectorController {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<DirectorDTO> updateDirector(@PathVariable(value = "id") Long id,
-                                                      @RequestPart(name = "director") @Valid DirectorDTO directorDTO,
-                                                      @RequestPart(name = "avatar", required = false) @ValidImage MultipartFile updateAvatar
+                                                      @RequestBody @Valid DirectorDTO directorDTO
     ) {
-        return new ResponseEntity<>(iDirectorService.updateDirector(id, directorDTO, updateAvatar), HttpStatus.CREATED);
+        return new ResponseEntity<>(iDirectorService.updateDirector(id, directorDTO), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete/{id}")

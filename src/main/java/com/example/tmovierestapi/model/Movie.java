@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
@@ -21,7 +22,7 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @NotNull(message = "Imdb id must be greater than 0")
     private Long imdbID;
 
     @NotBlank
@@ -48,14 +49,6 @@ public class Movie {
     private String time;
 
     @NotBlank
-    @Column(name = "episode_current")
-    private String episodeCurrent;
-
-    @NotBlank
-    @Column(name = "episode_total")
-    private String episodeTotal;
-
-    @NotBlank
     private String quality;
 
     @NotBlank(message = "Slug must not empty")
@@ -73,9 +66,6 @@ public class Movie {
     @NotBlank
     @Column(name = "poster_url")
     private String posterURL;
-
-    @Column(name = "show_times")
-    private String showTimes;
 
     @Column(name = "is_hot")
     private Boolean isHot;

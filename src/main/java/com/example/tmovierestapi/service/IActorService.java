@@ -9,7 +9,10 @@ import org.springframework.web.multipart.MultipartFile;
 public interface IActorService {
     PagedResponse<ActorResponse> getAllActors(int pageNo, int pageSize, String sortDir, String sortBy);
     ActorDTO addActor(ActorDTO actorDTO, MultipartFile avatar);
+
+    ActorDTO addActor(ActorDTO actorDTO);
     ActorDTO updateActor(Long id, ActorDTO actorDTO, MultipartFile avatar);
+    ActorDTO updateActor(Long id, ActorDTO actorDTO);
     void deleteActor(Long id);
     Actor getActorByID(Long id);
 }

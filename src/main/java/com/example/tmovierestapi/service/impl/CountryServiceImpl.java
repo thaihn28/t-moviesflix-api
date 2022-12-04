@@ -36,7 +36,7 @@ public class CountryServiceImpl implements ICountryService {
     @Override
     @CacheEvict(value = {"playlists", "movies", "playlistsBySeries",
             "playlistsByCate", "playlistsByCountry", "premiumPlaylists",
-            "moviesByActor", "moviesByDirector"
+            "moviesByActor", "moviesByDirector", "moviesByType", "hotMovies"
     }
             , allEntries = true)
     public CountryDTO addCountry(CountryDTO countryDTO) {
@@ -60,7 +60,7 @@ public class CountryServiceImpl implements ICountryService {
     @Override
     @CacheEvict(value = {"playlists", "movies", "playlistsBySeries",
             "playlistsByCate", "playlistsByCountry", "premiumPlaylists",
-            "moviesByActor", "moviesByDirector"
+            "moviesByActor", "moviesByDirector", "moviesByType", "hotMovies"
     }
             , allEntries = true)
     public CountryDTO updateCountry(Long id, CountryDTO countryDTO) {
@@ -80,7 +80,7 @@ public class CountryServiceImpl implements ICountryService {
     @Override
     @CacheEvict(value = {"playlists", "movies", "playlistsBySeries",
             "playlistsByCate", "playlistsByCountry", "premiumPlaylists",
-            "moviesByActor", "moviesByDirector"
+            "moviesByActor", "moviesByDirector", "moviesByType", "hotMovies"
     }
             , allEntries = true)
     public void deleteCountry(Long id) {

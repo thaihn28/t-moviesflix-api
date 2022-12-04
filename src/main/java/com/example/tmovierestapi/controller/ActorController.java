@@ -55,13 +55,32 @@ public class ActorController {
         return new ResponseEntity<>(iActorService.getActorByID(id), HttpStatus.OK);
     }
 
+    @PostMapping("/add/upload")
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<ActorDTO> addActorWithUploadFile(@RequestPart(name = "actor") @Valid ActorDTO actorDTO,
+                                             @RequestPart(name = "avatar") @ValidImage MultipartFile avatar) {
+        return new ResponseEntity<>(iActorService.addActor(actorDTO, avatar), HttpStatus.CREATED);
+    }
+
     @PostMapping("/add")
     @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<ActorDTO> addActor(@RequestPart(name = "actor") @Valid ActorDTO actorDTO,
-                                             @RequestPart(name = "avatar") @ValidImage MultipartFile avatar) {
-        return new ResponseEntity<>(iActorService.addActor(actorDTO, avatar), HttpStatus.CREATED);
+    public ResponseEntity<ActorDTO> addActor(@RequestBody @Valid ActorDTO actorDTO) {
+        return new ResponseEntity<>(iActorService.addActor(actorDTO), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/update/{id}/upload")
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<ActorDTO> updateActorWithUploadFile(@PathVariable(value = "id") Long id,
+                                                @RequestPart(name = "actor") @Valid ActorDTO actorDTO,
+                                                @RequestPart(name = "avatar", required = false) @ValidImage MultipartFile avatar
+    ) {
+        return new ResponseEntity<>(iActorService.updateActor(id, actorDTO, avatar), HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{id}")
@@ -69,10 +88,9 @@ public class ActorController {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ActorDTO> updateActor(@PathVariable(value = "id") Long id,
-                                                @RequestPart(name = "actor") @Valid ActorDTO actorDTO,
-                                                @RequestPart(name = "avatar", required = false) @ValidImage MultipartFile avatar
+                                                @RequestBody ActorDTO actorDTO
     ) {
-        return new ResponseEntity<>(iActorService.updateActor(id, actorDTO, avatar), HttpStatus.CREATED);
+        return new ResponseEntity<>(iActorService.updateActor(id, actorDTO), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete/{id}")

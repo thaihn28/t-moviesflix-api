@@ -1,6 +1,5 @@
 package com.example.tmovierestapi.payload.dto;
 
-import com.example.tmovierestapi.model.*;
 import com.example.tmovierestapi.payload.request.ActorRequest;
 import com.example.tmovierestapi.payload.request.CategoryRequest;
 import com.example.tmovierestapi.payload.request.DirectorRequest;
@@ -16,7 +15,7 @@ import java.util.Set;
 public class MovieDTO {
     private Long id;
 
-    @NotBlank(message = "IMDB ID must not be empty")
+    @NotNull(message = "Imdb id must be greater than 0")
     private Long imdbID;
 
     @NotBlank(message = "Movie name must not be empty")
@@ -39,16 +38,8 @@ public class MovieDTO {
     @NotBlank(message = "trailerURL should not be null or empty")
     private String trailerURL;
 
-    @NotBlank(message = "time should not be null or empty")
     private String time;
 
-    @NotBlank(message = "episodeCurrent should not be null or empty")
-    private String episodeCurrent;
-
-    @NotBlank(message = "episodeTotal should not be null or empty")
-    private String episodeTotal;
-
-    @NotBlank(message = "quality should not be null or empty")
     private String quality;
 
     @NotBlank(message = "Slug must not be empty")
@@ -60,8 +51,6 @@ public class MovieDTO {
     private String posterURL;
 
     private Integer year;
-
-    private String showTimes;
 
     private Boolean isHot;
 
