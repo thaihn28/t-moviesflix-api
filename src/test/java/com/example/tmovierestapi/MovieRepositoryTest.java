@@ -48,8 +48,6 @@ public class MovieRepositoryTest {
         movieDTO.setThumbURL("Thumb");
         movieDTO.setTrailerURL("trailer");
         movieDTO.setTime("Time");
-        movieDTO.setEpisodeCurrent("Tap hien tai");
-        movieDTO.setEpisodeTotal("Tong tap");
         movieDTO.setQuality("HD");
         movieDTO.setSlug("la-em");
         movieDTO.setPosterURL("Poster");
