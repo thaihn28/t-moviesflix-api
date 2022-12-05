@@ -92,7 +92,7 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
-    @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector"}
+    @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector", "moviesByType", "hotMovies"}
             , allEntries = true)
     @CachePut(value = MOVIE_HASH_KEY, key = "#result.id")
     public MovieDTO addMovie(MovieDTO movieDTO) {
@@ -167,6 +167,9 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
+    @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector", "moviesByType", "hotMovies"}
+            , allEntries = true)
+    @CachePut(value = MOVIE_HASH_KEY, key = "#result.id")
     public MovieDTO addMovieWithUploadFile(MovieDTO movieDTO, MultipartFile thumbFile, MultipartFile posterFile) {
         try {
             Boolean isExist = movieRepository.existsMovieBySlug(movieDTO.getSlug());
@@ -252,7 +255,7 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
-    @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector"}
+    @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector", "moviesByType", "hotMovies"}
             , allEntries = true)
     @CachePut(value = MOVIE_HASH_KEY, key = "#id")
     public MovieDTO updateMovie(Long id, MovieDTO movieDTO, MultipartFile thumbFile, MultipartFile posterFile) {
@@ -320,6 +323,11 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = MOVIE_HASH_KEY, key = "#id"),
+            @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector", "moviesByType", "hotMovies"}
+                    , allEntries = true)
+    })
     public MovieDTO updatePartialMovieField(Long id, MovieDTO movieDTO) {
         try {
             Movie movie = movieRepository.findMovieById(id)
@@ -380,7 +388,7 @@ public class MovieServiceImpl implements IMovieService {
     @Override
     @Caching(evict = {
             @CacheEvict(value = MOVIE_HASH_KEY, key = "#id"),
-            @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector"}
+            @CacheEvict(value = {"movies", "moviesByActor", "moviesByDirector", "moviesByType", "hotMovies"}
                     , allEntries = true)
     })
     public void deleteMovie(Long id) {
@@ -410,6 +418,7 @@ public class MovieServiceImpl implements IMovieService {
 
         PaymentMovieResponse movieResponse = new PaymentMovieResponse(
                 movie.getId(),
+                movie.getImdbID(),
                 movie.getName(),
                 movie.getOriginName(),
                 movie.getContent(),
@@ -445,6 +454,7 @@ public class MovieServiceImpl implements IMovieService {
 
                 PaymentMovieResponse paymentMovieResponse = new PaymentMovieResponse(
                         movieInPaymentModel.getId(),
+                        movieInPaymentModel.getImdbID(),
                         movieInPaymentModel.getName(),
                         movieInPaymentModel.getOriginName(),
                         movieInPaymentModel.getContent(),
@@ -537,6 +547,7 @@ public class MovieServiceImpl implements IMovieService {
             MovieResponse movieResponseObj = new MovieResponse();
 
             movieResponseObj.setId(m.getId());
+            movieResponseObj.setImdbID(m.getImdbID());
             movieResponseObj.setName(m.getName());
             movieResponseObj.setOriginName(m.getOriginName());
             movieResponseObj.setThumbURL(m.getThumbURL());

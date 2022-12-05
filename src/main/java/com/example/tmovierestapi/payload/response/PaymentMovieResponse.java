@@ -13,6 +13,8 @@ import java.util.Set;
 public class PaymentMovieResponse {
     private Long id;
 
+    private Long imdbID;
+
     @NotEmpty
     @Size(min = 2, max = 200, message = "Movie name must be minimum 2 characters and maximum 200 characters")
     private String name;
@@ -69,8 +71,9 @@ public class PaymentMovieResponse {
 
     private Set<Comment> comments;
 
-    public PaymentMovieResponse(Long id, String name, String originName, String content, String type, String thumbURL, String trailerURL, String time, String quality, String slug, String posterURL, Integer year, Boolean isHot, Boolean isPremium, Double price, LocalDateTime createdDate, LocalDateTime modifiedDate, Country country, Set<Actor> actors, Set<Director> directors, Set<Category> categories, Set<Episode> episodes, Set<Comment> comments) {
+    public PaymentMovieResponse(Long id, Long imdbID, String name, String originName, String content, String type, String thumbURL, String trailerURL, String time, String quality, String slug, String posterURL, Integer year, Boolean isHot, Boolean isPremium, Double price, LocalDateTime createdDate, LocalDateTime modifiedDate, Country country, Set<Actor> actors, Set<Director> directors, Set<Category> categories, Set<Episode> episodes, Set<Comment> comments) {
         this.id = id;
+        this.imdbID = imdbID;
         this.name = name;
         this.originName = originName;
         this.content = content;

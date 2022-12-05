@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class MovieResponse {
     private Long id;
+    private Long imdbID;
     private String name;
     private String originName;
     private String thumbURL;
