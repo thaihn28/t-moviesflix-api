@@ -9,7 +9,12 @@ public class MovieResponse {
     private String name;
     private String originName;
     private String thumbURL;
+    private String posterURL;
+    private String trailerURL;
     private Integer year;
     private String type;
     private String slug;
+    private Boolean isHot;
+    private Boolean isPremium;
+    private Double price;
 }

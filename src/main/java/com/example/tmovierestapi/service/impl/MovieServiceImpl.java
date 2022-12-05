@@ -510,12 +510,18 @@ public class MovieServiceImpl implements IMovieService {
             MovieResponse movieResponseObj = new MovieResponse();
 
             movieResponseObj.setId(m.getId());
+            movieResponseObj.setImdbID(m.getImdbID());
             movieResponseObj.setName(m.getName());
             movieResponseObj.setOriginName(m.getOriginName());
             movieResponseObj.setThumbURL(m.getThumbURL());
+            movieResponseObj.setPosterURL(m.getPosterURL());
+            movieResponseObj.setTrailerURL(m.getTrailerURL());
             movieResponseObj.setYear(m.getYear());
             movieResponseObj.setType(m.getType());
             movieResponseObj.setSlug(m.getSlug());
+            movieResponseObj.setIsHot(m.getIsHot());
+            movieResponseObj.setIsPremium(m.getIsPremium());
+            movieResponseObj.setPrice(m.getPrice());
 
             movieResponses.add(movieResponseObj);
         }
@@ -551,9 +557,14 @@ public class MovieServiceImpl implements IMovieService {
             movieResponseObj.setName(m.getName());
             movieResponseObj.setOriginName(m.getOriginName());
             movieResponseObj.setThumbURL(m.getThumbURL());
+            movieResponseObj.setPosterURL(m.getPosterURL());
+            movieResponseObj.setTrailerURL(m.getTrailerURL());
             movieResponseObj.setYear(m.getYear());
             movieResponseObj.setType(m.getType());
             movieResponseObj.setSlug(m.getSlug());
+            movieResponseObj.setIsHot(m.getIsHot());
+            movieResponseObj.setIsPremium(m.getIsPremium());
+            movieResponseObj.setPrice(m.getPrice());
 
             movieResponses.add(movieResponseObj);
         }
@@ -581,12 +592,18 @@ public class MovieServiceImpl implements IMovieService {
             MovieResponse movieResponseObj = new MovieResponse();
 
             movieResponseObj.setId(m.getId());
+            movieResponseObj.setImdbID(m.getImdbID());
             movieResponseObj.setName(m.getName());
             movieResponseObj.setOriginName(m.getOriginName());
             movieResponseObj.setThumbURL(m.getThumbURL());
+            movieResponseObj.setPosterURL(m.getPosterURL());
+            movieResponseObj.setTrailerURL(m.getTrailerURL());
             movieResponseObj.setYear(m.getYear());
             movieResponseObj.setType(m.getType());
             movieResponseObj.setSlug(m.getSlug());
+            movieResponseObj.setIsHot(m.getIsHot());
+            movieResponseObj.setIsPremium(m.getIsPremium());
+            movieResponseObj.setPrice(m.getPrice());
 
             movieResponses.add(movieResponseObj);
         }
@@ -616,12 +633,18 @@ public class MovieServiceImpl implements IMovieService {
             MovieResponse movieResponseObj = new MovieResponse();
 
             movieResponseObj.setId(m.getId());
+            movieResponseObj.setImdbID(m.getImdbID());
             movieResponseObj.setName(m.getName());
             movieResponseObj.setOriginName(m.getOriginName());
             movieResponseObj.setThumbURL(m.getThumbURL());
+            movieResponseObj.setPosterURL(m.getPosterURL());
+            movieResponseObj.setTrailerURL(m.getTrailerURL());
             movieResponseObj.setYear(m.getYear());
             movieResponseObj.setType(m.getType());
             movieResponseObj.setSlug(m.getSlug());
+            movieResponseObj.setIsHot(m.getIsHot());
+            movieResponseObj.setIsPremium(m.getIsPremium());
+            movieResponseObj.setPrice(m.getPrice());
 
             movieResponses.add(movieResponseObj);
         }
