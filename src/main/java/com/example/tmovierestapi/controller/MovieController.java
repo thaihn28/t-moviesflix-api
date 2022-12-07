@@ -28,6 +28,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 
 
+import java.util.Set;
+
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -122,14 +124,14 @@ public class MovieController {
         return new ResponseEntity<>("Deleted movie with ID-" + id + " successfully!", HttpStatus.OK);
     }
 
-    @GetMapping("/filter-by-category/{slug}")
-    public ResponseEntity<PagedResponse<Movie>> getMoviesByCategory(@PathVariable(value = "slug") String slug,
+    @GetMapping("/filter-by-category")
+    public ResponseEntity<PagedResponse<Movie>> getMoviesByCategory(@RequestParam(value = "slug") Set<String> slugs,
                                                                     @RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
                                                                     @RequestParam(value = "pageSize", required = false, defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int pageSize,
                                                                     @RequestParam(value = "sortBy", defaultValue = AppConstants.SORT_BY_NAME, required = false) String sortBy,
                                                                     @RequestParam(value = "sortDir", defaultValue = AppConstants.SORT_DIRECTION) String sortDir
     ) {
-        return new ResponseEntity<>(iMovieService.getMoviesByCategory(slug, pageNo, pageSize, sortDir, sortBy), HttpStatus.OK);
+        return new ResponseEntity<>(iMovieService.getMoviesByCategory(slugs, pageNo, pageSize, sortDir, sortBy), HttpStatus.OK);
     }
 
     @GetMapping("/filter-by-actor/{slug}")

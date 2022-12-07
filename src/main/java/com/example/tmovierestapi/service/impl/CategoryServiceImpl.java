@@ -62,12 +62,18 @@ public class CategoryServiceImpl implements ICategoryService {
             for (Movie m : c.getMovies()) {
                 MovieResponse movieResponseObj = new MovieResponse();
                 movieResponseObj.setId(m.getId());
+                movieResponseObj.setImdbID(m.getImdbID());
                 movieResponseObj.setName(m.getName());
                 movieResponseObj.setYear(m.getYear());
                 movieResponseObj.setOriginName(m.getOriginName());
                 movieResponseObj.setThumbURL(m.getThumbURL());
+                movieResponseObj.setPosterURL(m.getPosterURL());
+                movieResponseObj.setTrailerURL(m.getTrailerURL());
                 movieResponseObj.setType(m.getType());
                 movieResponseObj.setSlug(m.getSlug());
+                movieResponseObj.setIsHot(m.getIsHot());
+                movieResponseObj.setIsPremium(m.getIsPremium());
+                movieResponseObj.setPrice(m.getPrice());
 
                 movieResponseSet.add(movieResponseObj);
             }

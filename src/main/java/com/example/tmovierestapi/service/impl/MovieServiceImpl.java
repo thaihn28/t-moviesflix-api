@@ -235,23 +235,33 @@ public class MovieServiceImpl implements IMovieService {
     }
 
     @Override
-    public PagedResponse<Movie> getMoviesByCategory(String slug, int pageNo, int pageSize, String sortDir, String sortBy) {
+    public PagedResponse<Movie> getMoviesByCategory(Set<String> slugs, int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
 
         Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name())
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
 
-        Category category = categoryRepository.findCategoryBySlug(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Category", "slug", slug));
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        Page<Movie> movieResponse = movieRepository.findMoviesByCategories(category, pageable);
+        Set<Category> categories = new HashSet<>();
 
-        List<Movie> contents = movieResponse.getTotalElements() == 0 ? Collections.emptyList() : movieResponse.getContent();
+        for(String s : slugs){
+            Category category = categoryRepository.findCategoryBySlug(s)
+                    .orElseThrow(() -> new ResourceNotFoundException("Category", "slug", s));
+            categories.add(category);
+        }
 
-        return new PagedResponse<>(contents, movieResponse.getNumber(), movieResponse.getSize(),
-                movieResponse.getTotalElements(), movieResponse.getTotalPages(), movieResponse.isLast());
+        Page<Movie> movieResponse = movieRepository.findMoviesByCategoriesIn(categories, pageable);
+
+        Set<Movie> sourceSet = movieResponse.getTotalElements() == 0 ? Collections.emptySet() : new HashSet<>(movieResponse.getContent());
+
+        List<Movie> contents = new ArrayList<>(sourceSet);
+
+        PagedResponse res = new PagedResponse<>(contents, movieResponse.getNumber(), movieResponse.getSize(),
+                contents.size(), movieResponse.getTotalPages(), movieResponse.isLast());
+
+        return res;
     }
 
     @Override
