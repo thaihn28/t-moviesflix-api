@@ -36,8 +36,8 @@ public class PaypalController {
 
     @PostMapping("/pay")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-    public ResponseEntity<String> payment(@Valid @RequestParam(name = "slug") String slug) throws PayPalRESTException {
-        String processPaymentLink = paypalService.createPayment(slug,
+    public ResponseEntity<Payment> payment(@Valid @RequestParam(name = "slug") String slug) throws PayPalRESTException {
+        Payment processPayment = paypalService.createPayment(slug,
                 AppConstants.PAYPAL_CURRENCY,
                 PaypalPaymentMethod.PAYPAL.name(),
                 PaypalPaymentIntent.SALE.name(),
@@ -45,7 +45,7 @@ public class PaypalController {
                 rootURL + AppConstants.URL_PAYPAL_SUCCESS);
         currentUser = (CustomUserDetails) AppGetLoggedIn.getLoggedIn().getPrincipal();
 
-        return new ResponseEntity<>(processPaymentLink, HttpStatus.OK);
+        return new ResponseEntity<>(processPayment, HttpStatus.OK);
     }
 
     @GetMapping(value = AppConstants.URL_PAYPAL_CANCEL)

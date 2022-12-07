@@ -30,7 +30,7 @@ public class PaypalService {
     private PaymentService paymentService;
 
 
-    public String createPayment(
+    public Payment createPayment(
             String slug,
             String currency,
             String method,
@@ -62,13 +62,7 @@ public class PaypalService {
 
             Payment paymentResponse = payment.create(apiContext);
 
-//            System.out.println(paymentResponse.toJSON());
-
-            for (Links link : paymentResponse.getLinks()) {
-                if (link.getRel().equals("approval_url"))
-                    return link.getHref();
-            }
-            return null;
+            return paymentResponse;
         } catch (PayPalRESTException e) {
             throw new PayPalRESTException(e.getMessage());
         }
