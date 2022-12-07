@@ -123,7 +123,7 @@ public class PaymentService implements IPaymentService {
 
             paymentRepository.save(paymentModel);
         }
-        String url = "movie/detail" + movie.getSlug();
+        String url = "movie/detail/" + movie.getSlug();
 
         return url;
     }
