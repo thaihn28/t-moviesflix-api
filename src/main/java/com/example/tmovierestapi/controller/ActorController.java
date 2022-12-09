@@ -50,9 +50,9 @@ public class ActorController {
         return new ResponseEntity<>(iActorService.getAllActors(pageNo, pageSize, sortDir, sortBy), HttpStatus.OK);
     }
 
-    @GetMapping("/detail/{id}")
-    public ResponseEntity<Actor> getActorByID(@PathVariable(value = "id") Long id) {
-        return new ResponseEntity<>(iActorService.getActorByID(id), HttpStatus.OK);
+    @GetMapping("/detail/{slug}")
+    public ResponseEntity<Actor> getActorByID(@PathVariable(value = "slug") String slug) {
+        return new ResponseEntity<>(iActorService.getActorBySlug(slug), HttpStatus.OK);
     }
 
     @PostMapping("/add/upload")

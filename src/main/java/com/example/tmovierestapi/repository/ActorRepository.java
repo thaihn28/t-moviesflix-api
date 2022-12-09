@@ -11,6 +11,7 @@ import java.util.Optional;
 @Repository
 public interface ActorRepository extends JpaRepository<Actor, Long> {
     Optional<Actor> findActorById(Long id);
+    Optional<Actor> findActorBySlug(String slug);
     Boolean existsActorBySlug(String slug);
     Optional<Actor> findActorsBySlug(String slug);
 

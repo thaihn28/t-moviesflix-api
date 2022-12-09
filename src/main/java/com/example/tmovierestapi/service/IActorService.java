@@ -14,5 +14,5 @@ public interface IActorService {
     ActorDTO updateActor(Long id, ActorDTO actorDTO, MultipartFile avatar);
     ActorDTO updateActor(Long id, ActorDTO actorDTO);
     void deleteActor(Long id);
-    Actor getActorByID(Long id);
+    Actor getActorBySlug(String slug);
 }

@@ -219,10 +219,9 @@ public class ActorServiceImpl implements IActorService {
     }
 
     @Override
-    @Cacheable(value = ACTOR_HASH_KEY, key = "#id")
-    public Actor getActorByID(Long id) {
-        Actor actor = actorRepository.findActorById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Actor", "ID", id));
+    public Actor getActorBySlug(String slug) {
+        Actor actor = actorRepository.findActorBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Actor", "slug", slug));
         return actor;
     }
 }
