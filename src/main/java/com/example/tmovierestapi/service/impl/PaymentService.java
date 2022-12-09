@@ -12,6 +12,7 @@ import com.example.tmovierestapi.repository.MovieRepository;
 import com.example.tmovierestapi.repository.PaymentRepository;
 import com.example.tmovierestapi.repository.UserRepository;
 import com.example.tmovierestapi.service.IPaymentService;
+import com.example.tmovierestapi.utils.AppGetLoggedIn;
 import com.example.tmovierestapi.utils.AppUtils;
 import com.paypal.api.payments.Amount;
 import com.paypal.api.payments.Payer;
@@ -23,6 +24,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,7 +60,15 @@ public class PaymentService implements IPaymentService {
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, sort);
 
-        Page<PaymentModel> paymentResponse = paymentRepository.findAll(pageable);
+        Authentication authentication = AppGetLoggedIn.getLoggedIn();
+        User user = null;
+        if (!(authentication instanceof AnonymousAuthenticationToken)) {
+            String currentUserName = authentication.getName();
+            user = userRepository.findByUsername(currentUserName)
+                    .orElseThrow(() -> new UsernameNotFoundException("User " + currentUserName + " is not found!"));
+            
+        }
+        Page<PaymentModel> paymentResponse = paymentRepository.findAllByUser(user, pageable);
 
         List<PaymentModel> contents = paymentResponse.getTotalElements() == 0 ? Collections.emptyList() : paymentResponse.getContent();
 
@@ -71,14 +83,39 @@ public class PaymentService implements IPaymentService {
             p.setCurrency(p.getCurrency());
             p.setPaymentMethod(p.getPaymentMethod());
 
-            User user = p.getUser();
             UserDTO userResponse = new UserDTO();
             userResponse.setId(user.getId());
             userResponse.setEmail(user.getEmail());
             userResponse.setFullName(user.fullName());
             userResponse.setUsername(user.getUsername());
 
-            PaymentMovieResponse movieResponse = modelMapper.map(p.getMovie(), PaymentMovieResponse.class);
+            Movie m = p.getMovie();
+            PaymentMovieResponse movieResponse = new PaymentMovieResponse(
+                    m.getId(),
+                    m.getImdbID(),
+                    m.getName(),
+                    m.getOriginName(),
+                    m.getContent(),
+                    m.getType(),
+                    m.getThumbURL(),
+                    m.getTrailerURL(),
+                    m.getTime(),
+                    m.getQuality(),
+                    m.getSlug(),
+                    m.getPosterURL(),
+                    m.getYear(),
+                    m.getIsHot(),
+                    false,
+                    0d,
+                    m.getCreatedDate(),
+                    m.getModifiedDate(),
+                    m.getCountry(),
+                    m.getActors(),
+                    m.getDirectors(),
+                    m.getCategories(),
+                    m.getEpisodes(),
+                    m.getComments()
+            );
             movieResponse.setIsPremium(false);
             movieResponse.setPrice(0d);
             response.setMovie(movieResponse);

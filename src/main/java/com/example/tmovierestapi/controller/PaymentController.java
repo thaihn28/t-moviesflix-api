@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -34,6 +35,7 @@ public class PaymentController {
             @ApiResponse(responseCode  = "404", description = "Not found")
     })
 
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     @GetMapping()
     public ResponseEntity<PagedResponse<PaymentModelResponse>> getAllPayments(
             @RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
