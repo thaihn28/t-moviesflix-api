@@ -11,7 +11,12 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SearchResultsResponse {
-    Set<SearchMovieResponse> movies = new HashSet<>();
-    Set<SearchActorResponse> actors = new HashSet<>();
-    Set<SearchDirectorResponse> directors = new HashSet<>();
+    private Set<SearchMovieResponse> movies = new HashSet<>();
+    private Set<SearchActorResponse> actors = new HashSet<>();
+    private Set<SearchDirectorResponse> directors = new HashSet<>();
+    private int page;
+    private int size;
+    private long totalElements;
+    private int totalPages;
+    private boolean last;
 }

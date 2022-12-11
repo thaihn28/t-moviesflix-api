@@ -96,6 +96,13 @@ public class SearchServiceImpl implements ISearchService {
             }
             resultsResponse.setDirectors(searchDirectorResponseSet);
         }
+
+        resultsResponse.setPage(moviesPage.getNumber());
+        resultsResponse.setSize(moviesPage.getSize());
+        resultsResponse.setTotalElements(moviesPage.getTotalElements());
+        resultsResponse.setTotalPages(moviesPage.getTotalPages());
+        resultsResponse.setLast(moviesPage.isLast());
+
         return resultsResponse;
     }
 }

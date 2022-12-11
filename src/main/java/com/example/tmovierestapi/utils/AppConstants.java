@@ -3,7 +3,7 @@ package com.example.tmovierestapi.utils;
 import java.util.regex.Pattern;
 
 public class AppConstants {
-    public static final String MAX_PAGE_SIZE = "20";
+    public static final String MAX_PAGE_SIZE = "25";
     public static final String DEFAULT_PAGE_NUMBER = "0";
     public static final String DEFAULT_PAGE_SIZE = "10";
     public static final String SORT_BY_YEAR = "year";
