@@ -18,7 +18,6 @@ import com.paypal.api.payments.Amount;
 import com.paypal.api.payments.Payer;
 import com.paypal.api.payments.Payment;
 import com.paypal.api.payments.Transaction;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,9 +46,6 @@ public class PaymentService implements IPaymentService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
-
     @Override
     public PagedResponse<PaymentModelResponse> getAllPayments(int pageNo, int pageSize, String sortDir, String sortBy) {
         AppUtils.validatePageNumberAndSize(pageNo, pageSize);
@@ -66,14 +62,14 @@ public class PaymentService implements IPaymentService {
             String currentUserName = authentication.getName();
             user = userRepository.findByUsername(currentUserName)
                     .orElseThrow(() -> new UsernameNotFoundException("User " + currentUserName + " is not found!"));
-            
+
         }
         Page<PaymentModel> paymentResponse = paymentRepository.findAllByUser(user, pageable);
 
         List<PaymentModel> contents = paymentResponse.getTotalElements() == 0 ? Collections.emptyList() : paymentResponse.getContent();
 
         List<PaymentModelResponse> paymentModelResponses = new ArrayList<>();
-        for (PaymentModel p : contents){
+        for (PaymentModel p : contents) {
             PaymentModelResponse response = new PaymentModelResponse();
 
             response.setId(p.getId());
@@ -130,45 +126,44 @@ public class PaymentService implements IPaymentService {
     @Override
     public String addPayment(Payment payment) {
         PaymentModel paymentModel = new PaymentModel();
-        Movie movie = null;
 
-        for (Transaction transaction : payment.getTransactions()) {
-            Long movieID = Long.valueOf(transaction.getDescription());
-            movie = movieRepository.findMovieById(movieID)
-                    .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", movieID));
+        Transaction transaction = payment.getTransactions().get(0);
 
-            String payerEmail = payment.getPayer().getPayerInfo().getEmail();
-            User user = userRepository.findUserByEmail(payerEmail)
-                    .orElseThrow(() -> new ResourceNotFoundException("User", "email", payerEmail));
+        Long movieID = Long.valueOf(transaction.getDescription());
+        Movie movie = movieRepository.findMovieById(movieID)
+                .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", movieID));
 
-            paymentModel.setMovie(movie);
-            paymentModel.setUser(user);
+        paymentModel.setMovie(movie);
 
-            Payer payer = payment.getPayer();
+        String payerEmail = payment.getPayer().getPayerInfo().getEmail();
+        User user = userRepository.findUserByEmail(payerEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", payerEmail));
 
-            paymentModel.setPaymentMethod(payer.getPaymentMethod());
-            paymentModel.setStatus(payment.getState());
-            paymentModel.setAddress(payer
-                    .getPayerInfo()
-                    .getShippingAddress()
-                    .getCity()
-            );
-            Amount amount = transaction.getAmount();
-            paymentModel.setPrice(Double.parseDouble(amount.getTotal()));
-            paymentModel.setCurrency(amount.getCurrency());
-            paymentModel.setCreatedAt(LocalDateTime.now());
+        paymentModel.setUser(user);
 
-            paymentRepository.save(paymentModel);
-        }
-        String url = "movie/detail/" + movie.getSlug();
+        Payer payer = payment.getPayer();
 
-        return url;
+        paymentModel.setPaymentMethod(payer.getPaymentMethod());
+        paymentModel.setStatus(payment.getState());
+        paymentModel.setAddress(payer
+                .getPayerInfo()
+                .getShippingAddress()
+                .getCity()
+        );
+        Amount amount = transaction.getAmount();
+        paymentModel.setPrice(Double.parseDouble(amount.getTotal()));
+        paymentModel.setCurrency(amount.getCurrency());
+        paymentModel.setCreatedAt(LocalDateTime.now());
+
+        paymentRepository.save(paymentModel);
+
+        return "movie/detail/" + movie.getSlug();
     }
 
     @Override
     public void deletePayment(Movie movie) {
         List<PaymentModel> paymentModels = paymentRepository.findPaymentsModelByMovie(movie)
-                        .orElseThrow(() -> new ResourceNotFoundException("List payment", "movie-" + movie.getName(), " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("List payment", "movie-" + movie.getName(), " not found"));
 
         paymentRepository.deleteAll(paymentModels);
     }

@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -29,44 +28,6 @@ public class PaypalService {
 
     @Autowired
     private PaymentService paymentService;
-
-
-//    public Payment createPayment(
-//            Double total,
-//            String currency,
-//            String method,
-//            String intent,
-//            String cancelUrl,
-//            String successUrl) throws PayPalRESTException {
-
-//            Amount amount = new Amount();
-//            amount.setCurrency(currency);
-//            amount.setTotal(String.format("%.2f", total));
-//
-//            Transaction transaction = new Transaction();
-//            transaction.setAmount(amount);
-////            transaction.setPurchaseUnitReferenceId(movie.getId().toString());
-//            transactions.add(transaction);
-//
-//            Payer payer = new Payer();
-//            payer.setPaymentMethod(method);
-//
-//            Payment payment = new Payment();
-//            payment.setIntent(intent);
-//            payment.setPayer(payer);
-//            payment.setTransactions(transactions);
-//            RedirectUrls redirectUrls = new RedirectUrls();
-//            redirectUrls.setCancelUrl(cancelUrl);
-//            redirectUrls.setReturnUrl(successUrl);
-//            payment.setRedirectUrls(redirectUrls);
-//
-//            return payment.create(apiContext);
-////        catch (PayPalRESTException e) {
-////            throw new PayPalRESTException(e.getMessage());
-////        }
-//    }
-
-
 
     public Payment createPayment(
             String slug,
@@ -89,6 +50,7 @@ public class PaypalService {
 
         List<Transaction> transactions = new ArrayList<>();
         transactions.add(transaction);
+        transactionCopied.add(transaction);
 
         Payer payer = new Payer();
         payer.setPaymentMethod(method.toString());
@@ -107,7 +69,6 @@ public class PaypalService {
 
     public String executePayment(String paymentId, String payerId, CustomUserDetails currentUser) throws PayPalRESTException {
             StringBuilder content = new StringBuilder();
-            String response = "";
 
             Payment payment = new Payment();
             payment.setId(paymentId);
@@ -117,24 +78,14 @@ public class PaypalService {
             paymentExecute.setPayerId(payerId);
 
             Payment paymentResponse = payment.execute(apiContext, paymentExecute);
-//            paymentResponse.getTransactions().stream().filter(item -> item.getPurchaseUnitReferenceId() != null)
-//                    .collect(Collectors.toList());
             paymentResponse.getPayer().getPayerInfo().setEmail(currentUser.getEmail());
-//            paymentResponse.setTransactions(payment.getTransactions());
+            paymentResponse.setTransactions(payment.getTransactions());
 
             if (paymentResponse.getState().equals("approved")) {
-                response = paymentService.addPayment(paymentResponse);
+                String response = paymentService.addPayment(paymentResponse);
                 content.append(response);
             }
             return content.toString();
     }
-
-//    public Payment executePayment(String paymentId, String payerId) throws PayPalRESTException {
-//        Payment payment = new Payment();
-//        payment.setId(paymentId);
-//        PaymentExecution paymentExecute = new PaymentExecution();
-//        paymentExecute.setPayerId(payerId);
-//        return payment.execute(apiContext, paymentExecute);
-//    }
 
 }
