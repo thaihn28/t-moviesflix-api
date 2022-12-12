@@ -127,7 +127,8 @@ public class PaymentService implements IPaymentService {
     public String addPayment(Payment payment) {
         PaymentModel paymentModel = new PaymentModel();
 
-        Transaction transaction = payment.getTransactions().get(0);
+        int size = payment.getTransactions().size();
+        Transaction transaction = payment.getTransactions().get(size - 1);
 
         Long movieID = Long.valueOf(transaction.getDescription());
         Movie movie = movieRepository.findMovieById(movieID)

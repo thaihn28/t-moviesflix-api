@@ -22,7 +22,7 @@ public class PaypalService {
     @Autowired
     private APIContext apiContext;
 
-    private List<Transaction> transactionCopied = new ArrayList<>();
+    private List<Transaction> transactionCopied;
     @Autowired
     private MovieRepository movieRepository;
 
@@ -50,7 +50,7 @@ public class PaypalService {
 
         List<Transaction> transactions = new ArrayList<>();
         transactions.add(transaction);
-        transactionCopied.add(transaction);
+        transactionCopied = new ArrayList<>(transactions);
 
         Payer payer = new Payer();
         payer.setPaymentMethod(method.toString());
