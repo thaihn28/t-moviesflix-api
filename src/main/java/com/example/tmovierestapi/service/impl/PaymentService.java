@@ -133,7 +133,7 @@ public class PaymentService implements IPaymentService {
         Movie movie = null;
 
         for (Transaction transaction : payment.getTransactions()) {
-            Long movieID = Long.valueOf(transaction.getPurchaseUnitReferenceId());
+            Long movieID = Long.valueOf(transaction.getDescription());
             movie = movieRepository.findMovieById(movieID)
                     .orElseThrow(() -> new ResourceNotFoundException("Movie", "ID", movieID));
 
