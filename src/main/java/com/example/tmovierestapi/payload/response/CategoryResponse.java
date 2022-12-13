@@ -21,5 +21,5 @@ public class CategoryResponse {
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-    private Set<MovieResponse> movies = new HashSet<>();
+    private Set<MovieResponseInOtherModel> movies = new HashSet<>();
 }

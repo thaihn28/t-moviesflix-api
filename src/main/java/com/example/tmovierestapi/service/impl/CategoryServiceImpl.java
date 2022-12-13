@@ -8,6 +8,7 @@ import com.example.tmovierestapi.model.Playlist;
 import com.example.tmovierestapi.payload.dto.CategoryDTO;
 import com.example.tmovierestapi.payload.response.CategoryResponse;
 import com.example.tmovierestapi.payload.response.MovieResponse;
+import com.example.tmovierestapi.payload.response.MovieResponseInOtherModel;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.repository.CategoryRepository;
 import com.example.tmovierestapi.service.ICategoryService;
@@ -58,22 +59,22 @@ public class CategoryServiceImpl implements ICategoryService {
             categoryResponseObj.setSlug(c.getSlug());
             categoryResponseObj.setCreatedDate(c.getCreatedDate());
             categoryResponseObj.setModifiedDate(c.getModifiedDate());
-            Set<MovieResponse> movieResponseSet = new HashSet<>();
+            Set<MovieResponseInOtherModel> movieResponseSet = new HashSet<>();
             for (Movie m : c.getMovies()) {
-                MovieResponse movieResponseObj = new MovieResponse();
+                MovieResponseInOtherModel movieResponseObj = new MovieResponseInOtherModel();
                 movieResponseObj.setId(m.getId());
                 movieResponseObj.setImdbID(m.getImdbID());
                 movieResponseObj.setName(m.getName());
-                movieResponseObj.setYear(m.getYear());
-                movieResponseObj.setOriginName(m.getOriginName());
-                movieResponseObj.setThumbURL(m.getThumbURL());
-                movieResponseObj.setPosterURL(m.getPosterURL());
-                movieResponseObj.setTrailerURL(m.getTrailerURL());
-                movieResponseObj.setType(m.getType());
-                movieResponseObj.setSlug(m.getSlug());
-                movieResponseObj.setIsHot(m.getIsHot());
-                movieResponseObj.setIsPremium(m.getIsPremium());
-                movieResponseObj.setPrice(m.getPrice());
+//                movieResponseObj.setYear(m.getYear());
+//                movieResponseObj.setOriginName(m.getOriginName());
+//                movieResponseObj.setThumbURL(m.getThumbURL());
+//                movieResponseObj.setPosterURL(m.getPosterURL());
+//                movieResponseObj.setTrailerURL(m.getTrailerURL());
+//                movieResponseObj.setType(m.getType());
+//                movieResponseObj.setSlug(m.getSlug());
+//                movieResponseObj.setIsHot(m.getIsHot());
+//                movieResponseObj.setIsPremium(m.getIsPremium());
+//                movieResponseObj.setPrice(m.getPrice());
 
                 movieResponseSet.add(movieResponseObj);
             }

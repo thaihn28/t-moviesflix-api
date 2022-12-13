@@ -15,5 +15,5 @@ public class DirectorResponse {
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
     private Boolean isHot;
-    private Set<MovieResponse> movies = new HashSet<>();
+    private Set<MovieResponseInOtherModel> movies = new HashSet<>();
 }

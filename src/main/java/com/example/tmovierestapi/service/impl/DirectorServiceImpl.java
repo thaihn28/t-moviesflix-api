@@ -8,10 +8,7 @@ import com.example.tmovierestapi.model.Movie;
 import com.example.tmovierestapi.payload.dto.ActorDTO;
 import com.example.tmovierestapi.payload.dto.DirectorDTO;
 import com.example.tmovierestapi.payload.request.MovieRequest;
-import com.example.tmovierestapi.payload.response.ActorResponse;
-import com.example.tmovierestapi.payload.response.DirectorResponse;
-import com.example.tmovierestapi.payload.response.MovieResponse;
-import com.example.tmovierestapi.payload.response.PagedResponse;
+import com.example.tmovierestapi.payload.response.*;
 import com.example.tmovierestapi.repository.DirectorRepository;
 import com.example.tmovierestapi.repository.MovieRepository;
 import com.example.tmovierestapi.service.IDirectorService;
@@ -77,22 +74,22 @@ public class DirectorServiceImpl implements IDirectorService {
             directorResponseObj.setCreatedDate(d.getCreatedDate());
             directorResponseObj.setModifiedDate(d.getModifiedDate());
 
-            Set<MovieResponse> movieResponseSet = new HashSet<>();
+            Set<MovieResponseInOtherModel> movieResponseSet = new HashSet<>();
             for(Movie m : d.getMovies()){
-                MovieResponse movieResponseObj = new MovieResponse();
+                MovieResponseInOtherModel movieResponseObj = new MovieResponseInOtherModel();
                 movieResponseObj.setId(m.getId());
                 movieResponseObj.setImdbID(m.getImdbID());
                 movieResponseObj.setName(m.getName());
-                movieResponseObj.setYear(m.getYear());
-                movieResponseObj.setOriginName(m.getOriginName());
-                movieResponseObj.setThumbURL(m.getThumbURL());
-                movieResponseObj.setPosterURL(m.getPosterURL());
-                movieResponseObj.setTrailerURL(m.getTrailerURL());
-                movieResponseObj.setType(m.getType());
-                movieResponseObj.setSlug(m.getSlug());
-                movieResponseObj.setIsHot(m.getIsHot());
-                movieResponseObj.setIsPremium(m.getIsPremium());
-                movieResponseObj.setPrice(m.getPrice());
+//                movieResponseObj.setYear(m.getYear());
+//                movieResponseObj.setOriginName(m.getOriginName());
+//                movieResponseObj.setThumbURL(m.getThumbURL());
+//                movieResponseObj.setPosterURL(m.getPosterURL());
+//                movieResponseObj.setTrailerURL(m.getTrailerURL());
+//                movieResponseObj.setType(m.getType());
+//                movieResponseObj.setSlug(m.getSlug());
+//                movieResponseObj.setIsHot(m.getIsHot());
+//                movieResponseObj.setIsPremium(m.getIsPremium());
+//                movieResponseObj.setPrice(m.getPrice());
 
                 movieResponseSet.add(movieResponseObj);
             }
