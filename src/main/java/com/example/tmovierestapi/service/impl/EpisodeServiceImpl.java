@@ -7,6 +7,7 @@ import com.example.tmovierestapi.model.Movie;
 import com.example.tmovierestapi.payload.dto.EpisodeDTO;
 import com.example.tmovierestapi.payload.response.EpisodeResponse;
 import com.example.tmovierestapi.payload.response.MovieResponse;
+import com.example.tmovierestapi.payload.response.MovieResponseInOtherModel;
 import com.example.tmovierestapi.payload.response.PagedResponse;
 import com.example.tmovierestapi.repository.EpisodeRepository;
 import com.example.tmovierestapi.repository.MovieRepository;
@@ -67,7 +68,7 @@ public class EpisodeServiceImpl implements IEpisodeService {
 
             Movie movieObj = e.getMovie();
 
-            MovieResponse movieResponseObj = new MovieResponse();
+            MovieResponseInOtherModel movieResponseObj = new MovieResponseInOtherModel();
 
             movieResponseObj.setId(movieObj.getId());
             movieResponseObj.setImdbID(movieObj.getImdbID());

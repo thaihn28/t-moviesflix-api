@@ -15,7 +15,7 @@ public class EpisodeResponse {
 
     private String linkEmbed;
 
-    private MovieResponse movie;
+    private MovieResponseInOtherModel movie;
 
     private LocalDateTime createdDate;
 
