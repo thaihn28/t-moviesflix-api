@@ -40,6 +40,7 @@ public class EpisodeController {
     })
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<PagedResponse<EpisodeResponse>> getAllEpisodes(
             @RequestParam(value = "pageNo", required = false, defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int pageNo,
             @RequestParam(value = "pageSize", required = false, defaultValue = "5") int pageSize,
