@@ -62,7 +62,7 @@ public class CommentController {
 
     @PostMapping("/add")
     @PreAuthorize("hasAnyAuthority('USER', 'ADMIN')")
-    @ExceptionHandler(Exception.class)
+//    @ExceptionHandler(Exception.class)
     public ResponseEntity<CommentDTO> addComment(
             @RequestBody CommentDTO commentDTO,
             @RequestParam(name = "movie") Long movieId,

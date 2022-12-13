@@ -57,7 +57,7 @@ public class DirectorController {
     }
 
     @PostMapping("/add/upload")
-    @ExceptionHandler(Exception.class)
+//    @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<DirectorDTO> addDirectorWithUploadFile(@RequestPart(name = "director") @Valid DirectorDTO directorDTO,
@@ -66,7 +66,7 @@ public class DirectorController {
     }
 
     @PostMapping("/add")
-    @ExceptionHandler(Exception.class)
+//    @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<DirectorDTO> addDirector(@RequestBody @Valid DirectorDTO directorDTO) {
@@ -74,7 +74,7 @@ public class DirectorController {
     }
 
     @PutMapping("/update/{id}/upload")
-    @ExceptionHandler(Exception.class)
+//    @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<DirectorDTO> updateDirectorWithUploadFile(@PathVariable(value = "id") Long id,
@@ -85,7 +85,7 @@ public class DirectorController {
     }
 
     @PutMapping("/update/{id}")
-    @ExceptionHandler(Exception.class)
+//    @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<DirectorDTO> updateDirector(@PathVariable(value = "id") Long id,

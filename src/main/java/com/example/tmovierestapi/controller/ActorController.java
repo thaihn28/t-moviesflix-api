@@ -56,7 +56,6 @@ public class ActorController {
     }
 
     @PostMapping("/add/upload")
-    @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ActorDTO> addActorWithUploadFile(@RequestPart(name = "actor") @Valid ActorDTO actorDTO,
@@ -65,7 +64,6 @@ public class ActorController {
     }
 
     @PostMapping("/add")
-    @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ActorDTO> addActor(@RequestBody @Valid ActorDTO actorDTO) {
@@ -73,7 +71,6 @@ public class ActorController {
     }
 
     @PutMapping("/update/{id}/upload")
-    @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ActorDTO> updateActorWithUploadFile(@PathVariable(value = "id") Long id,
@@ -84,7 +81,6 @@ public class ActorController {
     }
 
     @PutMapping("/update/{id}")
-    @ExceptionHandler(Exception.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ActorDTO> updateActor(@PathVariable(value = "id") Long id,
